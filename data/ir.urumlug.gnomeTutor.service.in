@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=ir.urumlug.gnomeTutor
+Exec=@bindir@/ir.urumlug.gnomeTutor --gapplication-service
