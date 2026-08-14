@@ -1,10 +1,11 @@
 [Desktop Entry]
 Name=Linux Academy
+Comment=Learn Linux through real GUI apps and a real terminal
 Exec=ir.urumlug.gnomeTutor
 Icon=ir.urumlug.gnomeTutor
 Terminal=false
 Type=Application
-Categories=Utility;
-Keywords=GTK;
+Categories=Education;Utility;
+Keywords=linux;learn;terminal;gnome;education;
 StartupNotify=true
 DBusActivatable=true

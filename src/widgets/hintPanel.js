@@ -28,6 +28,7 @@ export const HintPanel = GObject.registerClass({
         this._button = new Gtk.Button({
             label: _('Need a hint?'),
             css_classes: ['flat'],
+            can_focus: true,
         });
         this._button.connect('clicked', () => this._revealNext());
         this._buttonBox.append(this._button);
@@ -38,6 +39,7 @@ export const HintPanel = GObject.registerClass({
             visible: false,
             valign: Gtk.Align.CENTER,
         });
+        this._badge.update_property(Gtk.AccessibleProperty.LABEL, _('Hint available'));
         this._buttonBox.append(this._badge);
         this.append(this._buttonBox);
 
@@ -52,6 +54,7 @@ export const HintPanel = GObject.registerClass({
             css_classes: ['flat', 'dim-label'],
             halign: Gtk.Align.START,
             visible: false,
+            can_focus: true,
         });
         this._moreLink.connect('clicked', () => this._revealNext());
         this.append(this._moreLink);
@@ -81,8 +84,13 @@ export const HintPanel = GObject.registerClass({
             return;
         this._badgeTimeout = GLib.timeout_add(GLib.PRIORITY_DEFAULT, delayMs, () => {
             this._badgeTimeout = 0;
-            if (this._revealed < this._hints.length)
+            if (this._revealed < this._hints.length) {
                 this._badge.visible = true;
+                this._button.update_property(
+                    Gtk.AccessibleProperty.DESCRIPTION,
+                    _('A hint is available for this step'),
+                );
+            }
             return GLib.SOURCE_REMOVE;
         });
     }
@@ -108,6 +116,10 @@ export const HintPanel = GObject.registerClass({
             halign: Gtk.Align.START,
             css_classes: ['dim-label'],
         }));
+        this._button.update_property(
+            Gtk.AccessibleProperty.DESCRIPTION,
+            _('Hint %d of %d revealed').format(this._revealed, this._hints.length),
+        );
         this.emit('hint-revealed');
 
         if (this._revealed >= this._hints.length) {

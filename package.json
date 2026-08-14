@@ -1,0 +1,11 @@
+{
+  "name": "gnome-tutor",
+  "private": true,
+  "scripts": {
+    "lint": "eslint src extension tools --ext .js",
+    "lint:fix": "npm run lint -- --fix"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  }
+}

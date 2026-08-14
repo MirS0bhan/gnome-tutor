@@ -3,10 +3,6 @@
     "runtime" : "org.gnome.Platform",
     "runtime-version" : "50",
     "sdk" : "org.gnome.Sdk",
-    "sdk-extensions" : [
-        "org.freedesktop.Sdk.Extension.node20",
-        "org.freedesktop.Sdk.Extension.typescript"
-    ],
     "command" : "ir.urumlug.gnomeTutor",
     "finish-args" : [
         "--share=network",
@@ -18,9 +14,6 @@
         "--talk-name=org.freedesktop.FileManager1",
         "--talk-name=systems.misano.LinuxAcademy.Spotlight"
     ],
-    "build-options" : {
-        "append-path" : "/usr/lib/sdk/typescript/bin:/usr/lib/sdk/node20/bin"
-    },
     "cleanup" : [
         "/include",
         "/lib/pkgconfig",
@@ -34,16 +27,17 @@
     ],
     "modules" : [
         {
-            "name" : "fast_float",
-            "buildsystem" : "cmake-ninja",
+            "name" : "bubblewrap",
+            "buildsystem" : "meson",
             "config-opts" : [
-                "-DFASTFLOAT_INSTALL=ON"
+                "-Dtests=false",
+                "-Dzidmap=false"
             ],
             "sources" : [
                 {
                     "type" : "git",
-                    "url" : "https://github.com/fastfloat/fast_float.git",
-                    "tag" : "v6.1.6"
+                    "url" : "https://github.com/containers/bubblewrap.git",
+                    "tag" : "v0.10.0"
                 }
             ]
         },
@@ -54,13 +48,10 @@
                 "-Dgtk3=false",
                 "-Dgtk4=true",
                 "-Ddocs=false",
-                "-Da11y=false",
+                "-Da11y=true",
                 "-Dvapi=false",
                 "--libdir=lib"
             ],
-            "build-options" : {
-                "network" : true
-            },
             "sources" : [
                 {
                     "type" : "git",
@@ -75,8 +66,8 @@
             "buildsystem" : "meson",
             "sources" : [
                 {
-                    "type" : "git",
-                    "url" : "file:///home/misano/Projects"
+                    "type" : "dir",
+                    "path" : "."
                 }
             ]
         }

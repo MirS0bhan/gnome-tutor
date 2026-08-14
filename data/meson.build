@@ -28,6 +28,11 @@ install_data('ir.urumlug.gnomeTutor.gschema.xml',
   install_dir: get_option('datadir') / 'glib-2.0' / 'schemas'
 )
 
+install_data(
+  'dbus/systems.misano.LinuxAcademy.Spotlight.xml',
+  install_dir: get_option('datadir') / meson.project_name() / 'dbus',
+)
+
 compile_schemas = find_program('glib-compile-schemas', required: false, disabler: true)
 test('Validate schema file',
      compile_schemas,

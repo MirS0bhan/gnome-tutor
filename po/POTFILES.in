@@ -1,7 +1,21 @@
 # List of source files containing translatable strings.
 # Please keep this file sorted alphabetically.
 data/ir.urumlug.gnomeTutor.desktop.in
-data/ir.urumlug.gnomeTutor.metainfo.xml.in
 data/ir.urumlug.gnomeTutor.gschema.xml
+data/ir.urumlug.gnomeTutor.metainfo.xml.in
+src/engine/journeyHelpers.js
+src/engine/localeUtils.js
 src/main.js
+src/widgets/bridgeBeatView.js
+src/widgets/contrastBeatView.js
+src/widgets/curriculumSidebar.js
+src/widgets/guiBeatView.js
+src/widgets/hintPanel.js
+src/widgets/instructionCardWindow.js
+src/widgets/journeyStack.js
+src/widgets/practiceBeatView.js
+src/widgets/preferencesWindow.js
+src/widgets/stepView.js
+src/widgets/terminalBeat.js
+src/widgets/tourBeatView.js
 src/window.js

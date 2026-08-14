@@ -7,8 +7,11 @@
 
 import Gio from 'gi://Gio';
 
-const BUS_NAME = 'systems.misano.LinuxAcademy.Spotlight';
-const OBJECT_PATH = '/systems/misano/LinuxAcademy/Spotlight';
+import {
+    SPOTLIGHT_BUS_NAME,
+    SPOTLIGHT_IFACE_NAME,
+    SPOTLIGHT_OBJECT_PATH,
+} from './spotlightDBus.js';
 
 export class SpotlightClient {
     constructor() {
@@ -27,9 +30,9 @@ export class SpotlightClient {
                 Gio.bus_get_sync(Gio.BusType.SESSION, null),
                 Gio.DBusProxyFlags.NONE,
                 null,
-                BUS_NAME,
-                OBJECT_PATH,
-                'systems.misano.LinuxAcademy.Spotlight',
+                SPOTLIGHT_BUS_NAME,
+                SPOTLIGHT_OBJECT_PATH,
+                SPOTLIGHT_IFACE_NAME,
                 null,
             );
             this._available = this._proxy.get_name_owner() !== null;

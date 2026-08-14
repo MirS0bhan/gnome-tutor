@@ -7,8 +7,10 @@
  */
 
 function stripQuotes(value) {
-    if ((value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'")))
+    const dq = '"';
+    const sq = '\'';
+    if ((value.startsWith(dq) && value.endsWith(dq)) ||
+        (value.startsWith(sq) && value.endsWith(sq)))
         return value.slice(1, -1);
     return value;
 }

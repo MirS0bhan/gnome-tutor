@@ -77,6 +77,14 @@ export const TerminalBeat = GObject.registerClass({
             title: _('This step installs real software on your actual computer. There\'s no reset button for this one.'),
             revealed: false,
         });
+        this._realSystemBanner.connect('notify::revealed', () => {
+            if (this._realSystemBanner.revealed) {
+                this._realSystemBanner.update_property(
+                    Gtk.AccessibleProperty.LABEL,
+                    this._realSystemBanner.title,
+                );
+            }
+        });
         this.append(this._realSystemBanner);
 
         this._instruction = new Gtk.Label({
@@ -84,6 +92,10 @@ export const TerminalBeat = GObject.registerClass({
             halign: Gtk.Align.START,
             css_classes: ['title-4'],
         });
+        this._instruction.update_property(
+            Gtk.AccessibleProperty.DESCRIPTION,
+            _('Step instructions'),
+        );
         this.append(this._instruction);
 
         this._sandboxLabel = new Gtk.Label({
@@ -99,16 +111,25 @@ export const TerminalBeat = GObject.registerClass({
             hexpand: true,
             margin_top: 6,
         });
+        this._terminal.update_property(Gtk.AccessibleProperty.LABEL, _('Practice terminal'));
         this._terminal.set_size_request(-1, 280);
         this._terminal.connect('contents-changed', () => this._checkSentinel());
         this.append(this._terminal);
 
         const toolbar = new Gtk.Box({ spacing: 6 });
         this._resetButton = new Gtk.Button({ label: _('Reset step') });
+        this._resetButton.update_property(
+            Gtk.AccessibleProperty.DESCRIPTION,
+            _('Restore the practice folder to its original state'),
+        );
         this._resetButton.connect('clicked', () => this.emit('reset-requested'));
         toolbar.append(this._resetButton);
 
         this._skipButton = new Gtk.Button({ label: _('Skip validation') });
+        this._skipButton.update_property(
+            Gtk.AccessibleProperty.DESCRIPTION,
+            _('Mark this step complete without checking your command'),
+        );
         this._skipButton.connect('clicked', () => this.emit('validated'));
         toolbar.append(this._skipButton);
         this.append(toolbar);
@@ -139,6 +160,14 @@ export const TerminalBeat = GObject.registerClass({
         } else if (sandboxPath) {
             this._sandboxLabel.label = _('Practice folder (not your real files): %s').format(sandboxPath);
             this._sandboxLabel.visible = true;
+            this._sandboxLabel.update_property(
+                Gtk.AccessibleProperty.DESCRIPTION,
+                _('Files here are copies for learning; your real home folder is not used.'),
+            );
+            this._terminal.update_property(
+                Gtk.AccessibleProperty.DESCRIPTION,
+                this._sandboxLabel.label,
+            );
         } else {
             this._sandboxLabel.visible = false;
         }
@@ -161,9 +190,7 @@ export const TerminalBeat = GObject.registerClass({
     _shouldUseBwrap() {
         if (this._step?.sandbox === false)
             return false;
-        if (GLib.getenv('GNOME_TUTOR_USE_BWRAP') !== '1')
-            return false;
-        if (GLib.file_test('/.flatpak-info', GLib.FileTest.EXISTS))
+        if (GLib.getenv('GNOME_TUTOR_USE_BWRAP') === '0')
             return false;
         return GLib.find_program_in_path('bwrap') !== null;
     }

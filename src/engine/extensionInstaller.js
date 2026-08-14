@@ -66,6 +66,30 @@ export class ExtensionInstaller {
             );
         }
 
+        const dbusPaths = [
+            GLib.build_filenamev([sourceDir, 'dbus']),
+            GLib.build_filenamev([sourceDir, '..', 'data', 'dbus']),
+        ];
+        for (const dbusPath of dbusPaths) {
+            const dbusSource = Gio.File.new_for_path(dbusPath);
+            if (!dbusSource.query_exists(null))
+                continue;
+            const dbusDest = dest.get_child('dbus');
+            dbusDest.make_directory_with_parents(null);
+            const enumerator = dbusSource.enumerate_children('standard::name', Gio.FileQueryInfoFlags.NONE, null);
+            let info;
+            while ((info = enumerator.next_file(null))) {
+                const fileName = info.get_name();
+                dbusSource.get_child(fileName).copy(
+                    dbusDest.get_child(fileName),
+                    Gio.FileCopyFlags.OVERWRITE,
+                    null,
+                    null,
+                );
+            }
+            break;
+        }
+
         let enabled = false;
         try {
             const proc = Gio.Subprocess.new(

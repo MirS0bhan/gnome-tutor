@@ -9,35 +9,19 @@ import Meta from 'gi://Meta';
 import St from 'gi://St';
 
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
+import {Extension as ShellExtension} from 'resource:///org/gnome/shell/extensions/extension.js';
 
-const BUS_NAME = 'systems.misano.LinuxAcademy.Spotlight';
-const OBJECT_PATH = '/systems/misano/LinuxAcademy/Spotlight';
+// Keep in sync with data/dbus/systems.misano.LinuxAcademy.Spotlight.xml
+const SPOTLIGHT_BUS_NAME = 'systems.misano.LinuxAcademy.Spotlight';
+const SPOTLIGHT_OBJECT_PATH = '/systems/misano/LinuxAcademy/Spotlight';
 
-const SpotlightIface = `
-<node>
-  <interface name="systems.misano.LinuxAcademy.Spotlight">
-    <method name="Highlight">
-      <arg type="i" name="x" direction="in"/>
-      <arg type="i" name="y" direction="in"/>
-      <arg type="i" name="w" direction="in"/>
-      <arg type="i" name="h" direction="in"/>
-      <arg type="s" name="label" direction="in"/>
-    </method>
-    <method name="HighlightWindow">
-      <arg type="s" name="wm_class" direction="in"/>
-      <arg type="s" name="label" direction="in"/>
-      <arg type="b" name="found" direction="out"/>
-    </method>
-    <method name="UpdateLabel">
-      <arg type="s" name="label" direction="in"/>
-    </method>
-    <method name="Clear">
-    </method>
-    <method name="IsOverviewOpen">
-      <arg type="b" name="open" direction="out"/>
-    </method>
-  </interface>
-</node>`;
+function loadExtensionInterfaceXml() {
+    const xmlFile = ShellExtension.dir
+        .get_child('dbus')
+        .get_child('systems.misano.LinuxAcademy.Spotlight.xml');
+    const [, contents] = xmlFile.load_contents(null);
+    return new TextDecoder().decode(contents);
+}
 
 export default class Extension {
     enable() {
@@ -54,12 +38,12 @@ export default class Extension {
             IsOverviewOpen: () => Main.overview.visible,
         };
 
-        this._dbus = Gio.DBusExportedObject.wrapJSObject(SpotlightIface, this._impl);
+        this._dbus = Gio.DBusExportedObject.wrapJSObject(loadExtensionInterfaceXml(), this._impl);
         this._ownerId = Gio.bus_own_name(
             Gio.BusType.SESSION,
-            BUS_NAME,
+            SPOTLIGHT_BUS_NAME,
             Gio.BusNameOwnerFlags.ALLOW_REPLACEMENT,
-            connection => this._dbus.export(connection, OBJECT_PATH),
+            connection => this._dbus.export(connection, SPOTLIGHT_OBJECT_PATH),
             () => {},
             () => {},
         );

@@ -2,5 +2,6 @@
 <gresources>
   <gresource prefix="/ir/urumlug/gnomeTutor">
     <file preprocess="xml-stripblanks">gtk/help-overlay.ui</file>
+    <file alias="dbus/systems.misano.LinuxAcademy.Spotlight.xml">../data/dbus/systems.misano.LinuxAcademy.Spotlight.xml</file>
   </gresource>
 </gresources>
