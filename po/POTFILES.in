@@ -3,6 +3,7 @@
 data/ir.urumlug.gnomeTutor.desktop.in
 data/ir.urumlug.gnomeTutor.gschema.xml
 data/ir.urumlug.gnomeTutor.metainfo.xml.in
+src/engine/a11yUtils.js
 src/engine/journeyHelpers.js
 src/engine/localeUtils.js
 src/main.js

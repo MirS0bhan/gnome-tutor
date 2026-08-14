@@ -7,6 +7,8 @@ import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
 import Adw from 'gi://Adw';
 
+import { setAccessibleDescription, setAccessibleLabel } from '../engine/a11yUtils.js';
+
 export const CurriculumSidebar = GObject.registerClass({
     GTypeName: 'CurriculumSidebar',
     Signals: {
@@ -41,7 +43,7 @@ export const CurriculumSidebar = GObject.registerClass({
             selection_mode: Gtk.SelectionMode.SINGLE,
             css_classes: ['navigation-sidebar'],
         });
-        this._list.update_property(Gtk.AccessibleProperty.LABEL, _('Curriculum tracks'));
+        setAccessibleLabel(this._list, _('Curriculum tracks'));
         this._list.connect('row-selected', (_box, row) => {
             if (!row?.track)
                 return;
@@ -160,8 +162,8 @@ export const CurriculumSidebar = GObject.registerClass({
                 valign: Gtk.Align.CENTER,
             });
             progressBar.set_fraction(progress.done ? 1.0 : Math.max(0, progress.fraction));
-            progressBar.update_property(
-                Gtk.AccessibleProperty.LABEL,
+            setAccessibleLabel(
+                progressBar,
                 progress.done
                     ? _('Track %d complete: %s').format(track.order ?? 0, track.title)
                     : _('Track %d, %d%% complete: %s').format(track.order ?? 0, percent, track.title),
@@ -209,13 +211,9 @@ export const CurriculumSidebar = GObject.registerClass({
 
             const row = new Gtk.ListBoxRow({ child: rowBox });
             row.track = track;
-            row.update_property(Gtk.AccessibleProperty.LABEL, this._trackLabel(track));
-            if (track.description) {
-                row.update_property(
-                    Gtk.AccessibleProperty.DESCRIPTION,
-                    track.description,
-                );
-            }
+            setAccessibleLabel(row, this._trackLabel(track));
+            if (track.description)
+                setAccessibleDescription(row, track.description);
             this._trackRows.set(track.id, row);
             this._list.append(row);
 

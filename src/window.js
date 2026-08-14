@@ -13,6 +13,7 @@ import Adw from 'gi://Adw';
 import { ContentLoader } from './engine/contentLoader.js';
 import { ExtensionInstaller } from './engine/extensionInstaller.js';
 import { applyWindowLocaleDirection } from './engine/localeUtils.js';
+import { setAccessibleDescription, setAccessibleLabel } from './engine/a11yUtils.js';
 import {
     breadcrumbLabel,
     firstIncompleteModule,
@@ -111,9 +112,9 @@ export const GnomeTutorWindow = GObject.registerClass({
             icon_name: 'sidebar-show-symbolic',
             visible: false,
         });
-        this._sidebarToggle.update_property(Gtk.AccessibleProperty.LABEL, _('Show sidebar'));
-        this._sidebarToggle.update_property(
-            Gtk.AccessibleProperty.DESCRIPTION,
+        setAccessibleLabel(this._sidebarToggle, _('Show sidebar'));
+        setAccessibleDescription(
+            this._sidebarToggle,
             _('Show or hide the curriculum sidebar'),
         );
         this._sidebarToggle.connect('toggled', () => {
@@ -137,7 +138,7 @@ export const GnomeTutorWindow = GObject.registerClass({
             tooltip_text: _('Main Menu'),
             menu_model: menu,
         });
-        this._menuButton.update_property(Gtk.AccessibleProperty.LABEL, _('Main Menu'));
+        setAccessibleLabel(this._menuButton, _('Main Menu'));
         header.pack_end(this._menuButton);
 
         const toolbar = new Adw.ToolbarView();

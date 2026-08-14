@@ -7,6 +7,8 @@ import GObject from 'gi://GObject';
 import GLib from 'gi://GLib';
 import Gtk from 'gi://Gtk';
 
+import { setAccessibleDescription, setAccessibleLabel } from '../engine/a11yUtils.js';
+
 export const HintPanel = GObject.registerClass({
     GTypeName: 'HintPanel',
     Signals: {
@@ -39,7 +41,7 @@ export const HintPanel = GObject.registerClass({
             visible: false,
             valign: Gtk.Align.CENTER,
         });
-        this._badge.update_property(Gtk.AccessibleProperty.LABEL, _('Hint available'));
+        setAccessibleLabel(this._badge, _('Hint available'));
         this._buttonBox.append(this._badge);
         this.append(this._buttonBox);
 
@@ -86,8 +88,8 @@ export const HintPanel = GObject.registerClass({
             this._badgeTimeout = 0;
             if (this._revealed < this._hints.length) {
                 this._badge.visible = true;
-                this._button.update_property(
-                    Gtk.AccessibleProperty.DESCRIPTION,
+                setAccessibleDescription(
+                    this._button,
                     _('A hint is available for this step'),
                 );
             }
@@ -116,8 +118,8 @@ export const HintPanel = GObject.registerClass({
             halign: Gtk.Align.START,
             css_classes: ['dim-label'],
         }));
-        this._button.update_property(
-            Gtk.AccessibleProperty.DESCRIPTION,
+        setAccessibleDescription(
+            this._button,
             _('Hint %d of %d revealed').format(this._revealed, this._hints.length),
         );
         this.emit('hint-revealed');

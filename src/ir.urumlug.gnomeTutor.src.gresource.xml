@@ -15,6 +15,7 @@
     <file>engine/spotlightClient.js</file>
     <file>engine/lessonEngine.js</file>
     <file>engine/spotlightAnchors.js</file>
+    <file>engine/a11yUtils.js</file>
     <file>engine/localeUtils.js</file>
     <file>engine/spotlightDBus.js</file>
     <file>engine/fixtureWatcher.js</file>

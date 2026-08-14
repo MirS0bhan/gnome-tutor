@@ -11,6 +11,7 @@ import {
     moduleOverviewButtonLabel,
     trackOverviewButtonLabel,
 } from '../engine/journeyHelpers.js';
+import { setAccessibleDescription } from '../engine/a11yUtils.js';
 
 export const JourneyStack = GObject.registerClass({
     GTypeName: 'JourneyStack',
@@ -78,8 +79,8 @@ export const JourneyStack = GObject.registerClass({
             ?? _('Pick a module to begin this track.');
         this._trackOverviewPage.action.label = trackOverviewButtonLabel(track, this._progressStore);
         this._trackOverviewPage.action.visible = true;
-        this._trackOverviewPage.action.update_property(
-            Gtk.AccessibleProperty.DESCRIPTION,
+        setAccessibleDescription(
+            this._trackOverviewPage.action,
             _('Start or continue the selected track'),
         );
         this.visible_child_name = 'track-overview';
@@ -92,8 +93,8 @@ export const JourneyStack = GObject.registerClass({
             ?? _('Work through each step in order — GUI, terminal, and bridge.');
         this._moduleOverviewPage.action.label = moduleOverviewButtonLabel(module, this._progressStore);
         this._moduleOverviewPage.action.visible = true;
-        this._moduleOverviewPage.action.update_property(
-            Gtk.AccessibleProperty.DESCRIPTION,
+        setAccessibleDescription(
+            this._moduleOverviewPage.action,
             _('Start or continue the selected module'),
         );
         this.visible_child_name = 'module-overview';

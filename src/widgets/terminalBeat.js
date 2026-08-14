@@ -10,6 +10,7 @@ import Adw from 'gi://Adw';
 
 import { loadVte } from '../engine/vteLoader.js';
 import { applyAdwaitaTheme } from '../engine/vteTheme.js';
+import { setAccessibleDescription, setAccessibleLabel } from '../engine/a11yUtils.js';
 import { HintPanel } from './hintPanel.js';
 
 const SENTINEL_RE = /__LA:(-?\d+):(.*)/;
@@ -78,12 +79,8 @@ export const TerminalBeat = GObject.registerClass({
             revealed: false,
         });
         this._realSystemBanner.connect('notify::revealed', () => {
-            if (this._realSystemBanner.revealed) {
-                this._realSystemBanner.update_property(
-                    Gtk.AccessibleProperty.LABEL,
-                    this._realSystemBanner.title,
-                );
-            }
+            if (this._realSystemBanner.revealed)
+                setAccessibleLabel(this._realSystemBanner, this._realSystemBanner.title);
         });
         this.append(this._realSystemBanner);
 
@@ -92,10 +89,7 @@ export const TerminalBeat = GObject.registerClass({
             halign: Gtk.Align.START,
             css_classes: ['title-4'],
         });
-        this._instruction.update_property(
-            Gtk.AccessibleProperty.DESCRIPTION,
-            _('Step instructions'),
-        );
+        setAccessibleDescription(this._instruction, _('Step instructions'));
         this.append(this._instruction);
 
         this._sandboxLabel = new Gtk.Label({
@@ -111,23 +105,23 @@ export const TerminalBeat = GObject.registerClass({
             hexpand: true,
             margin_top: 6,
         });
-        this._terminal.update_property(Gtk.AccessibleProperty.LABEL, _('Practice terminal'));
+        setAccessibleLabel(this._terminal, _('Practice terminal'));
         this._terminal.set_size_request(-1, 280);
         this._terminal.connect('contents-changed', () => this._checkSentinel());
         this.append(this._terminal);
 
         const toolbar = new Gtk.Box({ spacing: 6 });
         this._resetButton = new Gtk.Button({ label: _('Reset step') });
-        this._resetButton.update_property(
-            Gtk.AccessibleProperty.DESCRIPTION,
+        setAccessibleDescription(
+            this._resetButton,
             _('Restore the practice folder to its original state'),
         );
         this._resetButton.connect('clicked', () => this.emit('reset-requested'));
         toolbar.append(this._resetButton);
 
         this._skipButton = new Gtk.Button({ label: _('Skip validation') });
-        this._skipButton.update_property(
-            Gtk.AccessibleProperty.DESCRIPTION,
+        setAccessibleDescription(
+            this._skipButton,
             _('Mark this step complete without checking your command'),
         );
         this._skipButton.connect('clicked', () => this.emit('validated'));
@@ -160,14 +154,11 @@ export const TerminalBeat = GObject.registerClass({
         } else if (sandboxPath) {
             this._sandboxLabel.label = _('Practice folder (not your real files): %s').format(sandboxPath);
             this._sandboxLabel.visible = true;
-            this._sandboxLabel.update_property(
-                Gtk.AccessibleProperty.DESCRIPTION,
+            setAccessibleDescription(
+                this._sandboxLabel,
                 _('Files here are copies for learning; your real home folder is not used.'),
             );
-            this._terminal.update_property(
-                Gtk.AccessibleProperty.DESCRIPTION,
-                this._sandboxLabel.label,
-            );
+            setAccessibleDescription(this._terminal, this._sandboxLabel.label);
         } else {
             this._sandboxLabel.visible = false;
         }
