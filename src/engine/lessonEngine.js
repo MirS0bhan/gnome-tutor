@@ -4,8 +4,10 @@
  */
 
 import GLib from 'gi://GLib';
+import Gio from 'gi://Gio';
 
 import { AppLauncher } from './appLauncher.js';
+import { FixtureWatcher } from './fixtureWatcher.js';
 import { SandboxManager } from './sandboxManager.js';
 import { SpotlightClient } from './spotlightClient.js';
 import { resolveSpotlightList } from './spotlightAnchors.js';
@@ -13,14 +15,17 @@ import { resolveSpotlightList } from './spotlightAnchors.js';
 const NAUTILUS_WM_HINTS = ['nautilus', 'org.gnome.nautilus'];
 
 export class LessonEngine {
-    constructor({ progressStore }) {
+    constructor({ progressStore, onGuiFixtureMatched }) {
         this.progressStore = progressStore;
         this.sandbox = new SandboxManager();
         this.spotlight = new SpotlightClient();
+        this._fixtureWatcher = new FixtureWatcher();
+        this._onGuiFixtureMatched = onGuiFixtureMatched ?? null;
         this._activeGuiStep = null;
         this._guiPhaseIndex = -1;
         this._spotlightRetrySource = 0;
         this._spotlightActive = false;
+        this._guiFixtureMatched = false;
     }
 
     stepKey(module, step) {
@@ -51,10 +56,12 @@ export class LessonEngine {
 
     endStep() {
         this._cancelSpotlightRetry();
+        this._fixtureWatcher.clear();
         this.spotlight.clear();
         this._activeGuiStep = null;
         this._guiPhaseIndex = -1;
         this._spotlightActive = false;
+        this._guiFixtureMatched = false;
     }
 
     sandboxPath(module, step) {
@@ -90,6 +97,7 @@ export class LessonEngine {
         }
 
         this._applyGuiPhase(false, 0);
+        this._startFixtureWatch(module, step, path);
         return this.currentGuiPhaseState();
     }
 
@@ -185,5 +193,34 @@ export class LessonEngine {
             GLib.source_remove(this._spotlightRetrySource);
             this._spotlightRetrySource = 0;
         }
+    }
+
+    _startFixtureWatch(module, step, sandboxPath) {
+        this._fixtureWatcher.clear();
+        this._guiFixtureMatched = false;
+
+        const existsPath = step.validate?.exists;
+        if (!existsPath || !sandboxPath)
+            return;
+
+        const targetPath = GLib.build_filenamev([sandboxPath, existsPath]);
+        const notifyMatch = () => {
+            if (this._guiFixtureMatched)
+                return;
+            if (!Gio.File.new_for_path(targetPath).query_exists(null))
+                return;
+
+            this._guiFixtureMatched = true;
+            this._fixtureWatcher.clear();
+            if (this._onGuiFixtureMatched)
+                this._onGuiFixtureMatched(this.currentGuiPhaseState());
+        };
+
+        if (Gio.File.new_for_path(targetPath).query_exists(null)) {
+            notifyMatch();
+            return;
+        }
+
+        this._fixtureWatcher.watch(sandboxPath, notifyMatch);
     }
 }

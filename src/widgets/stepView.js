@@ -172,14 +172,19 @@ export const StepView = GObject.registerClass({
         if (!state)
             return;
         this._instructionCard?.onPhaseAdvanced(state.phaseIndex, state.phaseTotal, state.phase);
+        const label = state.phase?.instruction ?? state.phase?.label ?? '';
+        this._guiBeat.setPhaseProgress(state.phaseIndex, state.phaseTotal, label);
     }
 
     _onGuiOpenApp() {
         if (!this._engine || !this._module || !this._step)
             return;
         const state = this._engine.launchGuiApp(this._module, this._step);
-        if (state)
+        if (state) {
             this._instructionCard?.onAppOpened(state.phaseIndex, state.phaseTotal, state.phase);
+            const label = state.phase?.instruction ?? state.phase?.label ?? '';
+            this._guiBeat.setPhaseProgress(state.phaseIndex, state.phaseTotal, label);
+        }
     }
 
     _onGuiNextPhase() {
@@ -187,6 +192,18 @@ export const StepView = GObject.registerClass({
             return;
         const state = this._engine.advanceGuiPhase();
         this._syncGuiPhase(state);
+    }
+
+    onGuiFixtureMatched(state) {
+        if (!state || !this._step || this._step.kind !== 'gui')
+            return;
+
+        const isLast = state.phaseIndex + 1 >= state.phaseTotal;
+        if (isLast)
+            return;
+
+        const next = this._engine.advanceGuiPhase();
+        this._syncGuiPhase(next);
     }
 
     clear() {
@@ -299,6 +316,7 @@ export const StepView = GObject.registerClass({
                 stepIndex,
                 stepTotal,
             });
+            this._onGuiOpenApp();
             return;
         }
 
@@ -347,7 +365,7 @@ export const StepView = GObject.registerClass({
         card.append(cardInner);
         this._contentBox.append(card);
 
-        if (step.kind === 'contrast' || step.kind === 'bridge') {
+        if (step.kind === 'bridge') {
             const hints = step.hints ?? [];
             if (hints.length > 0) {
                 const hintPanel = new HintPanel();

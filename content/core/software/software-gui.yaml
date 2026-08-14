@@ -24,6 +24,37 @@ steps:
       - Press Super and type Software.
       - Flatpak apps appear alongside system packages.
 
+  - id: terminal-software-search
+    kind: terminal
+    title: Search packages from the terminal
+    fixture: fixtures/open-files/
+    instruction: |
+      Run your distro's search command to look up a package (read-only — nothing installs).
+    distro_variants:
+      debian:
+        instruction: Run `apt search gnome-software` to search packages.
+        validate:
+          pattern: '^apt\s+search\s+gnome-software\s*$'
+          expect_exit: 0
+      fedora:
+        instruction: Run `dnf search gnome-software` to search packages.
+        validate:
+          pattern: '^dnf\s+search\s+gnome-software\s*$'
+          expect_exit: 0
+      arch:
+        instruction: Run `pacman -Ss gnome-software` to search packages.
+        validate:
+          pattern: '^pacman\s+-Ss\s+gnome-software\s*$'
+          expect_exit: 0
+      default:
+        instruction: Run `apt search gnome-software` to search packages.
+        validate:
+          pattern: '^apt\s+search\s+gnome-software\s*$'
+          expect_exit: 0
+    hints:
+      - Searching does not install anything.
+      - The GUI Software app uses the same package sources.
+
   - id: bridge-software-gui
     kind: bridge
     title: When the GUI wins

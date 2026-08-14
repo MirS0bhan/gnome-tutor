@@ -79,6 +79,19 @@ export const InstructionCardWindow = GObject.registerClass({
         });
         box.append(this._spotlightNote);
 
+        this._spotlightBanner = new Adw.Banner({
+            title: _('Install the Spotlight extension for on-screen highlights during GUI lessons.'),
+            button_label: _('Learn how'),
+            revealed: false,
+        });
+        this._spotlightBanner.connect('button-clicked', () => {
+            const launcher = new Gtk.UriLauncher({
+                uri: 'https://github.com/urumlug/gnome-tutor#spotlight-extension',
+            });
+            launcher.launch(this, null, null);
+        });
+        box.append(this._spotlightBanner);
+
         const actions = new Gtk.Box({ spacing: 8 });
 
         this._openButton = new Gtk.Button({
@@ -127,26 +140,29 @@ export const InstructionCardWindow = GObject.registerClass({
         this._goalLabel.label = step.instruction?.trim() ?? '';
 
         this._phaseLabel.label = step.target_app === 'org.gnome.Nautilus'
-            ? _('Press the button below to open Files on the practice folder.')
-            : _('Press the button below to open %s.').format(appName);
+            ? _('%s should open on the practice folder. If it did not, press the button below.').format(appName)
+            : _('%s should open automatically. If it did not, press the button below.').format(appName);
         this._progressLabel.visible = false;
 
-        this._spotlightNote.visible = !spotlightAvailable;
-        this._spotlightNote.label = spotlightAvailable
-            ? ''
-            : _('Spotlight extension not detected — follow the text instructions above.');
+        this._spotlightNote.visible = false;
+        this._spotlightBanner.revealed = !spotlightAvailable;
+        if (!spotlightAvailable) {
+            this._spotlightNote.label = _(
+                'Without Spotlight, follow the text instructions. Enable the extension from the project README, then restart Shell.',
+            );
+            this._spotlightNote.visible = true;
+        }
 
         this._hintPanel.setHints(step.hints ?? []);
 
         this._openButton.label = step.target_app === 'org.gnome.Nautilus'
-            ? _('Open practice folder in Files')
-            : _('Open %s').format(appName);
+            ? _('Re-open practice folder in Files')
+            : _('Re-open %s').format(appName);
         this._openButton.visible = true;
         this._openButton.sensitive = true;
         this._nextButton.visible = false;
         this._doneButton.visible = false;
 
-        this.set_keep_above(true);
         this.present();
     }
 
@@ -179,7 +195,6 @@ export const InstructionCardWindow = GObject.registerClass({
     }
 
     dismiss() {
-        this.set_keep_above(false);
         if (this.visible)
             this.hide();
     }

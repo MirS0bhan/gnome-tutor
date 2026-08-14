@@ -14,10 +14,19 @@ export const GuiBeatView = GObject.registerClass({
 }, class GuiBeatView extends Gtk.Box {
     constructor(params = {}) {
         super({
+            orientation: Gtk.Orientation.VERTICAL,
             vexpand: true,
             hexpand: true,
+            spacing: 12,
             ...params,
         });
+
+        this._phaseLabel = new Gtk.Label({
+            css_classes: ['dim-label', 'caption'],
+            halign: Gtk.Align.CENTER,
+            visible: false,
+        });
+        this.append(this._phaseLabel);
 
         this._statusPage = new Adw.StatusPage({
             icon_name: 'folder-symbolic',
@@ -29,8 +38,23 @@ export const GuiBeatView = GObject.registerClass({
     }
 
     reset(_module, _step, { spotlightAvailable }) {
+        this._phaseLabel.visible = false;
         this._statusPage.description = spotlightAvailable
-            ? _('Use the floating instruction card beside Files. Spotlight highlights the Files window for each step.')
-            : _('Use the floating instruction card beside Files. Install the spotlight extension for on-screen highlighting — text instructions still work without it.');
+            ? _('Files should open on the practice folder. The instruction card stays beside this window. Spotlight highlights each step when the extension is enabled.')
+            : _('Files should open on the practice folder. Follow the floating instruction card — install the Spotlight extension for on-screen highlights.');
+    }
+
+    setPhaseProgress(phaseIndex, phaseTotal, phaseLabel) {
+        if (phaseIndex < 0 || phaseTotal <= 1) {
+            this._phaseLabel.visible = false;
+            return;
+        }
+
+        this._phaseLabel.visible = true;
+        this._phaseLabel.label = _('%1$d of %2$d — %3$s').format(
+            phaseIndex + 1,
+            phaseTotal,
+            phaseLabel,
+        );
     }
 });

@@ -81,6 +81,14 @@ export const TerminalBeat = GObject.registerClass({
         });
         this.append(this._instruction);
 
+        this._sandboxLabel = new Gtk.Label({
+            wrap: true,
+            halign: Gtk.Align.START,
+            css_classes: ['dim-label', 'caption'],
+            visible: false,
+        });
+        this.append(this._sandboxLabel);
+
         this._terminal = new Vte.Terminal({
             vexpand: true,
             hexpand: true,
@@ -115,7 +123,13 @@ export const TerminalBeat = GObject.registerClass({
             : null;
         this._expectExit = step.validate?.expect_exit ?? null;
 
-        this._instruction.label = step.instruction;
+        this._instruction.label = step.instruction?.trim() ?? '';
+        if (sandboxPath) {
+            this._sandboxLabel.label = _('Practice folder (not your real files): %s').format(sandboxPath);
+            this._sandboxLabel.visible = true;
+        } else {
+            this._sandboxLabel.visible = false;
+        }
         this._hintPanel.setHints(step.hints ?? []);
         this._spawnShell();
     }

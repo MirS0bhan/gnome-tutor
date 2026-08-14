@@ -23,6 +23,33 @@ steps:
 
       There is no separate Shell app to launch — Activities is part of the desktop.
 
+  - id: gui-files-intro
+    kind: gui
+    title: Open Files from the app grid
+    target_app: org.gnome.Nautilus
+    fixture: fixtures/open-files/
+    instruction: |
+      Press Super to open Activities, launch **Files**, and look at the practice folder.
+    phases:
+      - instruction: Open **Files** from the app grid or search, then explore the sidebar shortcuts.
+        label: Launch Files from Activities
+    hints:
+      - Press Super and type "Files" to search.
+      - The sidebar shows Documents, Downloads, and Pictures.
+
+  - id: terminal-home-list
+    kind: terminal
+    title: See the same folders in the terminal
+    fixture: fixtures/open-files/
+    instruction: |
+      In the terminal, run `ls` to list the practice home folder.
+    validate:
+      pattern: '^ls\s*$'
+      expect_exit: 0
+    hints:
+      - ls shows the same folders Files displays in the sidebar.
+      - You will practice paths like Documents/ in the Files track.
+
   - id: bridge-desktop
     kind: bridge
     title: GUI first, terminal later

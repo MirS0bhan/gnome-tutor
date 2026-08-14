@@ -24,6 +24,8 @@ steps:
         label: Open Documents in the sidebar
       - instruction: Right-click empty space, choose **New Folder**, and name it **Projects**.
         label: Create a folder named Projects
+    validate:
+      exists: Documents/Projects
     hints:
       - Make sure you are inside Documents before creating the folder.
       - Right-click in empty space and choose New Folder.

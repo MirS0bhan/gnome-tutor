@@ -17,6 +17,10 @@ function stepKindLabel(kind) {
         return _('Terminal');
     case 'bridge':
         return _('Bridge');
+    case 'practice':
+        return _('Practice');
+    case 'challenge':
+        return _('Challenge');
     default:
         return kind;
     }
