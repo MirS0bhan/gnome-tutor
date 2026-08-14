@@ -31,7 +31,7 @@
       }
     },
     {
-      "files": ["extension/**/*.js"],
+      "files": ["extension/**/*.js", "extension-windows-onboarding/**/*.js"],
       "globals": {
         "global": "readonly"
       }

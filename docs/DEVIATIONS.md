@@ -6,7 +6,9 @@ Each entry explains a non-standard widget or policy choice for Phase 0 + Phase 1
 
 Libadwaita has no circular progress indicator ([GNOME/libadwaita#1021](https://gitlab.gnome.org/GNOME/libadwaita/-/work_items/1021)). A vertical `Gtk.ProgressBar` plus percent/done text provides the same information with full AT-SPI coverage.
 
-## Spotlight D-Bus bus name — `systems.misano.LinuxAcademy.Spotlight`
+## Windows onboarding is a sibling extension
+
+Coach-marks for Windows switchers live in `windows-onboarding@urumlug.ir`, not inside the lesson Spotlight extension. Mixing them would fire first-session hints during GUI lessons (or require D-Bus in a contrast coach that must stay local-only). Spotlight yield is by watching `systems.misano.LinuxAcademy.Spotlight`.
 
 Renaming to match app ID `ir.urumlug.gnomeTutor` would break installed Shell extensions. The interface XML in [data/dbus/systems.misano.LinuxAcademy.Spotlight.xml](../data/dbus/systems.misano.LinuxAcademy.Spotlight.xml) is the shared contract; renaming is deferred to a coordinated release.
 

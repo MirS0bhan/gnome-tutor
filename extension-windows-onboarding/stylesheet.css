@@ -1,0 +1,22 @@
+.windows-onboarding-ring {
+    border: 3px solid #62a0ea;
+    border-radius: 10px;
+    background-color: transparent;
+}
+
+.windows-onboarding-bubble {
+    background-color: rgba(24, 24, 24, 0.92);
+    color: #f6f5f4;
+    padding: 12px 14px;
+    border-radius: 12px;
+}
+
+.windows-onboarding-label {
+    font-size: 15px;
+    color: #f6f5f4;
+}
+
+.windows-onboarding-close {
+    padding: 4px;
+    border-radius: 999px;
+}

@@ -42,6 +42,8 @@ Terminal validation is **advisory**. Learners can use **Skip validation** if the
 
 Optional Shell extension (`extension/`) exposes D-Bus methods for window/region highlights. Lessons work fully without it via text instructions.
 
+A separate first-session extension (`extension-windows-onboarding/`, `windows-onboarding@urumlug.ir`) shows Windows→GNOME coach-marks on real friction (not on login). It yields while Spotlight is highlighting a lesson. See [WINDOWS-ONBOARDING.md](WINDOWS-ONBOARDING.md).
+
 ## Content layout
 
 ```

@@ -1,0 +1,10 @@
+{
+    "name": "Windows to GNOME Coach",
+    "description": "Task-triggered Windows→GNOME coach-marks for first-session switchers. Not a tour.",
+    "uuid": "windows-onboarding@urumlug.ir",
+    "shell-version": ["48", "49", "50"],
+    "url": "https://github.com/MirS0bhan/gnome-tutor",
+    "version": 1,
+    "settings-schema": "org.urumlug.WindowsOnboarding",
+    "gettext-domain": "windows-onboarding"
+}

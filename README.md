@@ -22,7 +22,8 @@ src/           Application code
   engine/      Content loader, schema validation, progress store
   widgets/     Curriculum sidebar, step views
 content/       Loadable content packs (YAML + fixtures)
-extension/     Shell spotlight extension (Phase 3)
+extension/     Shell spotlight extension (lesson overlays)
+extension-windows-onboarding/  Windows→GNOME first-session coach-marks
 tools/         content-lint and other dev scripts
 ```
 
@@ -53,6 +54,17 @@ ir.urumlug.gnomeTutor --install-extension
 ```
 
 Restart Shell or log out/in after enabling.
+
+## Windows to GNOME Coach
+
+A separate Shell extension shows **task-triggered** Windows→GNOME coach-marks (Start miss, Win+E, workspaces, …). It is not a login tour. Spec: [docs/WINDOWS-ONBOARDING.md](docs/WINDOWS-ONBOARDING.md).
+
+```bash
+extension-windows-onboarding/install.sh
+gnome-extensions enable windows-onboarding@urumlug.ir
+```
+
+Then log out/in. Optional Alt+Tab and minimize hints stay off by default (Preferences → Replay / optional switches).
 
 ## Development
 
