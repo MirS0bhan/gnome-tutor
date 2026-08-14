@@ -12,6 +12,9 @@
         "--socket=wayland",
         "--filesystem=home",
         "--talk-name=org.freedesktop.FileManager1",
+        "--talk-name=org.freedesktop.Flatpak",
+        "--talk-name=org.freedesktop.portal.Desktop",
+        "--talk-name=org.freedesktop.portal.OpenURI",
         "--talk-name=systems.misano.LinuxAcademy.Spotlight"
     ],
     "cleanup" : [

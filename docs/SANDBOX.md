@@ -26,4 +26,6 @@ When enabled, the terminal beat spawns a bwrap sandbox binding the lesson fixtur
 
 **Flatpak note:** The Flatpak manifest bundles `bubblewrap` and builds VTE with accessibility enabled. Nested bwrap inside Flatpak was verified on GNOME Platform 50 using the bundled `bwrap` module. If a host runtime lacks usable nesting, set `GNOME_TUTOR_USE_BWRAP=0` and rely on the copy-only fixture boundary (documented in [DEVIATIONS.md](DEVIATIONS.md)).
 
+GUI lessons launch host applications (Files, Settings, etc.) via the FileManager1 D-Bus interface, the OpenURI portal, or `flatpak-spawn --host` — desktop entries inside the sandbox are not used because host binaries are not on the Flatpak `PATH`.
+
 **Exception:** Track 3 includes one `sandbox: false` terminal step that runs on the real system (banner shown in the lesson UI).

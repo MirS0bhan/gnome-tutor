@@ -5,6 +5,7 @@
 
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
+import GioUnix from 'gi://GioUnix';
 
 const FILE_MANAGER_DBUS = 'org.freedesktop.FileManager1';
 const FILE_MANAGER_PATH = '/org/freedesktop/FileManager1';
@@ -19,7 +20,7 @@ const APP_ALIASES = {
 };
 
 const FALLBACK_COMMANDS = {
-    'org.gnome.Nautilus': ['nautilus'],
+    'org.gnome.Nautilus': ['nautilus', 'org.gnome.Nautilus'],
     'org.gnome.Settings': ['gnome-control-center'],
     'org.gnome.Software': ['gnome-software'],
     'org.gnome.SystemMonitor': ['gnome-system-monitor'],
@@ -34,6 +35,9 @@ export class AppLauncher {
             return AppLauncher._openNautilus(sandboxPath);
 
         const launchFile = AppLauncher._resolveLaunchFile(step, sandboxPath);
+        if (AppLauncher._inFlatpak())
+            return AppLauncher._launchFallback(appId, launchFile);
+
         const app = AppLauncher._lookupApp(appId);
         if (app)
             return AppLauncher._launchApp(app, launchFile);
@@ -66,12 +70,16 @@ export class AppLauncher {
         return GLib.build_filenamev([sandboxPath, step.validate.exists]);
     }
 
+    static _inFlatpak() {
+        return GLib.file_test('/.flatpak-info', GLib.FileTest.EXISTS);
+    }
+
     static _lookupApp(appId) {
         const candidates = APP_ALIASES[appId] ?? [appId];
         for (const id of candidates) {
             for (const desktopId of [id, `${id}.desktop`]) {
                 try {
-                    const app = Gio.DesktopAppInfo.new(desktopId);
+                    const app = GioUnix.DesktopAppInfo.new(desktopId);
                     if (app)
                         return app;
                 } catch {
@@ -104,16 +112,55 @@ export class AppLauncher {
         return app.launch([], null) ?? true;
     }
 
+    static _spawn(argv) {
+        Gio.Subprocess.new(argv, Gio.SubprocessFlags.NONE);
+        return true;
+    }
+
+    static _spawnHost(argv) {
+        if (!AppLauncher._inFlatpak())
+            return AppLauncher._spawn(argv);
+
+        if (!GLib.find_program_in_path('flatpak-spawn'))
+            throw new Error(`host command unavailable in Flatpak: ${argv[0]}`);
+
+        return AppLauncher._spawn(['flatpak-spawn', '--host', ...argv]);
+    }
+
+    static _openUri(uri) {
+        try {
+            Gio.AppInfo.launch_default_for_uri(uri, null);
+            return true;
+        } catch {
+            // portal unavailable or rejected
+        }
+
+        if (GLib.find_program_in_path('gio'))
+            return AppLauncher._spawn(['gio', 'open', uri]);
+
+        if (GLib.find_program_in_path('xdg-open'))
+            return AppLauncher._spawn(['xdg-open', uri]);
+
+        return false;
+    }
+
     static _launchFallback(appId, filePath) {
         const commands = FALLBACK_COMMANDS[appId];
         if (!commands?.length)
             throw new Error(`application not found: ${appId}`);
 
+        if (filePath) {
+            const uri = Gio.File.new_for_path(filePath).get_uri();
+            if (AppLauncher._openUri(uri))
+                return true;
+        }
+
         for (const command of commands) {
             const argv = filePath ? [command, filePath] : [command];
             try {
-                Gio.Subprocess.new(argv, Gio.SubprocessFlags.NONE);
-                return true;
+                if (AppLauncher._inFlatpak())
+                    return AppLauncher._spawnHost(argv);
+                return AppLauncher._spawn(argv);
             } catch {
                 // try next command alias
             }
@@ -123,7 +170,8 @@ export class AppLauncher {
     }
 
     static _openNautilus(path) {
-        const uri = Gio.File.new_for_path(path).get_uri();
+        const file = Gio.File.new_for_path(path);
+        const uri = file.get_uri();
 
         try {
             const proxy = Gio.DBusProxy.new_sync(
@@ -138,15 +186,22 @@ export class AppLauncher {
             proxy.ShowFolders_sync([uri], '');
             return true;
         } catch {
-            const launcher = AppLauncher._lookupApp('org.gnome.Nautilus');
-            if (launcher)
-                return launcher.launch([Gio.File.new_for_path(path)], null) ?? true;
-
-            Gio.Subprocess.new(
-                ['nautilus', path],
-                Gio.SubprocessFlags.NONE,
-            );
-            return true;
+            // fall through to desktop / host launchers
         }
+
+        if (AppLauncher._openUri(uri))
+            return true;
+
+        if (!AppLauncher._inFlatpak()) {
+            try {
+                const launcher = AppLauncher._lookupApp('org.gnome.Nautilus');
+                if (launcher)
+                    return launcher.launch([file], null) ?? true;
+            } catch {
+                // fall through
+            }
+        }
+
+        return AppLauncher._launchFallback('org.gnome.Nautilus', path);
     }
 }

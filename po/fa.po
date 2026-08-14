@@ -384,3 +384,6 @@ msgstr "%1$d از %2$d — %3$s"
 
 msgid "Learn Linux through real GUI apps and a real terminal."
 msgstr "لینوکس را با برنامه‌های واقعی GUI و ترمینال واقعی بیاموزید."
+
+msgid "Learn Linux through real GUI apps and a real terminal"
+msgstr "لینوکس را با برنامه‌های واقعی GUI و ترمینال واقعی بیاموزید"

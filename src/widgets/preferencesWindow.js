@@ -4,7 +4,7 @@
  */
 
 import Adw from 'gi://Adw';
-import Gio from 'gi://Gio';
+import GioUnix from 'gi://GioUnix';
 import Gtk from 'gi://Gtk';
 
 import { ExtensionInstaller } from '../engine/extensionInstaller.js';
@@ -57,8 +57,8 @@ export function showPreferencesWindow(parent) {
     const openButton = new Gtk.Button({ label: _('Open'), valign: Gtk.Align.CENTER });
     openButton.connect('clicked', () => {
         try {
-            const app = Gio.DesktopAppInfo.new('org.gnome.Extensions.desktop')
-                ?? Gio.DesktopAppInfo.new('gnome-extensions');
+            const app = GioUnix.DesktopAppInfo.new('org.gnome.Extensions.desktop')
+                ?? GioUnix.DesktopAppInfo.new('gnome-extensions');
             app?.launch([], null);
         } catch (error) {
             console.error(error.message);

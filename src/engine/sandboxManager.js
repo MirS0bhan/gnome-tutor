@@ -24,10 +24,24 @@ function removeRecursive(file) {
     file.delete(null);
 }
 
+function ensureDirectory(file) {
+    if (!file.query_exists(null)) {
+        file.make_directory_with_parents(null);
+        return;
+    }
+
+    const type = file.query_file_type(Gio.FileQueryInfoFlags.NONE, null);
+    if (type === Gio.FileType.DIRECTORY)
+        return;
+
+    file.delete(null);
+    file.make_directory_with_parents(null);
+}
+
 function copyRecursive(source, destination) {
     const type = source.query_file_type(Gio.FileQueryInfoFlags.NONE, null);
     if (type === Gio.FileType.DIRECTORY) {
-        destination.make_directory_with_parents(null);
+        ensureDirectory(destination);
         const enumerator = source.enumerate_children('standard::name', Gio.FileQueryInfoFlags.NONE, null);
         let info;
         while ((info = enumerator.next_file(null))) {
@@ -38,7 +52,8 @@ function copyRecursive(source, destination) {
         }
         return;
     }
-    destination.get_parent().make_directory_with_parents(null);
+
+    ensureDirectory(destination.get_parent());
     source.copy(destination, Gio.FileCopyFlags.OVERWRITE, null, null);
 }
 
@@ -48,11 +63,11 @@ export class SandboxManager {
     }
 
     _resolveBaseDir() {
-        const flatpakVar = GLib.build_filenamev([
-            GLib.get_home_dir(), '.var', 'app', APP_ID, 'cache', 'lessons',
-        ]);
-        if (Gio.File.new_for_path(flatpakVar).query_exists(null))
-            return flatpakVar;
+        if (GLib.file_test('/.flatpak-info', GLib.FileTest.EXISTS)) {
+            return GLib.build_filenamev([
+                GLib.get_home_dir(), '.var', 'app', APP_ID, 'cache', 'lessons',
+            ]);
+        }
 
         return GLib.build_filenamev([
             GLib.get_user_cache_dir(), 'gnome-tutor', 'lessons',
@@ -82,9 +97,9 @@ export class SandboxManager {
             if (fixture.query_exists(null))
                 copyRecursive(fixture, dest);
             else
-                dest.make_directory_with_parents(null);
+                ensureDirectory(dest);
         } else {
-            dest.make_directory_with_parents(null);
+            ensureDirectory(dest);
         }
         return dest.get_path();
     }
@@ -98,9 +113,9 @@ export class SandboxManager {
             if (fixture.query_exists(null))
                 copyRecursive(fixture, dest);
             else
-                dest.make_directory_with_parents(null);
+                ensureDirectory(dest);
         } else {
-            dest.make_directory_with_parents(null);
+            ensureDirectory(dest);
         }
         return dest.get_path();
     }
