@@ -1,0 +1,39 @@
+track: filesystem
+track_title: Files and the filesystem
+module: copy-paste-files
+title: Copying files
+steps:
+  - id: contrast-filesystem
+    kind: contrast
+    title: One tree, no drive letters
+    body: |
+      Linux uses a single root directory `/`. Every disk and folder hangs off that
+      tree. Paths are case-sensitive, and hidden files start with a dot.
+
+  - id: gui-copy
+    kind: gui
+    target_app: org.gnome.Nautilus
+    fixture: fixtures/copy-paste-basic/
+    instruction: Copy photo.jpg from Downloads into Documents.
+    hints:
+      - Try selecting the file first, then look for a copy option.
+      - Right-click the file — there is a Copy option in the context menu.
+      - Select photo.jpg, press Ctrl+C, open Documents, press Ctrl+V.
+
+  - id: terminal-copy
+    kind: terminal
+    fixture: fixtures/copy-paste-basic/
+    instruction: Now do the same thing with a command — copy photo.jpg into Documents.
+    validate:
+      pattern: '^cp\s+.*photo\.jpg.*Documents/?\s*$'
+      expect_exit: 0
+    hints:
+      - The command for copying files is cp.
+      - cp takes the file first, then where it should go.
+      - cp photo.jpg Documents/
+
+  - id: bridge-copy
+    kind: bridge
+    body: |
+      You just did the same thing twice. The GUI is great for one file at a time —
+      but cp scales: `cp *.jpg Documents/` copies every jpg in the folder in one go.

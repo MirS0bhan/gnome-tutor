@@ -2,19 +2,6 @@
  *
  * Copyright 2026 misano
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
@@ -22,99 +9,111 @@ import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
 import Adw from 'gi://Adw';
 
-const TEMP_CAROUSEL_ITEMS = [
-    {
-        title: 'Welcome',
-        subtitle: 'Swipe or use the arrows to explore',
-        icon_name: 'emblem-favorite-symbolic',
-    },
-    {
-        title: 'GTK 4',
-        subtitle: 'Modern toolkit for GNOME apps',
-        icon_name: 'applications-graphics-symbolic',
-    },
-    {
-        title: 'Libadwaita',
-        subtitle: 'Adaptive widgets and HIG patterns',
-        icon_name: 'location-services-active-symbolic',
-    },
-    {
-        title: 'GJS',
-        subtitle: 'JavaScript bindings for GNOME',
-        icon_name: 'emoji-people-symbolic',
-    },
-];
+import { ContentLoader } from './engine/contentLoader.js';
+import { ProgressStore } from './engine/progressStore.js';
+import { CurriculumSidebar } from './widgets/curriculumSidebar.js';
+import { StepView } from './widgets/stepView.js';
 
 export const GnomeTutorWindow = GObject.registerClass({
     GTypeName: 'GnomeTutorWindow',
     Template: 'resource:///ir/urumlug/gnomeTutor/window.ui',
-    InternalChildren: ['carousel', 'carousel_dots', 'prev_button', 'next_button'],
+    InternalChildren: ['split_view', 'header_title', 'sidebar_scrolled', 'content_box'],
 }, class GnomeTutorWindow extends Adw.ApplicationWindow {
     constructor(application) {
         super({ application });
 
-        this._carousel_dots.set_carousel(this._carousel);
-        this._populate_carousel();
+        this._progressStore = new ProgressStore();
+        this._curriculum = null;
+        this._activeModule = null;
+        this._activeStepIndex = 0;
 
-        this._prev_button.connect('clicked', () => this._scroll_relative(-1));
-        this._next_button.connect('clicked', () => this._scroll_relative(1));
-        this._carousel.connect('notify::position', () => this._update_navigation());
-        this._update_navigation();
+        this._sidebar = new CurriculumSidebar({ vexpand: true });
+        this._stepView = new StepView({ vexpand: true });
+
+        this._sidebar_scrolled.set_child(this._sidebar);
+        this._content_box.append(this._stepView);
+
+        this._sidebar.setProgressStore(this._progressStore);
+        this._sidebar.connect('module-selected', (_sidebar, module) => {
+            this._openModule(module);
+        });
+        this._sidebar.connect('step-selected', (_sidebar, module, step) => {
+            this._openStep(module, step);
+        });
+        this._stepView.connect('continue', () => this._advanceStep());
+
+        this._loadCurriculum();
     }
 
-    _populate_carousel() {
-        for (const item of TEMP_CAROUSEL_ITEMS) {
-            const page = new Gtk.Box({
-                orientation: Gtk.Orientation.VERTICAL,
-                css_classes: ['card'],
-                spacing: 12,
-                margin_top: 24,
-                margin_bottom: 24,
-                margin_start: 24,
-                margin_end: 24,
-                halign: Gtk.Align.FILL,
-                valign: Gtk.Align.CENTER,
-            });
-
-            page.append(new Gtk.Image({
-                icon_name: item.icon_name,
-                pixel_size: 64,
-                halign: Gtk.Align.CENTER,
-            }));
-
-            page.append(new Gtk.Label({
-                label: item.title,
-                css_classes: ['title-1'],
-                halign: Gtk.Align.CENTER,
-            }));
-
-            page.append(new Gtk.Label({
-                label: item.subtitle,
-                css_classes: ['body'],
-                wrap: true,
-                justify: Gtk.Justification.CENTER,
-                halign: Gtk.Align.CENTER,
-            }));
-
-            this._carousel.append(page);
+    _loadCurriculum() {
+        try {
+            const loader = new ContentLoader(ContentLoader.defaultContentRoot());
+            this._curriculum = loader.load();
+            this._sidebar.setCurriculum(this._curriculum);
+        } catch (error) {
+            console.error(`Failed to load curriculum: ${error.message}`);
+            this._showLoadError(error.message);
         }
     }
 
-    _current_page() {
-        return Math.round(this._carousel.position);
+    _showLoadError(message) {
+        const page = new Adw.StatusPage({
+            icon_name: 'dialog-error-symbolic',
+            title: _('Could not load curriculum'),
+            description: message,
+        });
+        this._stepView.clear();
+        this._content_box.append(page);
     }
 
-    _scroll_relative(delta) {
-        const target = this._current_page() + delta;
-        if (target < 0 || target >= this._carousel.n_pages)
+    _openModule(module) {
+        this._activeModule = module;
+        this._activeStepIndex = 0;
+        this._header_title.subtitle = module.title;
+        this._sidebar.selectModule(module);
+        this._renderActiveStep();
+    }
+
+    _openStep(module, step) {
+        this._activeModule = module;
+        this._activeStepIndex = module.steps.findIndex(item => item.id === step.id);
+        if (this._activeStepIndex < 0)
+            this._activeStepIndex = 0;
+        this._header_title.subtitle = module.title;
+        this._sidebar.selectModule(module);
+        this._renderActiveStep();
+    }
+
+    _renderActiveStep() {
+        if (!this._activeModule)
             return;
 
-        this._carousel.scroll_to(target, true);
+        const step = this._activeModule.steps[this._activeStepIndex];
+        this._stepView.showStep(this._activeModule, step, {
+            stepIndex: this._activeStepIndex,
+            stepTotal: this._activeModule.steps.length,
+        });
     }
 
-    _update_navigation() {
-        const page = this._current_page();
-        this._prev_button.sensitive = page > 0;
-        this._next_button.sensitive = page < this._carousel.n_pages - 1;
+    _advanceStep() {
+        if (!this._activeModule)
+            return;
+
+        const step = this._activeModule.steps[this._activeStepIndex];
+        const stepKey = `${this._activeModule.track}/${this._activeModule.module}/${step.id}`;
+        this._progressStore.markStepCompleted(stepKey);
+
+        if (this._activeStepIndex + 1 >= this._activeModule.steps.length) {
+            this._progressStore.markModuleCompleted(`${this._activeModule.track}/${this._activeModule.module}`);
+            this._sidebar.setCurriculum(this._curriculum);
+            this._header_title.subtitle = _('Module complete');
+            this._activeModule = null;
+            this._stepView.clear();
+            return;
+        }
+
+        this._activeStepIndex++;
+        this._sidebar.setCurriculum(this._curriculum);
+        this._renderActiveStep();
     }
 });

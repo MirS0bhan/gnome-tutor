@@ -3,13 +3,19 @@
   <requires lib="gtk" version="4.0"/>
   <requires lib="Adw" version="1.0"/>
   <template class="GnomeTutorWindow" parent="AdwApplicationWindow">
-    <property name="title" translatable="yes">Gnome-tutor</property>
-    <property name="default-width">800</property>
-    <property name="default-height">600</property>
+    <property name="title" translatable="yes">GNOME Linux Academy</property>
+    <property name="default-width">960</property>
+    <property name="default-height">640</property>
     <property name="content">
       <object class="AdwToolbarView">
         <child type="top">
           <object class="AdwHeaderBar">
+            <property name="title-widget">
+              <object class="AdwWindowTitle" id="header_title">
+                <property name="title" translatable="yes">GNOME Linux Academy</property>
+                <property name="subtitle" translatable="yes">Learn Linux through real GUI and terminal tools</property>
+              </object>
+            </property>
             <child type="end">
               <object class="GtkMenuButton">
                 <property name="primary">True</property>
@@ -21,44 +27,20 @@
           </object>
         </child>
         <property name="content">
-          <object class="GtkBox">
-            <property name="orientation">vertical</property>
-            <property name="spacing">12</property>
-            <property name="margin-top">24</property>
-            <property name="margin-bottom">24</property>
-            <property name="margin-start">24</property>
-            <property name="margin-end">24</property>
-            <property name="vexpand">True</property>
-            <child>
-              <object class="Adw.Carousel" id="carousel">
-                <property name="vexpand">True</property>
-                <property name="allow-long-swipes">True</property>
-                <property name="allow-scroll-wheel">True</property>
-                <property name="spacing">12</property>
+          <object class="AdwNavigationSplitView" id="split_view">
+            <property name="sidebar-width-fraction">0.28</property>
+            <property name="min-sidebar-width">240</property>
+            <property name="max-sidebar-width">360</property>
+            <property name="sidebar">
+              <object class="GtkScrolledWindow" id="sidebar_scrolled">
+                <property name="hscrollbar-policy">never</property>
               </object>
-            </child>
-            <child>
-              <object class="GtkBox">
-                <property name="orientation">horizontal</property>
-                <property name="spacing">12</property>
-                <property name="halign">center</property>
-                <child>
-                  <object class="GtkButton" id="prev_button">
-                    <property name="icon-name">go-previous-symbolic</property>
-                    <property name="tooltip-text" translatable="yes">Previous</property>
-                  </object>
-                </child>
-                <child>
-                  <object class="Adw.CarouselIndicatorDots" id="carousel_dots"/>
-                </child>
-                <child>
-                  <object class="GtkButton" id="next_button">
-                    <property name="icon-name">go-next-symbolic</property>
-                    <property name="tooltip-text" translatable="yes">Next</property>
-                  </object>
-                </child>
+            </property>
+            <property name="content">
+              <object class="GtkBox" id="content_box">
+                <property name="orientation">vertical</property>
               </object>
-            </child>
+            </property>
           </object>
         </property>
       </object>
@@ -75,7 +57,7 @@
         <attribute name="action">win.show-help-overlay</attribute>
       </item>
       <item>
-        <attribute name="label" translatable="yes">_About Gnome-tutor</attribute>
+        <attribute name="label" translatable="yes">_About GNOME Linux Academy</attribute>
         <attribute name="action">app.about</attribute>
       </item>
     </section>

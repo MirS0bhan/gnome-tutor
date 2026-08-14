@@ -3,5 +3,11 @@
   <gresource prefix="/ir/urumlug/gnomeTutor/js">
     <file>main.js</file>
     <file>window.js</file>
+    <file>engine/schema.js</file>
+    <file>engine/yaml.js</file>
+    <file>engine/contentLoader.js</file>
+    <file>engine/progressStore.js</file>
+    <file>widgets/curriculumSidebar.js</file>
+    <file>widgets/stepView.js</file>
   </gresource>
 </gresources>

@@ -1,0 +1,27 @@
+track: orientation
+track_title: Orientation
+module: desktop-basics
+title: What is a Linux desktop?
+steps:
+  - id: contrast-desktop
+    kind: contrast
+    title: A different shape of desktop
+    body: |
+      Linux desktops use Activities, workspaces, and an app grid instead of a
+      single taskbar and Start menu. Your files live under one home folder —
+      there is no drive-letter maze like C:\ or D:\.
+
+  - id: gui-activities
+    kind: gui
+    target_app: org.gnome.Shell
+    instruction: Open Activities and locate the app grid.
+    hints:
+      - Press the Super key or click Activities in the top bar.
+      - The app grid shows installed applications.
+      - Search for an app by typing while Activities is open.
+
+  - id: bridge-desktop
+    kind: bridge
+    body: |
+      The GUI is the fastest way to explore a new desktop. The terminal becomes
+      more useful once you start automating tasks or working on remote machines.
