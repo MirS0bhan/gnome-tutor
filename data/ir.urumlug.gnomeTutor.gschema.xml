@@ -13,5 +13,13 @@
 			<default>''</default>
 			<summary>JSON map of hint reveal counts per step</summary>
 		</key>
+		<key name="welcome-seen" type="b">
+			<default>false</default>
+			<summary>Whether the first-run welcome screen has been dismissed</summary>
+		</key>
+		<key name="last-location-json" type="s">
+			<default>''</default>
+			<summary>Last curriculum location for resume hints</summary>
+		</key>
 	</schema>
 </schemalist>

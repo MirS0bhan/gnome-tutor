@@ -33,6 +33,9 @@ const SpotlightIface = `
     </method>
     <method name="Clear">
     </method>
+    <method name="IsOverviewOpen">
+      <arg type="b" name="open" direction="out"/>
+    </method>
   </interface>
 </node>`;
 
@@ -48,6 +51,7 @@ export default class Extension {
             HighlightWindow: (wmClass, label) => this._highlightWindow(wmClass, label),
             UpdateLabel: label => this._updateLabel(label),
             Clear: () => this._clear(),
+            IsOverviewOpen: () => Main.overview.visible,
         };
 
         this._dbus = Gio.DBusExportedObject.wrapJSObject(SpotlightIface, this._impl);

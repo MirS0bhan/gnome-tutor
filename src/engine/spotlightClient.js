@@ -83,4 +83,14 @@ export class SpotlightClient {
             console.debug(`Spotlight clear failed: ${error.message}`);
         }
     }
+
+    isOverviewOpen() {
+        if (!this._available)
+            return false;
+        try {
+            return this._proxy.IsOverviewOpen_sync() === true;
+        } catch {
+            return false;
+        }
+    }
 }

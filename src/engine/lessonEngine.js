@@ -18,18 +18,21 @@ import {
 const NAUTILUS_WM_HINTS = ['nautilus', 'org.gnome.nautilus'];
 
 export class LessonEngine {
-    constructor({ progressStore, onGuiFixtureMatched }) {
+    constructor({ progressStore, onGuiFixtureMatched, onTourOverviewOpened }) {
         this.progressStore = progressStore;
         this.sandbox = new SandboxManager();
         this.spotlight = new SpotlightClient();
         this._fixtureWatcher = new FixtureWatcher();
         this._onGuiFixtureMatched = onGuiFixtureMatched ?? null;
+        this._onTourOverviewOpened = onTourOverviewOpened ?? null;
         this._activeGuiStep = null;
         this._guiPhaseIndex = -1;
         this._spotlightRetrySource = 0;
         this._spotlightActive = false;
         this._guiFixtureMatched = false;
         this._spawnedProcess = null;
+        this._tourDetectSource = 0;
+        this._tourOverviewDetected = false;
     }
 
     stepKey(module, step) {
@@ -63,6 +66,7 @@ export class LessonEngine {
 
     endStep() {
         this._cancelSpotlightRetry();
+        this._cancelTourDetect();
         this._fixtureWatcher.clear();
         this._killDummyProcess();
         this.spotlight.clear();
@@ -70,6 +74,11 @@ export class LessonEngine {
         this._guiPhaseIndex = -1;
         this._spotlightActive = false;
         this._guiFixtureMatched = false;
+        this._tourOverviewDetected = false;
+    }
+
+    resetPractice(module, step) {
+        return this.sandbox.resetPractice(module, step?.fixture);
     }
 
     sandboxPath(module, step) {
@@ -116,7 +125,9 @@ export class LessonEngine {
     beginTour(module, step) {
         this._activeGuiStep = { module, step };
         this._guiPhaseIndex = 0;
+        this._tourOverviewDetected = false;
         this._applyGuiPhase(false, 0);
+        this._startTourOverviewDetect();
         return this.currentGuiPhaseState();
     }
 
@@ -208,6 +219,39 @@ export class LessonEngine {
         } else if (highlighted && retry > 0) {
             this._cancelSpotlightRetry();
         }
+    }
+
+    _cancelTourDetect() {
+        if (this._tourDetectSource) {
+            GLib.source_remove(this._tourDetectSource);
+            this._tourDetectSource = 0;
+        }
+    }
+
+    _startTourOverviewDetect() {
+        this._cancelTourDetect();
+        let attempts = 0;
+        const poll = () => {
+            if (!this._activeGuiStep || this._tourOverviewDetected)
+                return GLib.SOURCE_REMOVE;
+
+            if (this.spotlight.isOverviewOpen?.()) {
+                this._tourOverviewDetected = true;
+                this.spotlight.clear();
+                if (this._onTourOverviewOpened)
+                    this._onTourOverviewOpened();
+                return GLib.SOURCE_REMOVE;
+            }
+
+            attempts++;
+            if (attempts >= 25) {
+                if (this._onTourOverviewOpened)
+                    this._onTourOverviewOpened();
+                return GLib.SOURCE_REMOVE;
+            }
+            return GLib.SOURCE_CONTINUE;
+        };
+        this._tourDetectSource = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 1, poll);
     }
 
     _cancelSpotlightRetry() {

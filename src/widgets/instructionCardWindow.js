@@ -105,7 +105,7 @@ export const InstructionCardWindow = GObject.registerClass({
         actions.append(this._nextButton);
 
         this._doneButton = new Gtk.Button({
-            label: _('Done, next step'),
+            label: _('I did it — Next'),
             css_classes: ['suggested-action'],
             visible: false,
         });
@@ -122,13 +122,13 @@ export const InstructionCardWindow = GObject.registerClass({
         this.set_content(toolbar);
     }
 
-    presentStep(module, step, { spotlightAvailable, stepIndex, stepTotal }) {
+    presentStep(module, step, { spotlightAvailable, stepIndex, stepTotal, breadcrumb }) {
         this._phaseIndex = -1;
         this._phaseTotal = step.phases?.length ?? 1;
         const appName = AppLauncher.displayName(step.target_app);
 
         this._headerTitle.title = _('Follow along in %s').format(appName);
-        this._headerTitle.subtitle = _('%1$s · Step %2$d of %3$d').format(
+        this._headerTitle.subtitle = breadcrumb ?? _('%1$s · Step %2$d of %3$d').format(
             module.title,
             stepIndex + 1,
             stepTotal,

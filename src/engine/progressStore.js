@@ -15,6 +15,8 @@ class MemoryProgressBackend {
         this.completedSteps = new Set();
         this.completedModules = new Set();
         this.hintCounts = {};
+        this.welcomeSeen = false;
+        this.lastLocationJson = '';
     }
 }
 
@@ -86,6 +88,46 @@ export class ProgressStore {
         this._settings.set_strv('completed-modules', values);
     }
 
+    isWelcomeSeen() {
+        if (this._memory)
+            return this._memory.welcomeSeen;
+        try {
+            return this._settings.get_boolean('welcome-seen');
+        } catch {
+            return false;
+        }
+    }
+
+    markWelcomeSeen() {
+        if (this._memory) {
+            this._memory.welcomeSeen = true;
+            return;
+        }
+        this._settings.set_boolean('welcome-seen', true);
+    }
+
+    saveLastLocation({ track, module, stepIndex }) {
+        const payload = JSON.stringify({ track, module, stepIndex });
+        if (this._memory) {
+            this._memory.lastLocationJson = payload;
+            return;
+        }
+        this._settings.set_string('last-location-json', payload);
+    }
+
+    loadLastLocation() {
+        const raw = this._memory
+            ? this._memory.lastLocationJson
+            : this._settings.get_string('last-location-json');
+        if (!raw)
+            return null;
+        try {
+            return JSON.parse(raw);
+        } catch {
+            return null;
+        }
+    }
+
     isStepCompleted(stepId) {
         return this._getCompletedSteps().includes(stepId);
     }
@@ -132,10 +174,32 @@ export class ProgressStore {
     moduleProgress(module) {
         const completedSteps = module.steps.filter(step =>
             this.isStepCompleted(`${module.track}/${module.module}/${step.id}`));
+        const started = completedSteps.length > 0;
         return {
             completed: completedSteps.length,
             total: module.steps.length,
             done: completedSteps.length === module.steps.length,
+            started,
+        };
+    }
+
+    trackProgress(track) {
+        if (!track?.modules?.length)
+            return { completed: 0, total: 0, done: false, started: false, fraction: 0 };
+
+        const total = track.modules.length;
+        const completed = track.modules.filter(module =>
+            this.isModuleCompleted(`${module.track}/${module.module}`)).length;
+        const started = track.modules.some(module => {
+            const progress = this.moduleProgress(module);
+            return progress.started || progress.done;
+        });
+        return {
+            completed,
+            total,
+            done: completed === total,
+            started,
+            fraction: total > 0 ? completed / total : 0,
         };
     }
 

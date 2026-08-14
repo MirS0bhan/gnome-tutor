@@ -2,6 +2,7 @@ track: filesystem
 track_title: Files and the filesystem
 module: copy-paste-files
 title: Copying and pasting files
+module_description: Copy photo.jpg from Downloads into Documents — the GUI way, then the command-line way.
 order: 3
 steps:
   - id: contrast-copy
@@ -19,7 +20,7 @@ steps:
 
   - id: gui-copy
     kind: gui
-    title: Copy photo.jpg to Documents
+    title: Try it in Files
     target_app: org.gnome.Nautilus
     fixture: fixtures/copy-paste-basic/
     instruction: |

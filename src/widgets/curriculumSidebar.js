@@ -7,30 +7,10 @@ import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
 import Adw from 'gi://Adw';
 
-function stepKindLabel(kind) {
-    switch (kind) {
-    case 'contrast':
-        return _('Contrast');
-    case 'gui':
-        return _('Files');
-    case 'terminal':
-        return _('Terminal');
-    case 'bridge':
-        return _('Bridge');
-    case 'tour':
-        return _('Tour');
-    case 'practice':
-        return _('Practice');
-    case 'challenge':
-        return _('Challenge');
-    default:
-        return kind;
-    }
-}
-
 export const CurriculumSidebar = GObject.registerClass({
     GTypeName: 'CurriculumSidebar',
     Signals: {
+        'track-selected': {},
         'module-selected': {},
         'step-selected': {},
     },
@@ -38,31 +18,40 @@ export const CurriculumSidebar = GObject.registerClass({
     constructor(params = {}) {
         super({
             orientation: Gtk.Orientation.VERTICAL,
-            spacing: 12,
+            spacing: 0,
             vexpand: true,
             hexpand: true,
-            margin_top: 12,
-            margin_bottom: 12,
-            margin_start: 12,
-            margin_end: 12,
             ...params,
         });
 
         this._progressStore = null;
         this._curriculum = null;
+        this._selectedTrack = null;
         this._selectedModule = null;
         this._selectedStep = null;
+        this._trackRows = new Map();
 
-        this.append(new Adw.WindowTitle({
-            title: _('Curriculum'),
-            subtitle: _('Tracks, modules, and steps'),
-        }));
-
-        this._groupsBox = new Gtk.Box({
-            orientation: Gtk.Orientation.VERTICAL,
-            spacing: 18,
+        this._scrolled = new Gtk.ScrolledWindow({
+            vexpand: true,
+            hexpand: true,
+            hscrollbar_policy: Gtk.PolicyType.NEVER,
         });
-        this.append(this._groupsBox);
+
+        this._list = new Gtk.ListBox({
+            selection_mode: Gtk.SelectionMode.SINGLE,
+            css_classes: ['navigation-sidebar'],
+        });
+        this._list.connect('row-selected', (_box, row) => {
+            if (!row?.track)
+                return;
+            this._selectedTrack = row.track;
+            this._selectedModule = null;
+            this._selectedStep = null;
+            this.emit('track-selected');
+        });
+
+        this._scrolled.set_child(this._list);
+        this.append(this._scrolled);
     }
 
     setProgressStore(store) {
@@ -75,10 +64,29 @@ export const CurriculumSidebar = GObject.registerClass({
         this._rebuild();
     }
 
+    selectTrack(track) {
+        this._selectedTrack = track;
+        this._selectedModule = null;
+        this._selectedStep = null;
+        this._rebuild();
+        this._highlightTrack(track);
+    }
+
     selectModule(module) {
+        this._selectedTrack = this._curriculum?.tracks?.find(t => t.id === module.track) ?? null;
         this._selectedModule = module;
         this._selectedStep = null;
         this._rebuild();
+    }
+
+    scrollToTrack(track) {
+        const row = this._trackRows.get(track.id);
+        if (row)
+            this._list.select_row(row);
+    }
+
+    get selectedTrack() {
+        return this._selectedTrack;
     }
 
     get selectedModule() {
@@ -93,74 +101,144 @@ export const CurriculumSidebar = GObject.registerClass({
         return `${module.track}/${module.module}/${step.id}`;
     }
 
+    _trackLabel(track) {
+        const order = track.order ?? 0;
+        return _('%d. %s').format(order, track.title);
+    }
+
+    _highlightTrack(track) {
+        const row = this._trackRows.get(track?.id);
+        if (row)
+            this._list.select_row(row);
+    }
+
+    _moduleSubtitle(module) {
+        const progress = this._progressStore.moduleProgress(module);
+        if (progress.done)
+            return _('Review');
+        if (progress.started)
+            return _('Continue');
+        return _('%d steps').format(progress.total);
+    }
+
     _rebuild() {
-        let child = this._groupsBox.get_first_child();
+        let child = this._list.get_first_child();
         while (child) {
             const next = child.get_next_sibling();
-            this._groupsBox.remove(child);
+            this._list.remove(child);
             child = next;
         }
+        this._trackRows.clear();
 
         if (!this._curriculum)
             return;
 
         for (const track of this._curriculum.tracks) {
-            const group = new Adw.PreferencesGroup({
-                title: track.title,
-                description: _('%d modules').format(track.modules.length),
+            const progress = this._progressStore?.trackProgress(track)
+                ?? { fraction: 0, done: false };
+
+            const rowBox = new Gtk.Box({
+                orientation: Gtk.Orientation.HORIZONTAL,
+                spacing: 12,
+                margin_top: 8,
+                margin_bottom: 8,
+                margin_start: 12,
+                margin_end: 12,
             });
 
+            rowBox.append(new Adw.CircularProgressIndicator({
+                percentage: progress.done ? 100 : Math.round(progress.fraction * 100),
+            }));
+
+            const textBox = new Gtk.Box({
+                orientation: Gtk.Orientation.VERTICAL,
+                spacing: 2,
+                hexpand: true,
+            });
+
+            const titleRow = new Gtk.Box({ spacing: 8 });
+            titleRow.append(new Gtk.Label({
+                label: this._trackLabel(track),
+                xalign: 0,
+                css_classes: ['heading'],
+            }));
+            if (track.id === 'orientation') {
+                titleRow.append(new Gtk.Label({
+                    label: _('Start here'),
+                    css_classes: ['caption', 'accent'],
+                }));
+            }
+            textBox.append(titleRow);
+
+            if (track.description) {
+                textBox.append(new Gtk.Label({
+                    label: track.description,
+                    xalign: 0,
+                    wrap: true,
+                    css_classes: ['dim-label', 'caption'],
+                    max_width_chars: 28,
+                }));
+            }
+
+            rowBox.append(textBox);
+
+            const row = new Gtk.ListBoxRow({ child: rowBox });
+            row.track = track;
+            this._trackRows.set(track.id, row);
+            this._list.append(row);
+
+            if (this._selectedTrack?.id !== track.id)
+                continue;
+
             for (const module of track.modules) {
-                const progress = this._progressStore?.moduleProgress(module)
-                    ?? { completed: 0, total: module.steps.length, done: false };
-                const subtitle = progress.done
-                    ? _('Complete')
-                    : _('%d of %d steps').format(progress.completed, progress.total);
-
-                const moduleRow = new Adw.ExpanderRow({
-                    title: module.title,
-                    subtitle,
+                const moduleWrap = new Gtk.Box({
+                    orientation: Gtk.Orientation.VERTICAL,
+                    spacing: 4,
+                    margin_start: 36,
+                    margin_end: 8,
+                    margin_bottom: 8,
                 });
-                moduleRow.expanded = this._selectedModule === module;
 
-                if (progress.done) {
-                    moduleRow.add_suffix(new Gtk.Image({
-                        icon_name: 'object-select-symbolic',
-                        css_classes: ['success'],
-                    }));
-                }
-
-                moduleRow.connect('notify::expanded', () => {
-                    if (!moduleRow.expanded || this._selectedModule === module)
-                        return;
+                const moduleButton = new Gtk.Button({
+                    label: module.title,
+                    css_classes: ['flat'],
+                    halign: Gtk.Align.START,
+                });
+                moduleButton.connect('clicked', () => {
                     this._selectedModule = module;
                     this._selectedStep = null;
                     this.emit('module-selected');
                 });
+                moduleWrap.append(moduleButton);
+                moduleWrap.append(new Gtk.Label({
+                    label: this._moduleSubtitle(module),
+                    xalign: 0,
+                    css_classes: ['dim-label', 'caption'],
+                }));
 
                 for (const step of module.steps) {
                     const completed = this._progressStore?.isStepCompleted(this._stepKey(module, step)) ?? false;
-                    const stepRow = new Adw.ActionRow({
-                        title: step.title ?? step.id.replace(/-/g, ' '),
-                        subtitle: stepKindLabel(step.kind),
+                    const stepButton = new Gtk.Button({
+                        label: step.title ?? step.id,
+                        css_classes: ['flat'],
+                        halign: Gtk.Align.START,
                     });
-                    stepRow.add_prefix(new Gtk.Image({
-                        icon_name: completed ? 'object-select-symbolic' : 'radio-missing-symbolic',
-                        css_classes: completed ? ['success'] : ['dim-label'],
-                    }));
-                    stepRow.set_activatable(true);
-                    stepRow.connect('activated', () => {
+                    if (completed)
+                        stepButton.add_css_class('success');
+                    stepButton.connect('clicked', () => {
                         this._selectedModule = module;
                         this._selectedStep = step;
                         this.emit('step-selected');
                     });
-                    moduleRow.add_row(stepRow);
+                    moduleWrap.append(stepButton);
                 }
 
-                group.add(moduleRow);
+                const moduleRow = new Gtk.ListBoxRow({ child: moduleWrap });
+                moduleRow.set_selectable(false);
+                this._list.append(moduleRow);
             }
-
-            this._groupsBox.append(group);
         }
+
+        this._highlightTrack(this._selectedTrack);
     }
 });

@@ -48,7 +48,6 @@ export class SandboxManager {
     }
 
     _resolveBaseDir() {
-        const runtimeDir = GLib.getenv('XDG_RUNTIME_DIR');
         const flatpakVar = GLib.build_filenamev([
             GLib.get_home_dir(), '.var', 'app', APP_ID, 'cache', 'lessons',
         ]);
@@ -77,6 +76,22 @@ export class SandboxManager {
         if (dest.query_exists(null))
             return dest.get_path();
 
+        if (fixtureRelative) {
+            const fixturePath = this.resolveFixturePath(module, fixtureRelative);
+            const fixture = Gio.File.new_for_path(fixturePath);
+            if (fixture.query_exists(null))
+                copyRecursive(fixture, dest);
+            else
+                dest.make_directory_with_parents(null);
+        } else {
+            dest.make_directory_with_parents(null);
+        }
+        return dest.get_path();
+    }
+
+    resetPractice(module, fixtureRelative) {
+        const dest = Gio.File.new_for_path(this.practicePath(module));
+        removeRecursive(dest);
         if (fixtureRelative) {
             const fixturePath = this.resolveFixturePath(module, fixtureRelative);
             const fixture = Gio.File.new_for_path(fixturePath);

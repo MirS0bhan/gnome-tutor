@@ -6,7 +6,6 @@
 import GObject from 'gi://GObject';
 import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk';
-import Adw from 'gi://Adw';
 
 import { HintPanel } from './hintPanel.js';
 
@@ -34,17 +33,25 @@ export const ContrastBeatView = GObject.registerClass({
         }
 
         this.append(new Gtk.Label({
-            label: module.title,
-            css_classes: ['title-4'],
-            halign: Gtk.Align.START,
-        }));
-
-        this.append(new Gtk.Label({
             label: step.title,
             css_classes: ['title-2'],
             halign: Gtk.Align.START,
             wrap: true,
         }));
+
+        const columns = new Gtk.Box({
+            spacing: 0,
+            homogeneous: true,
+            margin_top: 12,
+        });
+
+        columns.append(this._column(_('What you\'re used to'), 'computer-symbolic',
+            step.body_left ?? '', ['dim-label']));
+        columns.append(new Gtk.Separator({ orientation: Gtk.Orientation.VERTICAL }));
+        columns.append(this._column(_('On Linux (GNOME)'), 'folder-symbolic',
+            step.body_right ?? '', ['accent']));
+
+        this.append(columns);
 
         if (step.contrast_diagram && module.pack_dir) {
             const diagramPath = Gio.File.new_for_path(module.pack_dir)
@@ -56,28 +63,17 @@ export const ContrastBeatView = GObject.registerClass({
                 picture.set_content_fit(Gtk.ContentFit.CONTAIN);
                 picture.set_size_request(-1, 160);
                 picture.halign = Gtk.Align.CENTER;
+                picture.margin_top = 18;
                 this.append(picture);
             }
         }
-
-        const columns = new Gtk.Box({
-            spacing: 24,
-            homogeneous: true,
-            margin_top: 12,
-        });
-
-        columns.append(this._column(_('What you\'re used to'), 'computer-symbolic',
-            step.body_left ?? _('Drive letters (C:\\, D:\\)\nStart menu & taskbar\nRegistry for settings')));
-        columns.append(this._column(_('On Linux / GNOME'), 'folder-symbolic',
-            step.body_right ?? _('One home folder\nActivities & app grid\nPlain-text config files')));
-        this.append(columns);
 
         if (step.body) {
             this.append(new Gtk.Label({
                 label: step.body,
                 wrap: true,
                 halign: Gtk.Align.START,
-                justify: Gtk.Justification.FILL,
+                margin_top: 12,
             }));
         }
 
@@ -90,12 +86,14 @@ export const ContrastBeatView = GObject.registerClass({
         }
     }
 
-    _column(title, iconName, body) {
+    _column(title, iconName, body, headerClasses = []) {
         const box = new Gtk.Box({
             orientation: Gtk.Orientation.VERTICAL,
             spacing: 8,
             css_classes: ['card'],
             vexpand: false,
+            margin_end: 12,
+            margin_start: 12,
         });
         const inner = new Gtk.Box({
             orientation: Gtk.Orientation.VERTICAL,
@@ -107,7 +105,7 @@ export const ContrastBeatView = GObject.registerClass({
         });
         const header = new Gtk.Box({ spacing: 8 });
         header.append(new Gtk.Image({ icon_name: iconName }));
-        header.append(new Gtk.Label({ label: title, css_classes: ['heading'] }));
+        header.append(new Gtk.Label({ label: title, css_classes: ['heading', ...headerClasses] }));
         inner.append(header);
         inner.append(new Gtk.Label({
             label: body,

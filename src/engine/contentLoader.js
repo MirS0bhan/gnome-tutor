@@ -57,12 +57,14 @@ export class ContentLoader {
         this.packs = [];
         this.tracks = new Map();
         this.modules = [];
+        this._trackMetadata = new Map();
     }
 
     load({ packId = null } = {}) {
         this.packs = [];
         this.tracks = new Map();
         this.modules = [];
+        this._trackMetadata = new Map();
 
         for (const packName of listDirectory(this._contentRoot)) {
             if (packName.startsWith('.'))
@@ -82,7 +84,13 @@ export class ContentLoader {
             return moduleSort(a, b);
         });
 
-        const tracks = [...this.tracks.values()].sort((a, b) => a.id.localeCompare(b.id));
+        const tracks = [...this.tracks.values()].sort((a, b) => {
+            const ao = a.order ?? 999;
+            const bo = b.order ?? 999;
+            if (ao !== bo)
+                return ao - bo;
+            return a.id.localeCompare(b.id);
+        });
         for (const track of tracks)
             track.modules.sort(moduleSort);
 
@@ -90,6 +98,31 @@ export class ContentLoader {
             packs: this.packs,
             tracks,
             modules: this.modules,
+        };
+    }
+
+    _loadTrackMetadata(packDir) {
+        const tracksPath = GLib.build_filenamev([packDir, 'tracks.yaml']);
+        const file = Gio.File.new_for_path(tracksPath);
+        if (!file.query_exists(null))
+            return new Map();
+
+        const doc = parseModuleText(readTextFile(file), tracksPath);
+        for (const entry of doc.tracks ?? []) {
+            if (entry?.id)
+                this._trackMetadata.set(entry.id, entry);
+        }
+        return this._trackMetadata;
+    }
+
+    _enrichTrack(trackId, trackTitle) {
+        const meta = this._trackMetadata?.get(trackId);
+        return {
+            id: trackId,
+            title: meta?.title ?? trackTitle,
+            description: meta?.description ?? '',
+            order: meta?.order ?? 999,
+            modules: [],
         };
     }
 
@@ -110,8 +143,10 @@ export class ContentLoader {
         const pack = { ...manifest, modules: [], pack_dir: packDir };
         this.packs.push(pack);
 
+        const trackMeta = this._loadTrackMetadata(packDir);
+
         for (const entry of listDirectory(packDir)) {
-            if (entry === 'pack.yaml' || entry === 'pack.json' || entry.startsWith('.'))
+            if (entry === 'pack.yaml' || entry === 'pack.json' || entry === 'tracks.yaml' || entry.startsWith('.'))
                 continue;
             const entryPath = GLib.build_filenamev([packDir, entry]);
             const entryFile = Gio.File.new_for_path(entryPath);
@@ -147,11 +182,7 @@ export class ContentLoader {
         this.modules.push(enriched);
 
         if (!this.tracks.has(module.track)) {
-            this.tracks.set(module.track, {
-                id: module.track,
-                title: module.track_title,
-                modules: [],
-            });
+            this.tracks.set(module.track, this._enrichTrack(module.track, module.track_title));
         }
         this.tracks.get(module.track).modules.push(enriched);
     }

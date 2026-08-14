@@ -74,7 +74,7 @@ export const TerminalBeat = GObject.registerClass({
         this._handledSentinel = null;
 
         this._realSystemBanner = new Adw.Banner({
-            title: _('This step runs on your real system — there is no reset button. Read the instructions carefully.'),
+            title: _('This step installs real software on your actual computer. There\'s no reset button for this one.'),
             revealed: false,
         });
         this.append(this._realSystemBanner);
@@ -150,7 +150,12 @@ export const TerminalBeat = GObject.registerClass({
     reset(step, sandboxPath) {
         this._spawned = false;
         this._handledSentinel = null;
+        this._hintPanel.clearHintBadge();
         this.start(step, sandboxPath);
+    }
+
+    scheduleHintBadge() {
+        this._hintPanel.scheduleHintBadge(5000);
     }
 
     _shouldUseBwrap() {

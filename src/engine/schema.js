@@ -153,6 +153,8 @@ function validateStep(step, path) {
         break;
     case 'bridge':
         requireString(step, 'body', `${path}/${id}`);
+        if (step.cta_label !== undefined && typeof step.cta_label !== 'string')
+            throw new ContentSchemaError('cta_label must be a string', `${path}/${id}`);
         if (step.hints !== undefined)
             requireStringArray(step, 'hints', `${path}/${id}`);
         break;
@@ -225,6 +227,7 @@ export function validateModule(module, sourcePath = '') {
         module: moduleId,
         title,
         order,
+        module_description: typeof module.module_description === 'string' ? module.module_description : '',
         steps,
         source_path: sourcePath,
     };

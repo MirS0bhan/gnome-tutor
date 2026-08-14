@@ -28,64 +28,82 @@ export const PracticeBeatView = GObject.registerClass({
         this._challenges = [];
         this._selectedStep = null;
         this._sandboxPath = null;
-        this._challengeRow = new Adw.ActionRow({
-            title: _('Optional challenge'),
-            subtitle: _('Pick a one-line task to try'),
-        });
-        this._challengeDropdown = new Gtk.DropDown({
-            model: Gtk.StringList.new([]),
-            valign: Gtk.Align.CENTER,
-        });
-        this._challengeRow.add_suffix(this._challengeDropdown);
-        this._challengeRow.set_activatable_widget(this._challengeDropdown);
+        this._activeChallenge = null;
 
-        this.append(new Adw.Banner({
-            title: _('Free practice — this folder persists until you reset it. Nothing here affects your real files.'),
-            revealed: true,
-        }));
-        this.append(this._challengeRow);
+        this._headerLabel = new Gtk.Label({
+            label: _('Your practice space — nothing here resets automatically.'),
+            css_classes: ['title-4'],
+            halign: Gtk.Align.START,
+            wrap: true,
+            margin_start: 24,
+            margin_end: 24,
+            margin_top: 12,
+        });
+        this.append(this._headerLabel);
+
+        this._challengeExpander = new Gtk.Expander({
+            label: _('Challenges'),
+            margin_start: 24,
+            margin_end: 24,
+        });
+        this._challengeList = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL, spacing: 4 });
+        this._challengeExpander.set_child(this._challengeList);
+        this.append(this._challengeExpander);
+
+        const toolbar = new Gtk.Box({
+            spacing: 8,
+            margin_start: 24,
+            margin_end: 24,
+        });
+        this._startFreshButton = new Gtk.Button({ label: _('Start fresh') });
+        this._startFreshButton.connect('clicked', () => this.emit('reset-requested'));
+        toolbar.append(this._startFreshButton);
+        this.append(toolbar);
+
         this.append(this._terminalHost);
-
-        this._challengeDropdown.connect('notify::selected', () => {
-            if (this._selectedStep)
-                this._onChallengeSelected(this._selectedStep, this._sandboxPath);
-        });
     }
 
     async showPractice(step, sandboxPath) {
         this._challenges = step.challenges ?? [];
-        const labels = [_('Free practice (no challenge)')];
-        for (const challenge of this._challenges)
-            labels.push(challenge.title);
-        this._challengeDropdown.model = Gtk.StringList.new(labels);
-        this._challengeRow.visible = this._challenges.length > 0;
         this._selectedStep = step;
         this._sandboxPath = sandboxPath;
+        this._activeChallenge = null;
+        this._headerLabel.label = _('Your practice space — nothing here resets automatically.');
+
+        let child = this._challengeList.get_first_child();
+        while (child) {
+            const next = child.get_next_sibling();
+            this._challengeList.remove(child);
+            child = next;
+        }
+        this._challengeExpander.visible = this._challenges.length > 0;
+
+        for (const challenge of this._challenges) {
+            const button = new Gtk.Button({
+                label: challenge.title,
+                css_classes: ['flat'],
+                halign: Gtk.Align.START,
+            });
+            button.connect('clicked', () => this._activateChallenge(challenge));
+            this._challengeList.append(button);
+        }
 
         if (!this._beat) {
             this._beat = await createTerminalBeat({ vexpand: true, hexpand: true });
             this._beat.connect('hint-revealed', () => this.emit('hint-revealed'));
-            this._beat.connect('reset-requested', () => this.emit('reset-requested'));
             this._terminalHost.append(this._beat);
         }
 
-        this._challengeDropdown.selected = 0;
         this._beat.reset(step, sandboxPath);
     }
 
-    _onChallengeSelected(step, sandboxPath) {
-        const index = this._challengeDropdown.selected;
-        if (index <= 0) {
-            this._beat.reset(step, sandboxPath);
-            return;
-        }
-        const challenge = this._challenges[index - 1];
-        if (!challenge)
-            return;
+    _activateChallenge(challenge) {
+        this._activeChallenge = challenge;
+        this._headerLabel.label = challenge.title;
         this._beat.reset({
             instruction: challenge.instruction,
             hints: challenge.hints ?? [],
             validate: challenge.validate,
-        }, sandboxPath);
+        }, this._sandboxPath);
     }
 });

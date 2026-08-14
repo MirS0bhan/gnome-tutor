@@ -23,7 +23,7 @@ export const BridgeBeatView = GObject.registerClass({
         });
     }
 
-    setStep(module, step) {
+    setStep(_module, step) {
         let child = this.get_first_child();
         while (child) {
             const next = child.get_next_sibling();
@@ -31,20 +31,30 @@ export const BridgeBeatView = GObject.registerClass({
             child = next;
         }
 
+        const center = new Gtk.Box({
+            orientation: Gtk.Orientation.VERTICAL,
+            spacing: 18,
+            halign: Gtk.Align.CENTER,
+            vexpand: true,
+            valign: Gtk.Align.CENTER,
+            width_request: 720,
+        });
+
         if (step.title) {
-            this.append(new Gtk.Label({
+            center.append(new Gtk.Label({
                 label: step.title,
                 css_classes: ['title-2'],
-                halign: Gtk.Align.START,
                 wrap: true,
+                justify: Gtk.Justification.CENTER,
             }));
         }
 
-        this.append(new Gtk.Label({
+        center.append(new Gtk.Label({
             label: step.body,
             wrap: true,
-            halign: Gtk.Align.START,
             justify: Gtk.Justification.FILL,
+            max_width_chars: 52,
+            halign: Gtk.Align.CENTER,
         }));
 
         const hints = step.hints ?? [];
@@ -52,7 +62,9 @@ export const BridgeBeatView = GObject.registerClass({
             const hintPanel = new HintPanel();
             hintPanel.setHints(hints);
             hintPanel.connect('hint-revealed', () => this.emit('hint-revealed'));
-            this.append(hintPanel);
+            center.append(hintPanel);
         }
+
+        this.append(center);
     }
 });

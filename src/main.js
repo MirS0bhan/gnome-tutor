@@ -48,7 +48,7 @@ export const GnomeTutorApplication = GObject.registerClass(
             const show_about_action = new Gio.SimpleAction({name: 'about'});
             show_about_action.connect('activate', action => {
                 const aboutParams = {
-                    application_name: _('GNOME Linux Academy'),
+                    application_name: _('Linux Academy'),
                     application_icon: 'ir.urumlug.gnomeTutor',
                     developer_name: 'misano / UrumLUG',
                     version: '0.1.0',

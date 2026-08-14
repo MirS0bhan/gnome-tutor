@@ -1,0 +1,41 @@
+tracks:
+  - id: orientation
+    order: 0
+    title: Orientation
+    description: Before the terminal, before files — get comfortable with the Linux desktop.
+  - id: filesystem
+    order: 1
+    title: Files & the Filesystem
+    description: Copy, move, and organize — the GUI way and the command-line way.
+  - id: permissions
+    order: 2
+    title: Permissions
+    description: Who can read, write, and run files — in Files and with chmod.
+  - id: software
+    order: 3
+    title: Software
+    description: Install and remove apps from the GUI and the package manager.
+  - id: processes
+    order: 4
+    title: Processes
+    description: See what is running and how to stop it.
+  - id: settings
+    order: 5
+    title: Settings
+    description: Personalize the desktop the GUI way.
+  - id: editing
+    order: 6
+    title: Editing
+    description: Edit text in a graphical editor and in the terminal.
+  - id: devices
+    order: 7
+    title: Devices
+    description: Disks, USB drives, and storage layout.
+  - id: networking
+    order: 8
+    title: Networking
+    description: Wi-Fi, connections, and basic network tools.
+  - id: practice
+    order: 9
+    title: Free Practice
+    description: A persistent sandbox and optional challenges.

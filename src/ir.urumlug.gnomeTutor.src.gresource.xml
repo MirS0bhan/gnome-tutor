@@ -7,6 +7,7 @@
     <file>engine/yaml.js</file>
     <file>engine/contentLoader.js</file>
     <file>engine/distroInfo.js</file>
+    <file>engine/journeyHelpers.js</file>
     <file>engine/progressStore.js</file>
     <file>engine/sandboxManager.js</file>
     <file>engine/appLauncher.js</file>
@@ -15,6 +16,9 @@
     <file>engine/lessonEngine.js</file>
     <file>engine/spotlightAnchors.js</file>
     <file>engine/fixtureWatcher.js</file>
+    <file>widgets/journeyStack.js</file>
+    <file>widgets/tourBeatView.js</file>
+    <file>widgets/preferencesWindow.js</file>
     <file>widgets/curriculumSidebar.js</file>
     <file>widgets/stepView.js</file>
     <file>widgets/guiBeatView.js</file>
