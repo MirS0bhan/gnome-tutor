@@ -1,0 +1,33 @@
+track: practice
+track_title: Free practice
+module: sandbox-playground
+title: Practice terminal
+order: 1
+steps:
+  - id: practice-intro
+    kind: contrast
+    title: Your sandbox
+    body: |
+      This track keeps one **persistent** practice folder. Experiment with commands,
+      make mistakes, and reset when you want a clean slate — nothing here touches
+      your real files.
+
+  - id: practice-shell
+    kind: practice
+    title: Free practice shell
+    fixture: fixtures/practice-home/
+    instruction: |
+      Use the terminal below freely. Try cd, ls, mkdir, cp, and rm. Press
+      **Reset step** in the menu or terminal toolbar to restore the starter files.
+
+  - id: challenge-ls
+    kind: challenge
+    title: Challenge — list files
+    fixture: fixtures/practice-home/
+    instruction: List all files including hidden ones with `ls -a`.
+    validate:
+      pattern: '^ls\s+-a\s*$'
+      expect_exit: 0
+    hints:
+      - The -a flag shows dotfiles.
+      - ls -a

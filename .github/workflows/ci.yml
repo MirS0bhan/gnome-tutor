@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gnome/gnome-builder-image-gitlab:master
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate content packs
+        run: gjs -m tools/content-lint.js content
+
+      - name: Configure
+        run: meson setup build --prefix=/usr
+
+      - name: Build
+        run: meson compile -C build
+
+      - name: Test
+        run: meson test -C build --print-errorlogs
+
+      - name: Install
+        run: meson install -C build

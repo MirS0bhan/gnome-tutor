@@ -1,0 +1,45 @@
+track: processes
+track_title: Processes and monitoring
+module: system-monitor
+title: System Monitor
+order: 1
+steps:
+  - id: contrast-processes
+    kind: contrast
+    title: Task Manager equivalents
+    body: |
+      Windows Task Manager and GNOME **System Monitor** show running apps and
+      resource usage. The terminal exposes the same data for remote and scripted use.
+
+  - id: gui-monitor
+    kind: gui
+    title: Open System Monitor
+    target_app: org.gnome.SystemMonitor
+    instruction: Open System Monitor and find a running process.
+    phases:
+      - instruction: Launch **System Monitor** from the app grid.
+        label: Open System Monitor
+      - instruction: Click the **Processes** tab and sort by CPU or memory.
+        label: Browse the process list
+    hints:
+      - Press Super and type System Monitor.
+      - You can force-quit misbehaving apps from here.
+
+  - id: terminal-ps
+    kind: terminal
+    title: ps snapshot
+    fixture: fixtures/open-files/
+    instruction: Run `ps` to list processes in this shell session.
+    validate:
+      pattern: '^ps\s*$'
+      expect_exit: 0
+    hints:
+      - ps shows a snapshot of processes.
+      - ps aux shows more detail on most systems.
+
+  - id: bridge-processes
+    kind: bridge
+    title: GUI vs ps/top
+    body: |
+      System Monitor is enough on your laptop. On a remote server without a GUI,
+      `ps`, `top`, and `htop` are how you see what is running.
