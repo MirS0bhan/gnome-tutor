@@ -13,18 +13,38 @@ function stripQuotes(value) {
     return value;
 }
 
+function parseScalar(text) {
+    const value = stripQuotes(text);
+    if (/^-?\d+$/.test(value))
+        return Number.parseInt(value, 10);
+    if (value === 'true')
+        return true;
+    if (value === 'false')
+        return false;
+    if (value === 'null' || value === '~')
+        return null;
+    return value;
+}
+
 function parseBlockScalar(lines, startIndex, indent) {
     const content = [];
     let index = startIndex;
+    const contentIndent = indent + 2;
     while (index < lines.length) {
         const line = lines[index];
-        if (line.trim() === '')
+        if (line.trim() === '') {
+            content.push('');
+            index++;
+            continue;
+        }
+        const lineIndent = line.length - line.trimStart().length;
+        if (lineIndent < contentIndent)
             break;
-        if (!line.startsWith(' '.repeat(indent + 2)) && line.trim() !== '')
-            break;
-        content.push(line.slice(indent + 2));
+        content.push(line.slice(contentIndent));
         index++;
     }
+    while (content.length > 0 && content[content.length - 1] === '')
+        content.pop();
     return { value: content.join('\n'), nextIndex: index };
 }
 
@@ -37,7 +57,7 @@ function parseValue(text, lines, index, indent) {
         const block = parseBlockScalar(lines, index, indent);
         return { value: block.value.replace(/\n/g, ' ').trim(), nextIndex: block.nextIndex };
     }
-    return { value: stripQuotes(text), nextIndex: index };
+    return { value: parseScalar(text), nextIndex: index };
 }
 
 function parseList(lines, startIndex, baseIndent) {
@@ -45,24 +65,38 @@ function parseList(lines, startIndex, baseIndent) {
     let index = startIndex;
     while (index < lines.length) {
         const line = lines[index];
-        if (line.trim() === '' || !line.startsWith(' '.repeat(baseIndent)))
+        if (line.trim() === '') {
+            index++;
+            continue;
+        }
+        if (!line.startsWith(' '.repeat(baseIndent)))
             break;
         const trimmed = line.trimStart();
         if (!trimmed.startsWith('- '))
             break;
         const itemText = trimmed.slice(2).trim();
         if (itemText.includes(':')) {
-            const nested = parseMapping(lines, index + 1, baseIndent + 2);
             const key = itemText.slice(0, itemText.indexOf(':')).trim();
             const inline = itemText.slice(itemText.indexOf(':') + 1).trim();
             const item = {};
             if (inline)
-                item[key] = stripQuotes(inline);
-            Object.assign(item, nested.value);
+                item[key] = parseScalar(inline);
+            if (index + 1 < lines.length) {
+                const nextLine = lines[index + 1];
+                const nextIndent = nextLine.length - nextLine.trimStart().length;
+                if (nextIndent > baseIndent && !nextLine.trimStart().startsWith('- ')) {
+                    const nested = parseMapping(lines, index + 1, nextIndent);
+                    Object.assign(item, nested.value);
+                    index = nested.nextIndex;
+                } else {
+                    index++;
+                }
+            } else {
+                index++;
+            }
             items.push(item);
-            index = nested.nextIndex;
         } else {
-            items.push(stripQuotes(itemText));
+            items.push(parseScalar(itemText));
             index++;
         }
     }
@@ -74,8 +108,10 @@ function parseMapping(lines, startIndex, baseIndent) {
     let index = startIndex;
     while (index < lines.length) {
         const line = lines[index];
-        if (line.trim() === '')
-            break;
+        if (line.trim() === '') {
+            index++;
+            continue;
+        }
         if (!line.startsWith(' '.repeat(baseIndent)))
             break;
         const trimmed = line.trimStart();
@@ -89,7 +125,9 @@ function parseMapping(lines, startIndex, baseIndent) {
         index++;
         if (rest === '') {
             if (index < lines.length && lines[index].trimStart().startsWith('- ')) {
-                const list = parseList(lines, index, baseIndent);
+                const listLine = lines[index];
+                const listIndent = listLine.length - listLine.trimStart().length;
+                const list = parseList(lines, index, listIndent);
                 map[key] = list.value;
                 index = list.nextIndex;
             } else if (index < lines.length && lines[index].startsWith(' '.repeat(baseIndent + 2))) {

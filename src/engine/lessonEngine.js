@@ -6,6 +6,7 @@
 import GLib from 'gi://GLib';
 
 import { AppLauncher } from './appLauncher.js';
+import { FixtureWatcher } from './fixtureWatcher.js';
 import { SandboxManager } from './sandboxManager.js';
 import { SpotlightClient } from './spotlightClient.js';
 import { resolveSpotlightList } from './spotlightAnchors.js';
@@ -21,6 +22,12 @@ export class LessonEngine {
         this._guiPhaseIndex = -1;
         this._spotlightRetrySource = 0;
         this._spotlightActive = false;
+        this.fixtureWatcher = new FixtureWatcher();
+        this._onFixtureDetected = null;
+    }
+
+    setFixtureDetectedCallback(callback) {
+        this._onFixtureDetected = callback;
     }
 
     stepKey(module, step) {
@@ -43,6 +50,17 @@ export class LessonEngine {
                 console.error(error.message);
             }
         }
+
+        if (step.kind === 'gui' && step.watch_file) {
+            const sandboxPath = this.sandboxPath(module, step);
+            if (sandboxPath) {
+                const watchPath = GLib.build_filenamev([sandboxPath, step.watch_file]);
+                this.fixtureWatcher.watch(watchPath, () => {
+                    if (this._onFixtureDetected)
+                        this._onFixtureDetected();
+                });
+            }
+        }
     }
 
     practicePath(module, step) {
@@ -50,6 +68,7 @@ export class LessonEngine {
     }
 
     endStep() {
+        this.fixtureWatcher.clear();
         this._cancelSpotlightRetry();
         this.spotlight.clear();
         this._activeGuiStep = null;

@@ -69,9 +69,10 @@ function validateStep(step, path) {
     if (!STEP_KINDS.has(kind))
         throw new ContentSchemaError(`unknown step kind "${kind}"`, path);
 
+    requireString(step, 'title', `${path}/${id}`);
+
     switch (kind) {
     case 'contrast':
-        requireString(step, 'title', `${path}/${id}`);
         requireString(step, 'body', `${path}/${id}`);
         if (step.contrast_diagram !== undefined && typeof step.contrast_diagram !== 'string')
             throw new ContentSchemaError('contrast_diagram must be a string', `${path}/${id}`);
@@ -87,6 +88,8 @@ function validateStep(step, path) {
             requireStringArray(step, 'hints', `${path}/${id}`);
         if (step.spotlight !== undefined)
             validateSpotlight(step.spotlight, `${path}/${id}/spotlight`);
+        if (step.watch_file !== undefined && typeof step.watch_file !== 'string')
+            throw new ContentSchemaError('watch_file must be a string', `${path}/${id}`);
         if (step.distro_variants !== undefined)
             validateDistroVariants(step.distro_variants, `${path}/${id}`);
         if (step.phases !== undefined) {

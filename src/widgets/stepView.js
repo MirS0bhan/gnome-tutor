@@ -98,7 +98,9 @@ export const StepView = GObject.registerClass({
         this._continueButton = new Gtk.Button({
             label: _('Continue'),
             css_classes: ['suggested-action'],
+            accessible_role: Gtk.AccessibleRole.BUTTON,
         });
+        this._continueButton.set_accessible_label(_('Continue to next step'));
         this._continueButton.connect('clicked', () => this.emit('continue'));
         this._footer.append(this._continueButton);
         this.append(this._footer);

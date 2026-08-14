@@ -22,6 +22,16 @@ function assertPathExists(baseDir, relativePath, context) {
         throw new ContentSchemaError(`missing path "${relativePath}" (${context})`, fullPath);
 }
 
+function assertFixtureExists(baseDir, relativePath, context) {
+    const normalized = relativePath.replace(/\/$/, '');
+    const fullPath = normalized.startsWith('fixtures/')
+        ? GLib.build_filenamev([baseDir, normalized])
+        : GLib.build_filenamev([baseDir, 'fixtures', normalized]);
+    const file = Gio.File.new_for_path(fullPath);
+    if (!file.query_exists(null))
+        throw new ContentSchemaError(`missing fixture path "${relativePath}" (${context})`, fullPath);
+}
+
 function validateFixtures(curriculum) {
     let fixtureCount = 0;
     let diagramCount = 0;
@@ -31,7 +41,7 @@ function validateFixtures(curriculum) {
 
         for (const step of mod.steps) {
             if (typeof step.fixture === 'string' && step.fixture.trim()) {
-                assertPathExists(packDir, step.fixture, `${mod.track}/${mod.module}/${step.id}`);
+                assertFixtureExists(packDir, step.fixture, `${mod.track}/${mod.module}/${step.id}`);
                 fixtureCount++;
             }
 

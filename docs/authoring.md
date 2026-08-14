@@ -100,3 +100,17 @@ Orientation modules explain the desktop without launching Shell (`org.gnome.Shel
 ## CI
 
 Pull requests run `gjs -m tools/content-lint.js content` and a Meson build. Fix schema or missing-fixture errors before merging.
+
+Report lesson friction with the **Lesson feedback** issue template.
+
+## Content pack split
+
+See [content-packs.md](content-packs.md) for installing packs under `$XDG_DATA_DIRS` or using a separate repository.
+
+## Optional GUI file watch
+
+GUI steps may set `watch_file` (path relative to the sandbox) for soft auto-detection. The app shows a toast when the file changes; learners still press **Done** manually.
+
+```yaml
+watch_file: Documents/new-folder
+```

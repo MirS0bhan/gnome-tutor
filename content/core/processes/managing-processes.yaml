@@ -1,0 +1,49 @@
+track: processes
+track_title: Processes and monitoring
+module: managing-processes
+title: Background jobs and stopping programs
+order: 2
+steps:
+  - id: contrast-jobs
+    kind: contrast
+    title: End Task vs kill
+    body: |
+      Windows Task Manager lets you **End task** for a frozen app. On Linux you can
+      use System Monitor the same way, or send signals from the terminal with
+      `kill`. Background jobs (`command &`) keep running after you get your prompt
+      back — list them with `jobs`.
+
+  - id: terminal-jobs
+    kind: terminal
+    title: List background jobs
+    fixture: fixtures/open-files/
+    instruction: |
+      Run `jobs` to list background jobs in this shell (the list may be empty — that is OK).
+    validate:
+      pattern: '^jobs\s*$'
+      expect_exit: 0
+    hints:
+      - jobs only shows tasks started in *this* shell with &.
+      - Try `sleep 30 &` then run jobs again on your own time.
+
+  - id: terminal-kill-list
+    kind: terminal
+    title: Signal names
+    fixture: fixtures/open-files/
+    instruction: |
+      Run `kill -l` to print the list of signal names the shell understands.
+    validate:
+      pattern: '^kill\s+-l\s*$'
+      expect_exit: 0
+    hints:
+      - kill -l is read-only — it does not stop anything.
+      - SIGTERM (15) asks politely; SIGKILL (9) cannot be ignored.
+
+  - id: bridge-jobs
+    kind: bridge
+    title: When to use GUI vs kill
+    body: |
+      Prefer System Monitor when you are unsure which process to stop. Use `kill`
+      when you already know the PID (from `ps` or `pgrep`) or when you are on a
+      remote server without a desktop. Background jobs matter when you start long
+      builds or servers from a terminal — `jobs`, `fg`, and `bg` keep you in control.

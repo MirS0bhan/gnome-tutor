@@ -1,10 +1,11 @@
 [Desktop Entry]
-Name=gnome-tutor
+Name=GNOME Linux Academy
+Comment=Learn Linux with real GNOME apps and the terminal
 Exec=ir.urumlug.gnomeTutor
 Icon=ir.urumlug.gnomeTutor
 Terminal=false
 Type=Application
-Categories=Utility;
-Keywords=GTK;
+Categories=Education;Utility;
+Keywords=linux;gnome;tutor;terminal;learn;
 StartupNotify=true
 DBusActivatable=true

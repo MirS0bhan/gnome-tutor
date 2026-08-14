@@ -93,6 +93,7 @@ export const TerminalBeat = GObject.registerClass({
 
         const toolbar = new Gtk.Box({ spacing: 6 });
         this._resetButton = new Gtk.Button({ label: _('Reset step') });
+        this._resetButton.set_accessible_label(_('Reset lesson sandbox to initial files'));
         this._resetButton.connect('clicked', () => this.emit('reset-requested'));
         toolbar.append(this._resetButton);
         this.append(toolbar);

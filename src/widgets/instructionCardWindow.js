@@ -85,6 +85,7 @@ export const InstructionCardWindow = GObject.registerClass({
             label: _('Open practice folder in Files'),
             css_classes: ['suggested-action'],
         });
+        this._openButton.set_accessible_label(_('Open practice folder in Files'));
         this._openButton.connect('clicked', () => this.emit('open-app'));
         actions.append(this._openButton);
 
@@ -92,6 +93,7 @@ export const InstructionCardWindow = GObject.registerClass({
             label: _('Next step'),
             visible: false,
         });
+        this._nextButton.set_accessible_label(_('Next instruction phase'));
         this._nextButton.connect('clicked', () => this.emit('next-phase'));
         actions.append(this._nextButton);
 
@@ -100,6 +102,7 @@ export const InstructionCardWindow = GObject.registerClass({
             css_classes: ['suggested-action'],
             visible: false,
         });
+        this._doneButton.set_accessible_label(_('Finish GUI step and continue'));
         this._doneButton.connect('clicked', () => this.emit('done'));
         actions.append(this._doneButton);
 

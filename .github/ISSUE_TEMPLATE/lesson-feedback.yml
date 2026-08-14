@@ -1,0 +1,54 @@
+name: Lesson feedback
+description: Report confusion, hint friction, or content errors in a module
+title: "[Lesson] "
+labels: ["content"]
+body:
+  - type: dropdown
+    id: track
+    attributes:
+      label: Track
+      options:
+        - orientation
+        - filesystem
+        - permissions
+        - software
+        - processes
+        - practice
+        - other
+  - type: input
+    id: module
+    attributes:
+      label: Module id
+      description: e.g. opening-files, renaming-files
+      placeholder: opening-files
+    validations:
+      required: true
+  - type: input
+    id: step
+    attributes:
+      label: Step id
+      description: e.g. gui-open-nautilus, terminal-navigate
+      placeholder: gui-open-nautilus
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What was confusing or wrong?
+      description: Include what you tried and what you expected.
+    validations:
+      required: true
+  - type: dropdown
+    id: hints
+    attributes:
+      label: Did you need hints?
+      options:
+        - "No"
+        - "1–2"
+        - "3+"
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: e.g. Fedora 42 GNOME 48, Flatpak 0.1.0
+      placeholder: Fedora 42, native build

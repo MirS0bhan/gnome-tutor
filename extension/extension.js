@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import Clutter from 'gi://Clutter';
 import GLib from 'gi://GLib';
 import Gio from 'gi://Gio';
 import Meta from 'gi://Meta';
@@ -103,7 +104,11 @@ export default class Extension {
         this._actors.push(actor);
     }
 
-    _showLabel(label, rx, ry) {
+    _isRtl() {
+        return Clutter.get_default_text_direction() === Clutter.TextDirection.RTL;
+    }
+
+    _showLabel(label, rx, ry, rw = 0) {
         if (this._label) {
             this._label.destroy();
             this._label = null;
@@ -113,11 +118,21 @@ export default class Extension {
             return;
 
         const monitor = this._monitorGeometry();
-        this._labelAnchor = { rx, ry };
+        const maxLabelWidth = 480;
+        const isRtl = this._isRtl();
+        let labelX = rx;
+        if (isRtl && rw > 0)
+            labelX = Math.max(monitor.x + 8, rx + rw - maxLabelWidth);
+        else if (isRtl)
+            labelX = Math.max(monitor.x + 8, rx);
+
+        labelX = Math.min(labelX, monitor.x + monitor.width - maxLabelWidth - 8);
+
+        this._labelAnchor = { rx, ry, rw, isRtl };
         this._label = new St.Label({
             text: label,
             style: 'background-color: rgba(0, 0, 0, 0.85); color: white; padding: 10px 14px; border-radius: 10px; font-size: 15px; max-width: 480px;',
-            x: rx,
+            x: labelX,
             y: Math.max(monitor.y + 8, ry - 48),
         });
         Main.uiGroup.add_child(this._label);
@@ -152,7 +167,7 @@ export default class Extension {
         Main.uiGroup.add_child(frame);
         this._actors.push(frame);
 
-        this._showLabel(label, rx, ry);
+        this._showLabel(label, rx, ry, w);
     }
 
     _findWindow(wmClass) {

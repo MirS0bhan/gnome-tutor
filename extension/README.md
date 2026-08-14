@@ -24,3 +24,7 @@ Bus name: `systems.misano.LinuxAcademy.Spotlight`
 | `Clear()` | Remove overlay |
 
 The main app degrades gracefully when this extension is absent — the floating instruction card still works.
+
+## RTL locales
+
+Spotlight labels anchor to the right edge of the highlighted region when the session text direction is RTL (e.g. Persian).

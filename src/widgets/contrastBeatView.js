@@ -65,6 +65,10 @@ export const ContrastBeatView = GObject.registerClass({
             homogeneous: true,
             margin_top: 12,
         });
+        const rtl = module.pack_language === 'fa'
+            || Gtk.Settings.get_default()?.gtk_text_direction === Gtk.TextDirection.RTL;
+        if (rtl)
+            columns.set_direction(Gtk.TextDirection.RTL);
 
         columns.append(this._column(_('Windows / macOS'), 'computer-symbolic',
             _('Drive letters (C:\\, D:\\)\nStart menu & taskbar\nRegistry for settings')));

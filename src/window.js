@@ -44,6 +44,11 @@ export const GnomeTutorWindow = GObject.registerClass({
 
         this._progressStore = new ProgressStore();
         this._lessonEngine = new LessonEngine({ progressStore: this._progressStore });
+        this._lessonEngine.setFixtureDetectedCallback(() => {
+            this._toast_overlay.add_toast(Adw.Toast.new(
+                _('Looks like you did it — press Continue when you are ready.'),
+            ));
+        });
         this._curriculum = null;
         this._availablePacks = [];
         this._activeModule = null;
