@@ -32,6 +32,7 @@ export const CurriculumSidebar = GObject.registerClass({
         this._selectedModule = null;
         this._selectedStep = null;
         this._trackRows = new Map();
+        this._blockRowSelection = false;
 
         this._scrolled = new Gtk.ScrolledWindow({
             vexpand: true,
@@ -45,7 +46,7 @@ export const CurriculumSidebar = GObject.registerClass({
         });
         setAccessibleLabel(this._list, _('Curriculum tracks'));
         this._list.connect('row-selected', (_box, row) => {
-            if (!row?.track)
+            if (this._blockRowSelection || !row?.track)
                 return;
             this._selectedTrack = row.track;
             this._selectedModule = null;
@@ -72,7 +73,6 @@ export const CurriculumSidebar = GObject.registerClass({
         this._selectedModule = null;
         this._selectedStep = null;
         this._rebuild();
-        this._highlightTrack(track);
     }
 
     selectModule(module) {
@@ -85,7 +85,16 @@ export const CurriculumSidebar = GObject.registerClass({
     scrollToTrack(track) {
         const row = this._trackRows.get(track.id);
         if (row)
+            this._selectRowSilently(row);
+    }
+
+    _selectRowSilently(row) {
+        this._blockRowSelection = true;
+        try {
             this._list.select_row(row);
+        } finally {
+            this._blockRowSelection = false;
+        }
     }
 
     get selectedTrack() {
@@ -112,7 +121,7 @@ export const CurriculumSidebar = GObject.registerClass({
     _highlightTrack(track) {
         const row = this._trackRows.get(track?.id);
         if (row)
-            this._list.select_row(row);
+            this._selectRowSilently(row);
     }
 
     _moduleSubtitle(module) {
