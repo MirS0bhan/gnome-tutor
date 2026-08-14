@@ -42,6 +42,12 @@ export const JourneyStack = GObject.registerClass({
         this.add_named(this._homePage, 'home');
         this.add_named(this._trackOverviewPage.box, 'track-overview');
         this.add_named(this._moduleOverviewPage.box, 'module-overview');
+
+        this.connect('notify::visible-child-name', () => {
+            if (this.visible_child_name !== 'welcome')
+                return;
+            this._welcomePage.get_last_child()?.grab_focus();
+        });
     }
 
     setLessonChild(child) {
@@ -72,6 +78,10 @@ export const JourneyStack = GObject.registerClass({
             ?? _('Pick a module to begin this track.');
         this._trackOverviewPage.action.label = trackOverviewButtonLabel(track, this._progressStore);
         this._trackOverviewPage.action.visible = true;
+        this._trackOverviewPage.action.update_property(
+            Gtk.AccessibleProperty.DESCRIPTION,
+            _('Start or continue the selected track'),
+        );
         this.visible_child_name = 'track-overview';
     }
 
@@ -82,6 +92,10 @@ export const JourneyStack = GObject.registerClass({
             ?? _('Work through each step in order — GUI, terminal, and bridge.');
         this._moduleOverviewPage.action.label = moduleOverviewButtonLabel(module, this._progressStore);
         this._moduleOverviewPage.action.visible = true;
+        this._moduleOverviewPage.action.update_property(
+            Gtk.AccessibleProperty.DESCRIPTION,
+            _('Start or continue the selected module'),
+        );
         this.visible_child_name = 'module-overview';
     }
 
@@ -117,6 +131,7 @@ export const JourneyStack = GObject.registerClass({
             css_classes: ['pill', 'suggested-action'],
             halign: Gtk.Align.CENTER,
             margin_bottom: 48,
+            can_focus: true,
         });
         button.connect('clicked', () => this.emit('welcome-started'));
         box.append(button);
@@ -160,6 +175,7 @@ export const JourneyStack = GObject.registerClass({
             css_classes: ['pill', 'suggested-action'],
             halign: Gtk.Align.CENTER,
             width_request: 200,
+            can_focus: true,
         });
         action.connect('clicked', () => {
             if (kind === 'track')

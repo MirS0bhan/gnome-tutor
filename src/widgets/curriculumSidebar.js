@@ -41,6 +41,7 @@ export const CurriculumSidebar = GObject.registerClass({
             selection_mode: Gtk.SelectionMode.SINGLE,
             css_classes: ['navigation-sidebar'],
         });
+        this._list.update_property(Gtk.AccessibleProperty.LABEL, _('Curriculum tracks'));
         this._list.connect('row-selected', (_box, row) => {
             if (!row?.track)
                 return;
@@ -146,16 +147,33 @@ export const CurriculumSidebar = GObject.registerClass({
                 margin_end: 12,
             });
 
-            const indicatorLabel = progress.done
-                ? '✓'
-                : `${Math.round(progress.fraction * 100)}%`;
-            const indicator = new Gtk.Label({
-                label: indicatorLabel,
-                width_chars: 3,
-                xalign: 0.5,
-                css_classes: progress.done ? ['success'] : ['dim-label', 'caption'],
+            const percent = progress.done ? 100 : Math.round(progress.fraction * 100);
+            const progressWrap = new Gtk.Box({
+                orientation: Gtk.Orientation.VERTICAL,
+                spacing: 2,
+                valign: Gtk.Align.CENTER,
             });
-            rowBox.append(indicator);
+            const progressBar = new Gtk.ProgressBar({
+                orientation: Gtk.Orientation.VERTICAL,
+                width_request: 6,
+                height_request: 36,
+                valign: Gtk.Align.CENTER,
+            });
+            progressBar.set_fraction(progress.done ? 1.0 : Math.max(0, progress.fraction));
+            progressBar.update_property(
+                Gtk.AccessibleProperty.LABEL,
+                progress.done
+                    ? _('Track %d complete: %s').format(track.order ?? 0, track.title)
+                    : _('Track %d, %d%% complete: %s').format(track.order ?? 0, percent, track.title),
+            );
+            progressWrap.append(progressBar);
+            progressWrap.append(new Gtk.Label({
+                label: progress.done ? _('Done') : `${percent}%`,
+                css_classes: ['caption', 'dim-label'],
+                width_chars: 4,
+                xalign: 0.5,
+            }));
+            rowBox.append(progressWrap);
 
             const textBox = new Gtk.Box({
                 orientation: Gtk.Orientation.VERTICAL,
@@ -191,6 +209,13 @@ export const CurriculumSidebar = GObject.registerClass({
 
             const row = new Gtk.ListBoxRow({ child: rowBox });
             row.track = track;
+            row.update_property(Gtk.AccessibleProperty.LABEL, this._trackLabel(track));
+            if (track.description) {
+                row.update_property(
+                    Gtk.AccessibleProperty.DESCRIPTION,
+                    track.description,
+                );
+            }
             this._trackRows.set(track.id, row);
             this._list.append(row);
 

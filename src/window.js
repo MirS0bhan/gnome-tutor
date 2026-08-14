@@ -12,6 +12,7 @@ import Adw from 'gi://Adw';
 
 import { ContentLoader } from './engine/contentLoader.js';
 import { ExtensionInstaller } from './engine/extensionInstaller.js';
+import { applyWindowLocaleDirection } from './engine/localeUtils.js';
 import {
     breadcrumbLabel,
     firstIncompleteModule,
@@ -48,6 +49,7 @@ export const GnomeTutorWindow = GObject.registerClass({
         this._activeStepIndex = 0;
         this._reviewMode = false;
 
+        applyWindowLocaleDirection(this);
         this._buildUi();
         this._registerActions();
 
@@ -109,6 +111,11 @@ export const GnomeTutorWindow = GObject.registerClass({
             icon_name: 'sidebar-show-symbolic',
             visible: false,
         });
+        this._sidebarToggle.update_property(Gtk.AccessibleProperty.LABEL, _('Show sidebar'));
+        this._sidebarToggle.update_property(
+            Gtk.AccessibleProperty.DESCRIPTION,
+            _('Show or hide the curriculum sidebar'),
+        );
         this._sidebarToggle.connect('toggled', () => {
             this._splitView.collapsed = !this._sidebarToggle.active;
         });
@@ -124,12 +131,14 @@ export const GnomeTutorWindow = GObject.registerClass({
         section.append(_('Quit'), 'app.quit');
         menu.append_section(null, section);
 
-        header.pack_end(new Gtk.MenuButton({
+        this._menuButton = new Gtk.MenuButton({
             icon_name: 'open-menu-symbolic',
             primary: true,
             tooltip_text: _('Main Menu'),
             menu_model: menu,
-        }));
+        });
+        this._menuButton.update_property(Gtk.AccessibleProperty.LABEL, _('Main Menu'));
+        header.pack_end(this._menuButton);
 
         const toolbar = new Adw.ToolbarView();
         toolbar.add_top_bar(header);
@@ -435,6 +444,7 @@ export const GnomeTutorWindow = GObject.registerClass({
         this._showMainShell('home');
         this._header_title.subtitle = _('Learn Linux through real GUI and terminal tools');
         this._stepView.clear();
+        this._toast_overlay.add_toast(Adw.Toast.new(_('All progress has been reset.')));
     }
 
     _confirmResetPractice() {

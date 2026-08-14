@@ -45,11 +45,21 @@ export const ContrastBeatView = GObject.registerClass({
             margin_top: 12,
         });
 
-        columns.append(this._column(_('What you\'re used to'), 'computer-symbolic',
-            step.body_left ?? '', ['dim-label']));
-        columns.append(new Gtk.Separator({ orientation: Gtk.Orientation.VERTICAL }));
-        columns.append(this._column(_('On Linux (GNOME)'), 'folder-symbolic',
-            step.body_right ?? '', ['accent']));
+        const leftColumn = this._column(_('What you\'re used to'), 'computer-symbolic',
+            step.body_left ?? '', ['dim-label']);
+        const separator = new Gtk.Separator({ orientation: Gtk.Orientation.VERTICAL });
+        const rightColumn = this._column(_('On Linux (GNOME)'), 'folder-symbolic',
+            step.body_right ?? '', ['accent']);
+
+        if (this.get_direction() === Gtk.TextDirection.RTL) {
+            columns.append(rightColumn);
+            columns.append(separator);
+            columns.append(leftColumn);
+        } else {
+            columns.append(leftColumn);
+            columns.append(separator);
+            columns.append(rightColumn);
+        }
 
         this.append(columns);
 
