@@ -10,6 +10,7 @@
     <file>engine/progressStore.js</file>
     <file>engine/sandboxManager.js</file>
     <file>engine/appLauncher.js</file>
+    <file>engine/extensionInstaller.js</file>
     <file>engine/spotlightClient.js</file>
     <file>engine/lessonEngine.js</file>
     <file>engine/spotlightAnchors.js</file>

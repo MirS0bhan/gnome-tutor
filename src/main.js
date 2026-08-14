@@ -22,6 +22,7 @@ import GObject from 'gi://GObject';
 import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk?version=4.0';
 import Adw from 'gi://Adw?version=1';
+import { print, printerr } from 'system';
 
 pkg.initGettext();
 pkg.initFormat();
@@ -76,7 +77,23 @@ export const GnomeTutorApplication = GObject.registerClass(
     }
 );
 
-export function main(argv) {
+export async function main(argv) {
+    if (argv.includes('--install-extension')) {
+        const { ExtensionInstaller } = await import('./engine/extensionInstaller.js');
+        try {
+            const result = ExtensionInstaller.install();
+            print(`Spotlight extension installed to ${result.installDir}.`);
+            if (result.enabled)
+                print('Extension enabled. Restart GNOME Shell or log out and back in.');
+            else
+                print(`Run: gnome-extensions enable ${ExtensionInstaller.uuid}`);
+            return 0;
+        } catch (error) {
+            printerr(`Failed to install Spotlight extension: ${error.message}\n`);
+            return 1;
+        }
+    }
+
     const application = new GnomeTutorApplication();
     return application.runAsync(argv);
 }

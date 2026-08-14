@@ -40,6 +40,7 @@ export const StepView = GObject.registerClass({
         'validated': {},
         'hint-revealed': {},
         'reset-step': {},
+        'install-spotlight': {},
     },
 }, class StepView extends Gtk.Box {
     constructor(params = {}) {
@@ -154,6 +155,7 @@ export const StepView = GObject.registerClass({
         card.connect('next-phase', () => this._onGuiNextPhase());
         card.connect('done', () => this.emit('continue'));
         card.connect('hint-revealed', () => this.emit('hint-revealed'));
+        card.connect('install-spotlight', () => this.emit('install-spotlight'));
     }
 
     _buildEmptyPage() {

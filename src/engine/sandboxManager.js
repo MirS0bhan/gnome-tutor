@@ -38,7 +38,7 @@ function copyRecursive(source, destination) {
         }
         return;
     }
-    destination.make_directory_with_parents(null);
+    destination.get_parent().make_directory_with_parents(null);
     source.copy(destination, Gio.FileCopyFlags.OVERWRITE, null, null);
 }
 

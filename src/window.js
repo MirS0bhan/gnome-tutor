@@ -11,6 +11,7 @@ import Gtk from 'gi://Gtk';
 import Adw from 'gi://Adw';
 
 import { ContentLoader } from './engine/contentLoader.js';
+import { ExtensionInstaller } from './engine/extensionInstaller.js';
 import { LessonEngine } from './engine/lessonEngine.js';
 import { ProgressStore } from './engine/progressStore.js';
 import { CurriculumSidebar } from './widgets/curriculumSidebar.js';
@@ -68,6 +69,7 @@ export const GnomeTutorWindow = GObject.registerClass({
         this._stepView.connect('validated', () => this._onStepValidated());
         this._stepView.connect('hint-revealed', () => this._recordHint());
         this._stepView.connect('reset-step', () => this._resetActiveStep());
+        this._stepView.connect('install-spotlight', () => this._installSpotlightExtension());
 
         this._loadCurriculum();
     }
@@ -83,6 +85,7 @@ export const GnomeTutorWindow = GObject.registerClass({
 
         const menu = Gio.Menu.new();
         const section = Gio.Menu.new();
+        section.append(_('Install Spotlight Extension'), 'win.install-spotlight');
         section.append(_('Reset Module Progress'), 'win.reset-module');
         section.append(_('Reset All Progress'), 'win.reset-all-progress');
         section.append(_('About GNOME Linux Academy'), 'app.about');
@@ -148,6 +151,41 @@ export const GnomeTutorWindow = GObject.registerClass({
         const resetAll = new Gio.SimpleAction({ name: 'reset-all-progress' });
         resetAll.connect('activate', () => this._confirmResetAllProgress());
         this.add_action(resetAll);
+
+        const installSpotlight = new Gio.SimpleAction({ name: 'install-spotlight' });
+        installSpotlight.connect('activate', () => this._installSpotlightExtension());
+        this.add_action(installSpotlight);
+    }
+
+    _installSpotlightExtension() {
+        const dialog = Adw.AlertDialog.new(
+            _('Install Spotlight extension?'),
+            _('This copies the optional GNOME Shell extension into your user account and enables it. Restart GNOME Shell or log out and back in afterward.'),
+        );
+        dialog.add_response('cancel', _('Cancel'));
+        dialog.add_response('install', _('Install'));
+        dialog.set_response_appearance('install', Adw.ResponseAppearance.SUGGESTED);
+        dialog.set_default_response('cancel');
+        dialog.set_close_response('cancel');
+        dialog.connect('response', (_dialog, response) => {
+            if (response !== 'install')
+                return;
+            try {
+                const result = ExtensionInstaller.install();
+                const message = result.enabled
+                    ? _('Spotlight extension installed and enabled. Restart GNOME Shell or log out and back in.')
+                    : _('Spotlight extension installed to %s. Run “gnome-extensions enable %s”, then restart Shell.').format(
+                        result.installDir,
+                        ExtensionInstaller.uuid,
+                    );
+                this._toast_overlay.add_toast(Adw.Toast.new(message));
+            } catch (error) {
+                this._toast_overlay.add_toast(Adw.Toast.new(
+                    _('Could not install Spotlight extension: %s').format(error.message),
+                ));
+            }
+        });
+        dialog.present(this);
     }
 
     _moduleForReset() {

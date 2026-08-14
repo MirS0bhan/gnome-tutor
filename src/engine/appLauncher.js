@@ -18,23 +18,27 @@ const APP_ALIASES = {
     'org.gnome.DiskUtility': ['org.gnome.DiskUtility', 'gnome-disks'],
 };
 
+const FALLBACK_COMMANDS = {
+    'org.gnome.Nautilus': ['nautilus'],
+    'org.gnome.Settings': ['gnome-control-center'],
+    'org.gnome.Software': ['gnome-software'],
+    'org.gnome.SystemMonitor': ['gnome-system-monitor'],
+    'org.gnome.TextEditor': ['gnome-text-editor', 'gedit'],
+    'org.gnome.DiskUtility': ['gnome-disks'],
+};
+
 export class AppLauncher {
     static launch(step, sandboxPath) {
         const appId = step.target_app;
         if (appId === 'org.gnome.Nautilus')
             return AppLauncher._openNautilus(sandboxPath);
 
-        const ids = APP_ALIASES[appId] ?? [appId];
-        for (const id of ids) {
-            const app = Gio.AppInfo.create_from_appid(id);
-            if (!app)
-                continue;
-            if (sandboxPath && appId === 'org.gnome.Nautilus')
-                return app.launch([GLib.File.new_for_path(sandboxPath)], null);
-            return app.launch([], null);
-        }
+        const launchFile = AppLauncher._resolveLaunchFile(step, sandboxPath);
+        const app = AppLauncher._lookupApp(appId);
+        if (app)
+            return AppLauncher._launchApp(app, launchFile);
 
-        throw new Error(`application not found: ${appId}`);
+        return AppLauncher._launchFallback(appId, launchFile);
     }
 
     static displayName(appId) {
@@ -56,6 +60,68 @@ export class AppLauncher {
         }
     }
 
+    static _resolveLaunchFile(step, sandboxPath) {
+        if (!sandboxPath || !step.validate?.exists)
+            return null;
+        return GLib.build_filenamev([sandboxPath, step.validate.exists]);
+    }
+
+    static _lookupApp(appId) {
+        const candidates = APP_ALIASES[appId] ?? [appId];
+        for (const id of candidates) {
+            for (const desktopId of [id, `${id}.desktop`]) {
+                try {
+                    const app = Gio.DesktopAppInfo.new(desktopId);
+                    if (app)
+                        return app;
+                } catch {
+                    // try next candidate
+                }
+            }
+        }
+
+        for (const app of Gio.AppInfo.get_all()) {
+            const id = app.get_id()?.replace(/\.desktop$/, '') ?? '';
+            if (candidates.includes(id))
+                return app;
+        }
+
+        return null;
+    }
+
+    static _launchApp(app, filePath) {
+        if (filePath) {
+            const file = Gio.File.new_for_path(filePath);
+            if (!file.query_exists(null))
+                throw new Error(`file not found: ${filePath}`);
+
+            if (typeof app.launch_uris === 'function')
+                return app.launch_uris([file.get_uri()], null) ?? true;
+
+            return app.launch([file], null) ?? true;
+        }
+
+        return app.launch([], null) ?? true;
+    }
+
+    static _launchFallback(appId, filePath) {
+        const commands = FALLBACK_COMMANDS[appId];
+        if (!commands?.length)
+            throw new Error(`application not found: ${appId}`);
+
+        for (const command of commands) {
+            const argv = filePath ? [command, filePath] : [command];
+            try {
+                Gio.Subprocess.new(argv, Gio.SubprocessFlags.NONE);
+                return true;
+            } catch {
+                // try next command alias
+            }
+        }
+
+        throw new Error(`application not found: ${appId}`);
+    }
+
     static _openNautilus(path) {
         const uri = Gio.File.new_for_path(path).get_uri();
 
@@ -72,7 +138,7 @@ export class AppLauncher {
             proxy.ShowFolders_sync([uri], '');
             return true;
         } catch {
-            const launcher = Gio.AppInfo.create_from_appid('org.gnome.Nautilus');
+            const launcher = AppLauncher._lookupApp('org.gnome.Nautilus');
             if (launcher)
                 return launcher.launch([Gio.File.new_for_path(path)], null) ?? true;
 

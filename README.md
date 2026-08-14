@@ -46,6 +46,12 @@ cp extension/metadata.json extension/extension.js ~/.local/share/gnome-shell/ext
 gnome-extensions enable linux-academy-spotlight@urumlug.ir
 ```
 
+Or install from the app menu (**Install Spotlight Extension**) or the CLI:
+
+```bash
+ir.urumlug.gnomeTutor --install-extension
+```
+
 Restart Shell or log out/in after enabling.
 
 ## Development

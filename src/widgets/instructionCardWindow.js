@@ -17,6 +17,7 @@ export const InstructionCardWindow = GObject.registerClass({
         'next-phase': {},
         'done': {},
         'hint-revealed': {},
+        'install-spotlight': {},
     },
 }, class InstructionCardWindow extends Adw.Window {
     constructor(params = {}) {
@@ -81,15 +82,10 @@ export const InstructionCardWindow = GObject.registerClass({
 
         this._spotlightBanner = new Adw.Banner({
             title: _('Install the Spotlight extension for on-screen highlights during GUI lessons.'),
-            button_label: _('Learn how'),
+            button_label: _('Install extension'),
             revealed: false,
         });
-        this._spotlightBanner.connect('button-clicked', () => {
-            const launcher = new Gtk.UriLauncher({
-                uri: 'https://github.com/urumlug/gnome-tutor#spotlight-extension',
-            });
-            launcher.launch(this, null, null);
-        });
+        this._spotlightBanner.connect('button-clicked', () => this.emit('install-spotlight'));
         box.append(this._spotlightBanner);
 
         const actions = new Gtk.Box({ spacing: 8 });

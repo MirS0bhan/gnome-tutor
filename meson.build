@@ -12,6 +12,7 @@ gnome = import('gnome')
 
 subdir('data')
 subdir('content')
+subdir('extension')
 subdir('src')
 subdir('po')
 
