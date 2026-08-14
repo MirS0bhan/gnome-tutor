@@ -1,0 +1,88 @@
+track: software
+track_title: نصب نرم‌افزار
+module: package-manager-terminal
+title: نصب از ترمینال
+order: 2
+steps:
+  - id: contrast-pm
+    kind: contrast
+    title: یک دستور نصب می‌کند
+    body_left: |
+      دانلود `.exe` از وب و امید به امنیت.
+    body_right: |
+      مدیر بسته نرم‌افزار تأییدشده و وابستگی می‌آورد. دستور بسته به توزیع فرق
+      می‌کند — متن درس از /etc/os-release با سیستم شما هماهنگ می‌شود.
+    body: |
+      مدیر بسته وابستگی را خودکار حل می‌کند. دستور بسته به توزیع متفاوت است.
+
+  - id: terminal-install
+    kind: terminal
+    title: جستجوی بسته (بدون نصب)
+    fixture: fixtures/open-files/
+    instruction: |
+      دستور جستجوی توزیع خود را برای دیدن بسته اجرا کنید (فقط خواندن).
+    distro_variants:
+      debian:
+        instruction: `apt search hello` را اجرا کنید (فقط خواندن).
+        validate:
+          pattern: '^apt\s+search\s+hello\s*$'
+          expect_exit: 0
+      fedora:
+        instruction: `dnf search hello` را اجرا کنید (فقط خواندن).
+        validate:
+          pattern: '^dnf\s+search\s+hello\s*$'
+          expect_exit: 0
+      arch:
+        instruction: `pacman -Ss hello` را اجرا کنید (فقط خواندن).
+        validate:
+          pattern: '^pacman\s+-Ss\s+hello\s*$'
+          expect_exit: 0
+      default:
+        instruction: `apt search hello` را اجرا کنید (فقط خواندن).
+        validate:
+          pattern: '^apt\s+search\s+hello\s*$'
+          expect_exit: 0
+    hints:
+      - جستجو چیزی نصب نمی‌کند.
+      - hello را با هر نام بسته عوض کنید.
+
+  - id: terminal-real-install
+    kind: terminal
+    sandbox: false
+    title: نصب واقعی (اختیاری)
+    instruction: |
+      این گام روی **سیستم واقعی** شماست — sandbox ریست ندارد. اگر راحتید دستور
+      جستجو یا dry-run برای بسته کوچک اجرا کنید (مثلاً `apt search gnome-calculator`).
+      اگر توزیع فرق دارد اعتبارسنجی را رد کنید.
+    distro_variants:
+      debian:
+        instruction: `apt search gnome-calculator` را روی سیستم واقعی اجرا کنید (فقط خواندن).
+        validate:
+          pattern: '^apt\s+search\s+\S+\s*$'
+          expect_exit: 0
+      fedora:
+        instruction: `dnf search gnome-calculator` را روی سیستم واقعی اجرا کنید (فقط خواندن).
+        validate:
+          pattern: '^dnf\s+search\s+\S+\s*$'
+          expect_exit: 0
+      arch:
+        instruction: `pacman -Ss gnome-calculator` را روی سیستم واقعی اجرا کنید (فقط خواندن).
+        validate:
+          pattern: '^pacman\s+-Ss\s+\S+\s*$'
+          expect_exit: 0
+      default:
+        instruction: `apt search gnome-calculator` را روی سیستم واقعی اجرا کنید (فقط خواندن).
+        validate:
+          pattern: '^apt\s+search\s+\S+\s*$'
+          expect_exit: 0
+    hints:
+      - این تنها گام برنامه درسی بدون sandbox درس است.
+      - اگر دستور درست است ولی الگو نمی‌خورد از رد اعتبارسنجی استفاده کنید.
+
+  - id: bridge-pm
+    kind: bridge
+    title: نصب قابل اسکریپت
+    body: |
+      مدیر بسته ترمینال وقتی همان پشته را روی چند ماشین نصب می‌کنید یا در
+      اسکریpt مستند می‌کنید برتر است. Flatpak و بسته توزیع می‌توانند با هم باشند —
+      **GNOME Software** را برای مرور دوستانه باز کنید.

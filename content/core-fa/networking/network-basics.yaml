@@ -1,0 +1,49 @@
+track: networking
+track_title: مبانی شبکه
+module: network-basics
+title: آدرس IP و ping
+order: 1
+steps:
+  - id: contrast-network
+    kind: contrast
+    title: تنظیمات در برابر ip/ping
+    body_left: |
+      **تنظیمات شبکه** در control panel، یا `ipconfig` در cmd.
+    body_right: |
+      **تنظیمات → شبکه** برای Wi-Fi؛ `ip a` و `ping` در ترمینال —
+      روی SSH همان‌طور که پشت میز نیستید کار می‌کند.
+    body: |
+      ترمینال اینجا جلو می‌افتد چون از راه دور همان‌طور کار می‌کند.
+
+  - id: gui-network
+    kind: gui
+    title: اتصال خود را پیدا کنید
+    target_app: org.gnome.Settings
+    instruction: تنظیمات → شبکه (یا Wi-Fi) را باز و جزئیات اتصال فعال را ببینید.
+    phases:
+      - instruction: **تنظیمات** و **شبکه** یا **Wi-Fi**.
+        label: تنظیمات شبکه
+      - instruction: اتصال فعال را کلیک و IP یا جزئیات لینk را ببینید.
+        label: جزئیات اتصال
+    hints:
+      - Super و Settings.
+      - عبارت‌ها کمی بسته به نسخه GNOME فرق می‌کند.
+
+  - id: terminal-ip
+    kind: terminal
+    title: ip a
+    fixture: fixtures/open-files/
+    instruction: `ip a` را برای فهرست interface و آدرس‌ها اجرا کنید.
+    validate:
+      pattern: '^ip\s+a(ddr)?\s*$'
+      expect_exit: 0
+    hints:
+      - ip a interfaceهایی مثل lo و wlan0 یا eth0 نشان می‌دهد.
+      - آدرس inet روی interface فعال را ببینید.
+
+  - id: bridge-network
+    kind: bridge
+    title: SSH GUI ندارد
+    body: |
+      تا اینجا تقریباً همه‌چیز معادل GUI داشت. اتصال **SSH** فقط ترمینال است —
+      به همین دلیل این دستورها روی سرور و ماشین دور مهم‌اند.

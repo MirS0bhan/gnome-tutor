@@ -1,0 +1,48 @@
+track: filesystem
+track_title: فایل‌ها و سیستم فایل
+module: renaming-files
+title: تغییر نام فایل
+order: 4
+steps:
+  - id: contrast-rename
+    kind: contrast
+    title: تغییر نام در برابر جابه‌جایی
+    body: |
+      تغییر نام فایل در همان پوشه است. **جابه‌جایی** به پوشه دیگر با نام جدید
+      در ترمینال یک عمل (`mv`) است.
+
+  - id: gui-rename
+    kind: gui
+    title: تغییر نام در فایل‌ها
+    target_app: org.gnome.Nautilus
+    fixture: fixtures/rename-basic/
+    instruction: **draft.txt** را در Documents به **notes.txt** تغییر نام دهید.
+    phases:
+      - instruction: **Documents** را باز و **draft.txt** را انتخاب کنید.
+        label: draft.txt را انتخاب کنید
+      - instruction: **F2** یا راست‌کلیک → تغییر نام، سپس **notes.txt**.
+        label: نام را notes.txt بگذارید
+    validate:
+      exists: Documents/notes.txt
+    hints:
+      - F2 میانبر تغییر نام است.
+      - راست‌کلیک و تغییر نام.
+
+  - id: terminal-rename
+    kind: terminal
+    title: mv برای تغییر نام
+    fixture: fixtures/rename-basic/
+    instruction: با `mv Documents/draft.txt Documents/notes.txt` همان کار را انجام دهید.
+    validate:
+      pattern: '^mv\s+Documents/draft\.txt\s+Documents/notes\.txt\s*$'
+      expect_exit: 0
+    hints:
+      - mv اول مسیر قدیم، بعد جدید.
+      - mv Documents/draft.txt Documents/notes.txt
+
+  - id: bridge-rename
+    kind: bridge
+    title: چه وقت mv
+    body: |
+      تغییر نام یک فایل در فایل‌ها آسان است. تغییر نام دسته‌ای — مثلاً پیشوند
+      برای همه `.jpg` — با حلقه shell یا mv با الگو خیلی سریع‌تر است.

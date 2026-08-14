@@ -1,0 +1,47 @@
+track: orientation
+track_title: آشنایی
+module: where-things-live
+title: چیزها کجا هستند
+order: 2
+steps:
+  - id: contrast-home
+    kind: contrast
+    title: یک پوشه Home، نه حرف درایو
+    contrast_diagram: diagrams/home-not-c-drive.svg
+    body: |
+      در ویندوز مسیرها شبیه `C:\Users\You\Documents` است. در لینوکس فایل‌های
+      شخصی زیر **/home/نام‌کاربری** (در فایل‌ها **Home** نامیده می‌شود) هستند.
+      رجیstry وجود ندارد — بسیاری از تنظیمات فایل‌های ساده در پوشه‌های `.config` هستند.
+
+  - id: gui-home
+    kind: gui
+    title: باز کردن Home در فایل‌ها
+    target_app: org.gnome.Nautilus
+    fixture: fixtures/open-files/
+    instruction: فایل‌ها را باز کنید و چیدمان پوشه **Home** تمرین را ببینید.
+    phases:
+      - instruction: فایل‌ها را روی پوشه تمرین باز کنید و **Documents**، **Downloads** و **Pictures** را در نوار کناری ببینید.
+        label: میانبرهای نوار کناری را ببینید
+    hints:
+      - Home فضای شخصی شما روی سیستم است.
+      - نوار کناری پوشه‌های رایج مثل Documents و Downloads را نشان می‌دهد.
+
+  - id: terminal-home
+    kind: terminal
+    title: فهرست پوشه‌ها از ترمینال
+    fixture: fixtures/open-files/
+    instruction: |
+      در ترمینال با `ls` پوشه‌های Home تمرین را فهرست کنید.
+    validate:
+      pattern: '^ls\s*$'
+      expect_exit: 0
+    hints:
+      - ls فایل‌ها و پوشه‌های پوشه جاری را نشان می‌دهد.
+      - باید Documents، Downloads و Pictures را در خروجی ببینید.
+
+  - id: bridge-home
+    kind: bridge
+    title: مسیرهایی که دوباره می‌بینید
+    body: |
+      برنامه فایل‌ها نام‌های دوستانه نشان می‌دهد؛ ترمینال همان پوشه‌ها را به‌صورت
+      مسیر مثل `Documents/` و `Downloads/` می‌بیند. در مسیر فایل‌ها تمرین می‌کنید.

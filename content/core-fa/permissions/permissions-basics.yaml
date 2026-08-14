@@ -1,0 +1,46 @@
+track: permissions
+track_title: مجوزها و مالکیت
+module: permissions-basics
+title: خواندن مجوزها
+order: 1
+steps:
+  - id: contrast-perms
+    kind: contrast
+    title: ACL در برابر rwx
+    body: |
+      ویندوز از ACL پیچیده استفاده می‌کند. لینوکس سنتی **مالک**، **گروه** و **سایرین**
+      دارد، هر کدام **خواندن**، **نوشتن** و **اجرا** (rwx).
+
+  - id: gui-properties
+    kind: gui
+    title: ویژگی‌ها → مجوزها
+    target_app: org.gnome.Nautilus
+    fixture: fixtures/permissions-basic/
+    instruction: ویژگی‌های **script.sh** را باز و تب مجوزها را ببینید.
+    phases:
+      - instruction: **script.sh** را در پوشه تمرین انتخاب کنید.
+        label: script.sh را انتخاب کنید
+      - instruction: راست‌کلیک → **ویژگی‌ها** → تب **مجوزها**.
+        label: تب مجوزها را باز کنید
+    hints:
+      - ویژگی‌ها در منوی راست‌کلیک است.
+      - مجوز اجرا اجازه اجرای برنامه را می‌دهد.
+
+  - id: terminal-ls
+    kind: terminal
+    title: ls -l
+    fixture: fixtures/permissions-basic/
+    instruction: `ls -l` را برای دیدن حروف مجوز در فهرست اجرا کنید.
+    validate:
+      pattern: '^ls\s+-l\s*$'
+      expect_exit: 0
+    hints:
+      - ستون اول مجوزهایی مثل -rw-r--r-- را نشان می‌دهد.
+      - ls -l
+
+  - id: bridge-perms
+    kind: bridge
+    title: GUI در برابر ls -l
+    body: |
+      ویژگی‌ها برای تغییر یک فایل روشن است. `ls -l` مجوز همه چیز در پوشه را
+      یکجا نشان می‌دهد — روی سرور و در اسکریپت ضروری است.

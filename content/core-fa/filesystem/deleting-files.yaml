@@ -1,0 +1,51 @@
+track: filesystem
+track_title: فایل‌ها و سیستم فایل
+module: deleting-files
+title: حذف امن فایل
+order: 6
+steps:
+  - id: contrast-delete
+    kind: contrast
+    title: سطل زباله در برابر rm
+    body_left: |
+      حذف در File Explorer اغلب اول به **سطل زباله** می‌رود.
+    body_right: |
+      فایل‌ها به **سطل زباله** می‌فرستد. **rm** در ترمینال فوراً حذف می‌کند —
+      بدون بازگشت. این تفاوت در زندگی واقعی مهم است.
+    body: |
+      در GUI اغلب اول سطل زباله. rm در ترمینال فوری است. به همین دلیل در sandbox تمرین می‌کنیم.
+
+  - id: gui-delete
+    kind: gui
+    title: انتقال به سطل زباله
+    target_app: org.gnome.Nautilus
+    fixture: fixtures/delete-basic/
+    instruction: **temp.txt** را با انتقال به سطل زباله (یا حذف) پاک کنید.
+    phases:
+      - instruction: **temp.txt** را در پوشه تمرین انتخاب کنید.
+        label: temp.txt را انتخاب کنید
+      - instruction: **Delete** یا راست‌کلیک → انتقال به سطل زباله.
+        label: به سطل زباله بفرستید
+    hints:
+      - Delete در GNOME اغلب به سطل زباله می‌فرستد.
+      - Shift+Delete ممکن است سطل زباله را دور بزند — در این درس نزنید.
+
+  - id: terminal-delete
+    kind: terminal
+    title: rm در sandbox
+    fixture: fixtures/delete-basic/
+    instruction: **temp.txt** را با `rm temp.txt` حذف کنید.
+    validate:
+      pattern: '^rm\s+temp\.txt\s*$'
+      expect_exit: 0
+    hints:
+      - rm در ترمینال دائمی حذف می‌کند.
+      - rm temp.txt
+
+  - id: bridge-delete
+    kind: bridge
+    title: rm بازگشتی ندارد
+    body: |
+      وقتی سطل زباله می‌خواهید از فایل‌ها استفاده کنید. وقتی مطمئنید rm —
+      و هرگز `rm -rf` روی مسیری که دوبار چک نکرده‌اید نزنید. GUI و ترمینال اینجا
+      متقارن نیستند: سطل زباله در برابر حذف دائمی.

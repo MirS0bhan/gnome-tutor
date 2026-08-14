@@ -1,0 +1,56 @@
+track: filesystem
+track_title: فایل‌ها و سیستم فایل
+module: creating-folders
+title: ساخت پوشه
+order: 2
+steps:
+  - id: contrast-folders
+    kind: contrast
+    title: پوشه همان directory است
+    body: |
+      «پوشه» در برنامه فایل‌ها در لینوکس **directory** نامیده می‌شود. با ماوس یا
+      دستور، روی دیسک یکسان است — ظرفی برای فایل و پوشه‌های دیگر.
+
+  - id: gui-new-folder
+    kind: gui
+    title: پوشه جدید در Documents
+    target_app: org.gnome.Nautilus
+    fixture: fixtures/create-folders/
+    instruction: |
+      فایل‌ها را باز کنید و در Documents پوشه **Projects** بسازید.
+    phases:
+      - instruction: **Documents** را در نوار کناری باز کنید.
+        label: Documents را در نوار کناری باز کنید
+        spotlight:
+          - anchor: nautilus-sidebar
+            label: Documents در نوار کناری
+      - instruction: روی فضای خالی راست‌کلیک، **پوشه جدید** و نام **Projects**.
+        label: پوشه Projects بسازید
+    validate:
+      exists: Documents/Projects
+    hints:
+      - قبل از ساخت پوشه داخل Documents باشید.
+      - راست‌کلیک در فضای خالی و پوشه جدید.
+      - نام Projects را وارد و تأیید کنید.
+
+  - id: terminal-mkdir
+    kind: terminal
+    title: mkdir از ترمینال
+    fixture: fixtures/create-folders/
+    instruction: |
+      همان کار را از ترمینال: `mkdir Documents/Projects` را امتحان کنید.
+    validate:
+      pattern: '^mkdir\s+(Documents/)?Projects/?\s*$'
+      expect_exit: 0
+    hints:
+      - mkdir پوشه می‌سازد.
+      - mkdir Documents/Projects داخل Documents پوشه Projects می‌سازد.
+      - ls Documents را برای بررسی اجرا کنید.
+
+  - id: bridge-folders
+    kind: bridge
+    title: mkdir در برابر پوشه جدید
+    body: |
+      mkdir معادل «پوشه جدید» در ترمینال است. برای مسیر تو در تو مثل
+      Documents/Projects/2026/notes، یک دستور `mkdir -p` همه پوشه‌های لازم را می‌سازد —
+      خیلی سریع‌تر از کلیک در درخت عمیق GUI.

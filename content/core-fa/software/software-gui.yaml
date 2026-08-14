@@ -1,0 +1,62 @@
+track: software
+track_title: نصب نرم‌افزار
+module: software-gui
+title: GNOME Software
+order: 1
+steps:
+  - id: contrast-software
+    kind: contrast
+    title: فروشگاه برنامه در برابر نصب‌کننده تصادفی
+    body: |
+      توزیع‌های لینوکس **مخزن** بسته تأییدشده دارند. **نرم‌افزار** GNOME از
+      همان مخزن و Flatpak نصب می‌کند — به ندرت به دنبال فایل شبیه `.exe` می‌گردید.
+
+  - id: gui-software-browse
+    kind: gui
+    title: مرور نرم‌افزار
+    target_app: org.gnome.Software
+    instruction: نرم‌افزار را باز کنید و به‌روزرسانی یا دسته‌ها را ببینید (نیازی به نصب نیست).
+    phases:
+      - instruction: **نرم‌افزار** را باز و صفحه **به‌روزرسانی** یا **کاوش** را ببینید.
+        label: نرم‌افزار را باز کنید
+    hints:
+      - Super و تایپ Software یا نرم‌افزار.
+      - برنامه‌های Flatpak کنار بسته سیستم دیده می‌شوند.
+
+  - id: terminal-software-search
+    kind: terminal
+    title: جستجوی بسته از ترمینال
+    fixture: fixtures/open-files/
+    instruction: |
+      دستور جستجوی توزیع خود را اجرا کنید (فقط خواندن — چیزی نصب نمی‌شود).
+    distro_variants:
+      debian:
+        instruction: `apt search gnome-software` را اجرا کنید.
+        validate:
+          pattern: '^apt\s+search\s+gnome-software\s*$'
+          expect_exit: 0
+      fedora:
+        instruction: `dnf search gnome-software` را اجرا کنید.
+        validate:
+          pattern: '^dnf\s+search\s+gnome-software\s*$'
+          expect_exit: 0
+      arch:
+        instruction: `pacman -Ss gnome-software` را اجرا کنید.
+        validate:
+          pattern: '^pacman\s+-Ss\s+gnome-software\s*$'
+          expect_exit: 0
+      default:
+        instruction: `apt search gnome-software` را اجرا کنید.
+        validate:
+          pattern: '^apt\s+search\s+gnome-software\s*$'
+          expect_exit: 0
+    hints:
+      - جستجو چیزی نصب نمی‌کند.
+      - برنامه GUI همان منابع بسته را استفاده می‌کند.
+
+  - id: bridge-software-gui
+    kind: bridge
+    title: وقتی GUI برنده است
+    body: |
+      نرم‌افزار برای کشف برنامه و مدیریت بصری به‌روزرسانی عالی است. همان نصب‌ها
+      را با مدیر بسته ترمینال در ادامه تمرین می‌کنید.

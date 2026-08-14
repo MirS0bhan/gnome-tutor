@@ -1,0 +1,51 @@
+track: practice
+track_title: تمرین آزاد
+module: sandbox-playground
+title: ترمینال تمرین
+order: 1
+steps:
+  - id: practice-intro
+    kind: contrast
+    title: sandbox شما
+    body_left: |
+      گام‌های آموزشی با دکمه ریست بعد از هر کار.
+    body_right: |
+      یک پوشه **پایدار** تمرین. آزادانه امتحان کنید — وقتی خواستید از نو شروع
+      کنید. چالش‌های یک‌خطی اختیاری همان موتور اعتبارسنجی را استفاده می‌کنند.
+    body: |
+      این مسیر یک پوشه تمرین پایدار نگه می‌دارد. به فایل‌های واقعی شما دست نمی‌زند.
+
+  - id: practice-shell
+    kind: practice
+    title: پوسته تمرین آزاد
+    fixture: fixtures/practice-home/
+    instruction: |
+      از ترمینال زیر آزادانه استفاده کنید. cd، ls، mkdir، cp و rm را امتحان کنید.
+      چالش اختیاری از منوی کشویی انتخاب کنید یا خودتان کاوش کنید.
+    challenges:
+      - title: فهرست همه فایل‌ها
+        instruction: `ls -a` را برای فهرست همه فایل‌ها از جمله مخفی اجرا کنید.
+        validate:
+          pattern: '^ls\s+-a\s*$'
+          expect_exit: 0
+        hints:
+          - ls -a dotfileها را نشان می‌دهد.
+      - title: ساخت پوشه
+        instruction: پوشه `experiments` را با mkdir بسازید.
+        validate:
+          pattern: '^mkdir\s+experiments/?\s*$'
+          expect_exit: 0
+        hints:
+          - mkdir پوشه می‌سازد.
+
+  - id: challenge-ls
+    kind: challenge
+    title: چالش — فهرست فایل‌ها
+    fixture: fixtures/practice-home/
+    instruction: با `ls -a` همه فایل‌ها از جمله مخفی را فهرست کنید.
+    validate:
+      pattern: '^ls\s+-a\s*$'
+      expect_exit: 0
+    hints:
+      - پرچم -a dotfileها را نشان می‌دهد.
+      - ls -a

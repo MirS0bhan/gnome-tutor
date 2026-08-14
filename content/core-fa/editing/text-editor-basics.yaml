@@ -1,0 +1,53 @@
+track: editing
+track_title: ویرایش متن
+module: text-editor-basics
+title: Text Editor و nano
+order: 1
+steps:
+  - id: contrast-editors
+    kind: contrast
+    title: Notepad در برابر ویرایشگر ترمینال
+    body_left: |
+      **Notepad** یا مشابه برای ویرایش سریع روی میزکار.
+    body_right: |
+      **Text Editor** برای GUI؛ **nano** برای SSH بدون نمایش.
+      vim/emacs هستند ولی ابزار پیشرفته اختیاری‌اند.
+    body: |
+      ویرایشگر گرافیکی مثل Notepad است. ویرایشگر ترمینال وقتی فقط SSH دارید مهم است.
+
+  - id: gui-edit
+    kind: gui
+    title: ویرایش notes.txt
+    target_app: org.gnome.TextEditor
+    fixture: fixtures/edit-notes/
+    instruction: **notes.txt** را باز، یک خط اضافه و ذخیره کنید.
+    phases:
+      - instruction: **notes.txt** را در Text Editor باز کنید.
+        label: فایل را باز کنید
+      - instruction: خط جدید در پایین اضافه و **Ctrl+S** ذخیره.
+        label: تغییرات را ذخیره کنید
+    validate:
+      exists: notes.txt
+    hints:
+      - Super و تایپ Text Editor.
+      - Ctrl+S ذخیره می‌کند.
+
+  - id: terminal-nano
+    kind: terminal
+    title: خواندن فایل با cat
+    fixture: fixtures/edit-notes/
+    instruction: |
+      بعد از ویرایش GUI، `cat notes.txt` را در ترمینال اجرا کنید.
+    validate:
+      pattern: '^cat\s+notes\.txt\s*$'
+      expect_exit: 0
+    hints:
+      - cat محتوای فایل را در ترمینال چاپ می‌کند.
+      - nano notes.txt وقتی آماده‌اید در ترمینال باز می‌کند.
+
+  - id: bridge-editors
+    kind: bridge
+    title: nano کافی است
+    body: |
+      nano بیشتر ویرایش ترمینال را پوشش می‌دهد. vim و emacs وقتی بخواهید هستند —
+      برای کاربر توانمند لینوکس لازم نیست.

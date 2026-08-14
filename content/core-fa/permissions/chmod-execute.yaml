@@ -1,0 +1,46 @@
+track: permissions
+track_title: مجوزها و مالکیت
+module: chmod-execute
+title: قابل اجرا کردن فایل
+order: 2
+steps:
+  - id: contrast-execute
+    kind: contrast
+    title: چرا +x مهم است
+    body: |
+      اسکریپت shell قبل از `./script.sh` به مجوز **اجرا** (+x) نیاز دارد.
+      بدون آن باید مفسر را صریح صدا بزنید.
+
+  - id: gui-chmod
+    kind: gui
+    title: اجازه اجرا
+    target_app: org.gnome.Nautilus
+    fixture: fixtures/permissions-basic/
+    instruction: در ویژگی‌ها → مجوزها، **اجرا** برای مالک **script.sh** را فعال کنید.
+    phases:
+      - instruction: ویژگی‌ها → مجوزها برای **script.sh**.
+        label: مجوزهای script.sh
+      - instruction: **اجازه اجرا به‌عنوان برنامه** (یا Execute مالک) را روشن کنید.
+        label: مجوز اجرا را فعال کنید
+    hints:
+      - عبارت دقیق بسته به نسخه GNOME کمی فرق می‌کند.
+      - Execute مالک برای اسکript خودتان کافی است.
+
+  - id: terminal-chmod
+    kind: terminal
+    title: chmod +x
+    fixture: fixtures/permissions-basic/
+    instruction: با `chmod +x script.sh` یا حالت octal مثل `chmod 755 script.sh` مجوز اجرا بدهید.
+    validate:
+      pattern: '^chmod\s+(\+x|[0-7]{3,4})\s+script\.sh\s*$'
+      expect_exit: 0
+    hints:
+      - chmod مجوز را عوض می‌کند.
+      - +x اجرا را اضافه می‌کند مگر u/g/o مشخص کنید.
+
+  - id: bridge-chmod
+    kind: bridge
+    title: sudo همچنان خطرناک است
+    body: |
+      chmod بیت مجوز فایل‌های خودتان را درست می‌کند. **sudo** دستور را به‌عنوان
+      مدیر اجرا می‌کند — GUI آن را پشت «احراز هویت» پنهان می‌کند چون اشتباه کل سیستم را تحت تأثیر می‌گذارد.

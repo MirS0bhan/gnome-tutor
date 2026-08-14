@@ -1,0 +1,386 @@
+# Persian translation for GNOME Linux Academy.
+# Copyright (C) 2026 misano / UrumLUG
+# This file is distributed under the same license as the gnome-tutor package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-tutor 0.1.0\n"
+"Report-Msgid-Bugs-To: https://github.com/MirS0bhan/gnome-tutor/issues\n"
+"POT-Creation-Date: 2026-08-14 12:00+0000\n"
+"PO-Revision-Date: 2026-08-14 12:00+0000\n"
+"Last-Translator: misano / UrumLUG <>\n"
+"Language-Team: Persian <>\n"
+"Language: fa\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Linux Academy"
+msgstr "آکادمی لینوکس"
+
+msgid "Learn Linux through real GUI and terminal tools"
+msgstr "لینوکس را با برنامه‌های واقعی و ترمینال واقعی بیاموزید"
+
+msgid "Show sidebar"
+msgstr "نمایش نوار کناری"
+
+msgid "Show or hide the curriculum sidebar"
+msgstr "نمایش یا پنهان کردن نوار کناری برنامه درسی"
+
+msgid "Preferences"
+msgstr "ترجیحات"
+
+msgid "Reset Module Progress"
+msgstr "بازنشانی پیشرفت ماژول"
+
+msgid "Reset All Progress"
+msgstr "بازنشانی همه پیشرفت"
+
+msgid "About Linux Academy"
+msgstr "درباره آکادمی لینوکس"
+
+msgid "Keyboard Shortcuts"
+msgstr "میانبرهای صفحه‌کلید"
+
+msgid "Quit"
+msgstr "خروج"
+
+msgid "Main Menu"
+msgstr "منوی اصلی"
+
+msgid "Curriculum"
+msgstr "برنامه درسی"
+
+msgid "Lesson"
+msgstr "درس"
+
+msgid "Review"
+msgstr "مرور"
+
+msgid "Continue"
+msgstr "ادامه"
+
+msgid "Begin"
+msgstr "شروع"
+
+msgid "Install Spotlight extension?"
+msgstr "افزونه Spotlight نصب شود؟"
+
+msgid "This copies the optional GNOME Shell extension into your user account and enables it. Restart GNOME Shell or log out and back in afterward."
+msgstr "افزونه اختیاری GNOME Shell را در حساب کاربری شما کپی و فعال می‌کند. بعد از آن GNOME Shell را ریستارت کنید یا خارج و دوباره وارد شوید."
+
+msgid "Cancel"
+msgstr "لغو"
+
+msgid "Install"
+msgstr "نصب"
+
+msgid "Spotlight extension installed and enabled. Restart GNOME Shell."
+msgstr "افزونه Spotlight نصب و فعال شد. GNOME Shell را ریستارت کنید."
+
+msgid "Spotlight extension installed. Enable it from Preferences."
+msgstr "افزونه Spotlight نصب شد. از ترجیحات آن را فعال کنید."
+
+msgid "Select a module in the sidebar to reset."
+msgstr "برای بازنشانی، ماژولی را در نوار کناری انتخاب کنید."
+
+msgid "Progress reset for “%s”."
+msgstr "پیشرفت «%s» بازنشانی شد."
+
+msgid "Reset all progress?"
+msgstr "همه پیشرفت بازنشانی شود؟"
+
+msgid "This clears completion and hint history for every module."
+msgstr "تکمیل و تاریخچه راهنما برای همه ماژول‌ها پاک می‌شود."
+
+msgid "Reset Everything"
+msgstr "بازنشانی همه"
+
+msgid "All progress has been reset."
+msgstr "همه پیشرفت بازنشانی شد."
+
+msgid "Start fresh?"
+msgstr "از نو شروع شود؟"
+
+msgid "This will erase everything in your practice folder."
+msgstr "همه چیز در پوشه تمرین شما پاک می‌شود."
+
+msgid "Erase"
+msgstr "پاک کردن"
+
+msgid "Could not load lessons"
+msgstr "بارگذاری درس‌ها ممکن نشد"
+
+msgid "Curriculum unavailable"
+msgstr "برنامه درسی در دسترس نیست"
+
+msgid "OK"
+msgstr "تأیید"
+
+msgid "That's it."
+msgstr "همین بود."
+
+msgid "Nice."
+msgstr "عالی."
+
+msgid "Module complete"
+msgstr "ماژول تمام شد"
+
+msgid "Need a hint?"
+msgstr "به راهنما نیاز دارید؟"
+
+msgid "Hint available"
+msgstr "راهنما موجود است"
+
+msgid "Show me more"
+msgstr "بیشتر نشان بده"
+
+msgid "A hint is available for this step"
+msgstr "برای این گام راهنما موجود است"
+
+msgid "Hint %d of %d revealed"
+msgstr "راهنمای %d از %d نمایش داده شد"
+
+msgid "Terminal unavailable"
+msgstr "ترمینال در دسترس نیست"
+
+msgid "The VTE library is not installed in this environment. Use Continue below to skip this step, or reinstall from an updated Flatpak build."
+msgstr "کتابخانه VTE در این محیط نصب نیست. با «ادامه» این گام را رد کنید یا نسخه به‌روز Flatpak را نصب کنید."
+
+msgid "This step installs real software on your actual computer. There's no reset button for this one."
+msgstr "این گام نرم‌افزار واقعی روی رایانه شما نصب می‌کند. دکمه بازنشانی برای این گام نیست."
+
+msgid "Step instructions"
+msgstr "دستورالعمل گام"
+
+msgid "Practice terminal"
+msgstr "ترمینال تمرین"
+
+msgid "Reset step"
+msgstr "بازنشانی گام"
+
+msgid "Restore the practice folder to its original state"
+msgstr "پوشه تمرین را به حالت اولیه برگردانید"
+
+msgid "Skip validation"
+msgstr "رد اعتبارسنجی"
+
+msgid "Mark this step complete without checking your command"
+msgstr "این گام را بدون بررسی دستور کامل علامت بزنید"
+
+msgid "Practice folder (not your real files): %s"
+msgstr "پوشه تمرین (فایل‌های واقعی شما نیست): %s"
+
+msgid "Files here are copies for learning; your real home folder is not used."
+msgstr "فایل‌های اینجا برای یادگیری کپی شده‌اند؛ پوشه home واقعی شما استفاده نمی‌شود."
+
+msgid "Pick a module to begin this track."
+msgstr "برای شروع این مسیر یک ماژول انتخاب کنید."
+
+msgid "Start or continue the selected track"
+msgstr "مسیر انتخاب‌شده را شروع یا ادامه دهید"
+
+msgid "Work through each step in order — GUI, terminal, and bridge."
+msgstr "هر گام را به ترتیب طی کنید — رابط گرافیکی، ترمینال و پل."
+
+msgid "Start or continue the selected module"
+msgstr "ماژول انتخاب‌شده را شروع یا ادامه دهید"
+
+msgid "Welcome to Linux Academy"
+msgstr "به آکادمی لینوکس خوش آمدید"
+
+msgid "Learn Linux the way you'll actually use it — in the real apps, and in the real terminal."
+msgstr "لینوکس را همان‌طور که واقعاً استفاده می‌کنید بیاموزید — در برنامه‌های واقعی و ترمینال واقعی."
+
+msgid "Get started"
+msgstr "شروع کنید"
+
+msgid "Pick a track"
+msgstr "یک مسیر انتخاب کنید"
+
+msgid "Pick a track from the left to begin."
+msgstr "برای شروع از سمت چپ یک مسیر انتخاب کنید."
+
+msgid "Curriculum tracks"
+msgstr "مسیرهای برنامه درسی"
+
+msgid "%d. %s"
+msgstr "%d. %s"
+
+msgid "%d steps"
+msgstr "%d گام"
+
+msgid "Track %d complete: %s"
+msgstr "مسیر %d کامل شد: %s"
+
+msgid "Track %d, %d%% complete: %s"
+msgstr "مسیر %d، %d%% کامل: %s"
+
+msgid "Done"
+msgstr "تمام"
+
+msgid "Start here"
+msgstr "از اینجا شروع کنید"
+
+msgid "What you're used to"
+msgstr "آنچه به آن عادت دارید"
+
+msgid "On Linux (GNOME)"
+msgstr "در لینوکس (GNOME)"
+
+msgid "Teach Linux through real GUI apps and a real terminal."
+msgstr "لینوکس را با برنامه‌های واقعی و ترمینال واقعی آموزش دهید."
+
+msgid "translator-credits"
+msgstr "misano / UrumLUG"
+
+msgid "Your practice space — nothing here resets automatically."
+msgstr "فضای تمرین شما — اینجا چیزی خودکار ریست نمی‌شود."
+
+msgid "Challenges"
+msgstr "چالش‌ها"
+
+msgid "Start fresh"
+msgstr "شروع از نو"
+
+msgid "Spotlight extension"
+msgstr "افزونه Spotlight"
+
+msgid "Optional on-screen highlights during GUI lessons."
+msgstr "هایلایت اختیاری روی صفحه در درس‌های رابط گرافیکی."
+
+msgid "Get the Spotlight extension"
+msgstr "دریافت افزونه Spotlight"
+
+msgid "Install the companion Shell extension into your user account."
+msgstr "افزونه همراه Shell را در حساب کاربری خود نصب کنید."
+
+msgid "Install extension"
+msgstr "نصب افزونه"
+
+msgid "Open Extensions app"
+msgstr "باز کردن برنامه افزونه‌ها"
+
+msgid "Manage installed GNOME Shell extensions."
+msgstr "مدیریت افزونه‌های نصب‌شده GNOME Shell."
+
+msgid "Open"
+msgstr "باز کردن"
+
+msgid "Lesson instructions"
+msgstr "دستورالعمل درس"
+
+msgid "Follow along in Files"
+msgstr "در فایل‌ها دنبال کنید"
+
+msgid "Open Files, then complete each step"
+msgstr "فایل‌ها را باز کنید، سپس هر گام را کامل کنید"
+
+msgid "Install the Spotlight extension for on-screen highlights during GUI lessons."
+msgstr "برای هایلایت روی صفحه در درس‌های GUI افزونه Spotlight را نصب کنید."
+
+msgid "Open practice folder in Files"
+msgstr "باز کردن پوشه تمرین در فایل‌ها"
+
+msgid "Next step"
+msgstr "گام بعد"
+
+msgid "I did it — Next"
+msgstr "انجام دادم — بعدی"
+
+msgid "Follow along in %s"
+msgstr "در %s دنبال کنید"
+
+msgid "%1$s · Step %2$d of %3$d"
+msgstr "%1$s · گام %2$d از %3$d"
+
+msgid "%s should open on the practice folder. If it did not, press the button below."
+msgstr "%s باید روی پوشه تمرین باز شود. اگر نشد دکمه زیر را بزنید."
+
+msgid "%s should open automatically. If it did not, press the button below."
+msgstr "%s باید خودکار باز شود. اگر نشد دکمه زیر را بزنید."
+
+msgid "Re-open practice folder in Files"
+msgstr "باز کردن دوباره پوشه تمرین در فایل‌ها"
+
+msgid "Re-open %s"
+msgstr "باز کردن دوباره %s"
+
+msgid "Desktop tour"
+msgstr "گشت میزکار"
+
+msgid "Follow each highlighted area on your desktop."
+msgstr "هر ناحیه هایلایت‌شده روی میزکار را دنبال کنید."
+
+msgid "%1$d of %2$d"
+msgstr "%1$d از %2$d"
+
+msgid "Next"
+msgstr "بعدی"
+
+msgid "Try it now"
+msgstr "همین حالا امتحان کنید"
+
+msgid "Step %1$d of %2$d"
+msgstr "گام %1$d از %2$d"
+
+msgid "%1$s · %2$s"
+msgstr "%1$s · %2$s"
+
+msgid "%1$s · %2$s · %3$s"
+msgstr "%1$s · %2$s · %3$s"
+
+msgid "Next: %s →"
+msgstr "بعدی: %s ←"
+
+msgid "Next lesson →"
+msgstr "درس بعدی ←"
+
+msgid "Files"
+msgstr "فایل‌ها"
+
+msgid "Settings"
+msgstr "تنظیمات"
+
+msgid "Software"
+msgstr "نرم‌افزار"
+
+msgid "System Monitor"
+msgstr "System Monitor"
+
+msgid "Text Editor"
+msgstr "ویرایشگر متن"
+
+msgid "Disks"
+msgstr "دیسک‌ها"
+
+msgid "app"
+msgstr "برنامه"
+
+msgid "Practice in the real Files app"
+msgstr "تمرین در برنامه واقعی فایل‌ها"
+
+msgid "Use the floating instruction card to open Files and follow each step."
+msgstr "از کارت شناور دستورالعمل برای باز کردن فایل‌ها و دنبال کردن هر گام استفاده کنید."
+
+msgid "Follow the desktop tour"
+msgstr "گشت میزکار را دنبال کنید"
+
+msgid "Use the instruction card. Spotlight highlights each part of the GNOME desktop."
+msgstr "از کارت دستورالعمل استفاده کنید. Spotlight هر بخش میزکار GNOME را هایلایت می‌کند."
+
+msgid "Follow the floating instruction card — install the Spotlight extension for on-screen highlights."
+msgstr "کارت شناور را دنبال کنید — برای هایلایت روی صفحه افزونه Spotlight را نصب کنید."
+
+msgid "Files should open on the practice folder. The instruction card stays beside this window. Spotlight highlights each step when the extension is enabled."
+msgstr "فایل‌ها باید روی پوشه تمرین باز شود. کارت دستورالعمل کنار این پنجره می‌ماند. با افزونه فعال Spotlight هر گام را هایلایت می‌کند."
+
+msgid "Files should open on the practice folder. Follow the floating instruction card — install the Spotlight extension for on-screen highlights."
+msgstr "فایل‌ها باید روی پوشه تمرین باز شود. کارت شناور را دنبال کنید — برای هایلایت افزونه Spotlight را نصب کنید."
+
+msgid "%1$d of %2$d — %3$s"
+msgstr "%1$d از %2$d — %3$s"
+
+msgid "Learn Linux through real GUI apps and a real terminal."
+msgstr "لینوکس را با برنامه‌های واقعی GUI و ترمینال واقعی بیاموزید."

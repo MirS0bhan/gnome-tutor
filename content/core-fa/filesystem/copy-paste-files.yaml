@@ -1,0 +1,64 @@
+track: filesystem
+track_title: فایل‌ها و سیستم فایل
+module: copy-paste-files
+title: کپی و چسباندن فایل
+module_description: photo.jpg را از Downloads به Documents کپی کنید — اول با GUI، بعد با خط فرمان.
+order: 3
+steps:
+  - id: contrast-copy
+    kind: contrast
+    title: همان میانبرها، قوانین امنیت متفاوت
+    body_left: |
+      **Ctrl+C** و **Ctrl+V** در File Explorer. حذف اغلب اول به سطل زباله می‌رود.
+    body_right: |
+      همان میانبرها در فایل‌ها. **rm** در ترمینال فوراً حذف می‌کند — بدون سطل زباله.
+      به همین دلیل اول در sandbox تمرین می‌کنیم.
+    body: |
+      کپی و چسباندن مثل ویندوز است. حذف در ترمینال دائمی است — اول در sandbox تمرین کنید.
+
+  - id: gui-copy
+    kind: gui
+    title: در فایل‌ها امتحان کنید
+    target_app: org.gnome.Nautilus
+    fixture: fixtures/copy-paste-basic/
+    instruction: |
+      **photo.jpg** را از **Downloads** به **Documents** با کپی و چسباندن منتقل کنید.
+    phases:
+      - instruction: در Downloads یک‌بار روی **photo.jpg** کلیک کنید.
+        label: photo.jpg را در Downloads انتخاب کنید
+        spotlight:
+          - mode: window
+            wm_class: nautilus
+            label: پنجره فایل‌ها
+      - instruction: **Ctrl+C** (یا راست‌کلیک → کپی).
+        label: با Ctrl+C کپی کنید
+      - instruction: **Documents** را در نوار کناری باز کنید، **Ctrl+V** بچسبانید.
+        label: Documents را باز و Ctrl+V بچسبانید
+        spotlight:
+          - anchor: nautilus-sidebar
+            label: Documents در نوار کناری
+    hints:
+      - photo.jpg را در Downloads انتخاب کنید.
+      - Ctrl+C، Documents، Ctrl+V.
+      - یا راست‌کلیک کپی و در Documents چسباندن.
+
+  - id: terminal-copy
+    kind: terminal
+    title: cp از ترمینال
+    fixture: fixtures/copy-paste-basic/
+    instruction: |
+      همان کپی با دستور: `cp photo.jpg Documents/` را امتحان کنید.
+    validate:
+      pattern: '^cp\s+.*photo\.jpg.*Documents/?\s*$'
+      expect_exit: 0
+    hints:
+      - دستور کپی cp است.
+      - cp اول منبع، بعد مقصد.
+      - cp photo.jpg Documents/
+
+  - id: bridge-copy
+    kind: bridge
+    title: cp در برابر کپی و چسباندن
+    body: |
+      یک فایل را دو بار کپی کردید — GUI و ترمینال. فایل‌ها برای کپی گاه‌به‌گاه عالی است.
+      ترمینال برای کپی زیاد بهتر است، مثلاً `cp *.jpg Documents/` همه JPEGها را یکجا کپی می‌کند.

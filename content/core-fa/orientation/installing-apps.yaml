@@ -1,0 +1,64 @@
+track: orientation
+track_title: آشنایی
+module: installing-apps
+title: نصب برنامه
+order: 3
+steps:
+  - id: contrast-installers
+    kind: contrast
+    title: مخزن، نه فایل .exe تصادفی
+    body: |
+      در ویندوز اغلب نصب‌کننده از وب دانلود می‌شود. در GNOME، **نرم‌افزار** برنامه‌های
+      تأییدشده از توزیع و Flatpak را نصب می‌کند — شبیه فروشگاه برنامه، با به‌روزرسانی یکجا.
+
+  - id: gui-software
+    kind: gui
+    title: مرور GNOME Software
+    target_app: org.gnome.Software
+    instruction: **نرم‌افزار** را باز کنید و جستجو یا مرور کنید (نیازی به نصب نیست).
+    phases:
+      - instruction: نرم‌افزار را از شبکه برنامه‌ها یا جستجو باز کنید.
+        label: باز کردن GNOME Software
+      - instruction: با جستجو یا دسته‌ها برنامه‌های موجود را ببینید.
+        label: جستجو یا مرور برنامه
+    hints:
+      - Super را بزنید و «Software» یا «نرم‌افزار» را تایپ کنید.
+      - به‌روزرسانی‌ها هم در نرم‌افزار دیده می‌شوند.
+
+  - id: terminal-software-search
+    kind: terminal
+    title: جستجوی بسته از ترمینال
+    fixture: fixtures/open-files/
+    instruction: |
+      از ترمینال بسته جستجو کنید — همان مخزنی که نرم‌افزار استفاده می‌کند.
+    distro_variants:
+      debian:
+        instruction: `apt search firefox` را برای جستجوی بسته اجرا کنید (فقط خواندن).
+        validate:
+          pattern: '^apt\s+search\s+firefox\s*$'
+          expect_exit: 0
+      fedora:
+        instruction: `dnf search firefox` را برای جستجوی بسته اجرا کنید (فقط خواندن).
+        validate:
+          pattern: '^dnf\s+search\s+firefox\s*$'
+          expect_exit: 0
+      arch:
+        instruction: `pacman -Ss firefox` را برای جستجوی بسته اجرا کنید (فقط خواندن).
+        validate:
+          pattern: '^pacman\s+-Ss\s+firefox\s*$'
+          expect_exit: 0
+      default:
+        instruction: `apt search firefox` را برای جستجوی بسته اجرا کنید (فقط خواندن).
+        validate:
+          pattern: '^apt\s+search\s+firefox\s*$'
+          expect_exit: 0
+    hints:
+      - جستجو چیزی نصب نمی‌کند.
+      - وقتی نام بسته را می‌دانید، نصب از ترمینال سریع‌تر است.
+
+  - id: bridge-software
+    kind: bridge
+    title: رابط گرافیکی در برابر ترمینال
+    body: |
+      نرم‌افزار برای کشف برنامه عالی است. مدیر بسته ترمینال (`apt`، `dnf`، `pacman`)
+      وقتی نام بسته را می‌دانید سریع‌تر است — در مسیر نرم‌افزار تمرین می‌کنید.

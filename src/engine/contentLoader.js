@@ -13,6 +13,10 @@ import { parseYaml } from './yaml.js';
 export { ContentSchemaError };
 
 const MODULE_SUFFIXES = ['.yaml', '.yml', '.json'];
+const PACK_BY_LANGUAGE = {
+    fa: 'core-fa',
+    en: 'core',
+};
 
 function readTextFile(file) {
     const [ok, contents] = file.load_contents(null);
@@ -66,14 +70,15 @@ export class ContentLoader {
         this.modules = [];
         this._trackMetadata = new Map();
 
-        for (const packName of listDirectory(this._contentRoot)) {
-            if (packName.startsWith('.'))
-                continue;
+        const allPackNames = listDirectory(this._contentRoot).filter(name => !name.startsWith('.'));
+        const packNames = packId && packId !== 'all'
+            ? [packId]
+            : ContentLoader._selectPackNames(allPackNames);
+
+        for (const packName of packNames) {
             const packDir = GLib.build_filenamev([this._contentRoot, packName]);
             const packFile = Gio.File.new_for_path(packDir);
             if (packFile.query_file_type(Gio.FileQueryInfoFlags.NONE, null) !== Gio.FileType.DIRECTORY)
-                continue;
-            if (packId && packName !== packId && packId !== 'all')
                 continue;
             this._loadPack(packDir, packName);
         }
@@ -185,6 +190,25 @@ export class ContentLoader {
             this.tracks.set(module.track, this._enrichTrack(module.track, module.track_title));
         }
         this.tracks.get(module.track).modules.push(enriched);
+    }
+
+    static _preferredLanguage() {
+        for (const lang of GLib.get_language_names()) {
+            if (lang.startsWith('fa'))
+                return 'fa';
+            if (lang.startsWith('en'))
+                return 'en';
+        }
+        return 'en';
+    }
+
+    static _selectPackNames(packNames) {
+        const preferred = PACK_BY_LANGUAGE[ContentLoader._preferredLanguage()];
+        if (preferred && packNames.includes(preferred))
+            return [preferred];
+        if (packNames.includes('core'))
+            return ['core'];
+        return packNames;
     }
 
     static defaultContentRoot() {

@@ -1,0 +1,52 @@
+track: settings
+track_title: تنظیمات و پیکربندی
+module: background-settings
+title: پس‌زمینه میزکار
+order: 1
+steps:
+  - id: contrast-settings
+    kind: contrast
+    title: Registry در برابر پیکربندی متنی
+    body_left: |
+      **Registry** ویندوز — پایگاه داده باینری با regedit.
+    body_right: |
+      تنظیمات لینوکس عمدتاً **متن ساده** زیر ~/.config و /etc — قابل خواندن،
+      diff و پشتیبان با cp.
+    body: |
+      GNOME بسیاری از ترجیحات را در dconf و فایل‌های config ذخیره می‌کند که
+      از ترمینال هم خوانده می‌شوند.
+
+  - id: gui-background
+    kind: gui
+    title: تغییر پس‌زمینه
+    target_app: org.gnome.Settings
+    instruction: تنظیمات → پس‌زمینه را باز و تصویر یا رنگ دیگری انتخاب کنید.
+    phases:
+      - instruction: **تنظیمات** را باز و **پس‌زمینه** را ببینید.
+        label: تنظیمات پس‌زمینه
+      - instruction: تصویر یا رنگ پس‌زمینه دیگری انتخاب کنید.
+        label: پس‌زمینه جدید
+    hints:
+      - Super و تایپ Settings یا تنظیمات.
+      - تغییر فوراً اعمال می‌شود.
+
+  - id: terminal-gsettings
+    kind: terminal
+    title: خواندن تنظیم به‌صورت متن
+    fixture: fixtures/open-files/
+    instruction: |
+      URI پس‌زمینه فعلی را با
+      `gsettings get org.gnome.desktop.background picture-uri` بخوانید.
+    validate:
+      pattern: '^gsettings\s+get\s+org\.gnome\.desktop\.background\s+picture-uri\s*$'
+      expect_exit: 0
+    hints:
+      - gsettings تنظیمات GNOME را از ترمینال می‌خواند.
+      - همین مقدار را در GUI عوض کردید.
+
+  - id: bridge-settings
+    kind: bridge
+    title: پشتیبان با cp -r
+    body: |
+      پشتیبان ~/.config بخش زیادی از میزکار را کپی می‌کند — کاری که با Registry
+      ویندوز عملاً سخت است.

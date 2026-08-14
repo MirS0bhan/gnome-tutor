@@ -1,0 +1,51 @@
+track: devices
+track_title: دستگاه‌ها و ذخیره‌سازی
+module: disks-overview
+title: دیسک‌ها و ذخیره‌سازی
+order: 1
+steps:
+  - id: contrast-disks
+    kind: contrast
+    title: حرف درایو در برابر device
+    body_left: |
+      **This PC** درایو C:، D: و removable را با حرف نشان می‌دهد.
+    body_right: |
+      **Disks** دستگاه فیزیکی و پارتیشن را نشان می‌دهد. USB زیر
+      /media/you/... یا /run/media/you/... mount می‌شود.
+    body: |
+      لینوکس به‌جای حرف درایو مستقیماً block device را نشان می‌دهد.
+
+  - id: gui-disks
+    kind: gui
+    title: دیسک اصلی را ببینید
+    target_app: org.gnome.DiskUtility
+    instruction: |
+      **Disks** را باز، دیسک اصلی را انتخاب و اندازه و پارتیشن را ببینید
+      (فقط خواندن — format نزنید).
+    phases:
+      - instruction: **Disks** را از شبکه برنامه‌ها باز کنید.
+        label: Disks را باز کنید
+      - instruction: دیسک اصلی را کلیک و اندازه و نوع پارتیشن را بخوانید.
+        label: چیدمان دیسک
+    hints:
+      - Super و تایپ Disks.
+      - این درس فقط بازرسی است.
+
+  - id: terminal-lsblk
+    kind: terminal
+    title: lsblk و df
+    fixture: fixtures/open-files/
+    instruction: `lsblk` را برای فهرست block device به‌صورت متن اجرا کنید.
+    validate:
+      pattern: '^lsblk\s*$|^df\s+-h\s*$'
+      expect_exit: 0
+    hints:
+      - lsblk همان موجودی Disks را به‌صورت متن نشان می‌دهد.
+      - df -h فضای آزاد filesystemهای mount‌شده.
+
+  - id: bridge-disks
+    kind: bridge
+    title: خروجی مناسب انجمن
+    body: |
+      وقتی انجمن پشتیبانی اطلاعات دیسک می‌خواهد، `lsblk` و `df -h` پاسخ
+      استاندارد هستند — نسخه متنی آنچه در Disks دیدید.

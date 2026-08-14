@@ -1,0 +1,41 @@
+tracks:
+  - id: orientation
+    order: 0
+    title: آشنایی
+    description: پیش از ترمینال و پیش از فایل‌ها — با میزکار لینوکس راحت شوید.
+  - id: filesystem
+    order: 1
+    title: فایل‌ها و سیستم فایل
+    description: کپی، جابه‌جایی و مرتب‌سازی — هم با رابط گرافیکی و هم با خط فرمان.
+  - id: permissions
+    order: 2
+    title: مجوزها
+    description: چه کسی می‌تواند بخواند، بنویسد و اجرا کند — در برنامه فایل‌ها و با chmod.
+  - id: software
+    order: 3
+    title: نرم‌افزار
+    description: نصب و حذف برنامه از رابط گرافیکی و مدیر بسته.
+  - id: processes
+    order: 4
+    title: فرایندها
+    description: ببینید چه چیزی در حال اجراست و چگونه متوقفش کنید.
+  - id: settings
+    order: 5
+    title: تنظیمات
+    description: شخصی‌سازی میزکار با رابط گرافیکی.
+  - id: editing
+    order: 6
+    title: ویرایش متن
+    description: ویرایش در ویرایشگر گرافیکی و در ترمینال.
+  - id: devices
+    order: 7
+    title: دستگاه‌ها
+    description: دیسک‌ها، درایو USB و چیدمان ذخیره‌سازی.
+  - id: networking
+    order: 8
+    title: شبکه
+    description: وای‌فای، اتصال‌ها و ابزارهای پایه شبکه.
+  - id: practice
+    order: 9
+    title: تمرین آزاد
+    description: یک محیط تمرین پایدار و چالش‌های اختیاری.

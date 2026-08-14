@@ -1,0 +1,55 @@
+track: processes
+track_title: فرایندها و پایش
+module: system-monitor
+title: System Monitor
+order: 1
+steps:
+  - id: contrast-processes
+    kind: contrast
+    title: معادل Task Manager
+    body_left: |
+      **Task Manager** با Ctrl+Alt+Del در ویندوز.
+    body_right: |
+      **System Monitor** در GNOME، یا `ps` / `top` / `kill` در ترمینال — همان
+      ایده، و روی SSH قابل اسکریpt.
+    body: |
+      Task Manager ویندوز و System Monitor GNOME برنامه‌های در حال اجرا و منابع را
+      نشان می‌دهند. ترمینال همان داده را برای استفاده دور فراهم می‌کند.
+
+  - id: gui-monitor
+    kind: gui
+    title: فرایند تمرین را پیدا کنید
+    target_app: org.gnome.SystemMonitor
+    spawn_process: true
+    instruction: |
+      System Monitor را باز کنید، **academy-dummy-process** را در فهرست پیدا
+      و متوقف کنید.
+    phases:
+      - instruction: **System Monitor** را باز و تب **Processes** را ببینید.
+        label: System Monitor را باز کنید
+      - instruction: **academy-dummy-process** را پیدا و متوقف کنید.
+        label: فرایند تمرین را متوقف کنید
+    hints:
+      - Super و تایپ System Monitor.
+      - اگر هست از جعبه جستجو در فهرست فرایند استفاده کنید.
+
+  - id: terminal-kill
+    kind: terminal
+    title: توقف از ترمینال
+    fixture: fixtures/open-files/
+    spawn_process: true
+    instruction: |
+      **academy-dummy-process** را با `pkill -f academy-dummy-process` متوقف کنید.
+    validate:
+      pattern: '^pkill\s+(-f\s+)?academy-dummy-process\s*$|^kill\s+\d+\s*$'
+      expect_exit: 0
+    hints:
+      - pgrep academy-dummy-process شناسه‌ها را فهرست می‌کند.
+      - pkill -f academy-dummy-process با نام متوقف می‌کند.
+
+  - id: bridge-processes
+    kind: bridge
+    title: GUI در برابر ps/top
+    body: |
+      System Monitor برای لپ‌تاپ کافی است. روی سرور بدون GUI، `ps`، `top` و `kill`
+      راه دیدن و متوقف کردن فرایندهای مشکل‌دار هستند.
