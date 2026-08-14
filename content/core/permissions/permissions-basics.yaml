@@ -1,0 +1,46 @@
+track: permissions
+track_title: Permissions and ownership
+module: permissions-basics
+title: Reading permissions
+order: 1
+steps:
+  - id: contrast-perms
+    kind: contrast
+    title: ACLs vs rwx
+    body: |
+      Windows uses complex ACL lists. Linux traditionally uses **owner**, **group**,
+      and **others**, each with **read**, **write**, and **execute** bits (rwx).
+
+  - id: gui-properties
+    kind: gui
+    title: Properties → Permissions
+    target_app: org.gnome.Nautilus
+    fixture: fixtures/permissions-basic/
+    instruction: Open **script.sh** Properties and view the Permissions tab.
+    phases:
+      - instruction: Select **script.sh** in the practice folder.
+        label: Select script.sh
+      - instruction: Right-click → **Properties** → **Permissions** tab.
+        label: Open the Permissions tab
+    hints:
+      - Properties is in the right-click menu.
+      - Execute permission lets a file run as a program.
+
+  - id: terminal-ls
+    kind: terminal
+    title: ls -l
+    fixture: fixtures/permissions-basic/
+    instruction: Run `ls -l` to see permission letters in the listing.
+    validate:
+      pattern: '^ls\s+-l\s*$'
+      expect_exit: 0
+    hints:
+      - The first column shows permissions like -rw-r--r--.
+      - ls -l
+
+  - id: bridge-perms
+    kind: bridge
+    title: GUI vs ls -l
+    body: |
+      Properties is clear when changing one file. `ls -l` shows permissions for
+      everything in a folder at once — essential on servers and in scripts.

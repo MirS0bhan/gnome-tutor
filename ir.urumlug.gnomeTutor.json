@@ -1,24 +1,20 @@
 {
-    "id" : "ir.urumlug.gnomeTutor",
-    "runtime" : "org.gnome.Platform",
-    "runtime-version" : "50",
-    "sdk" : "org.gnome.Sdk",
-    "sdk-extensions" : [
-        "org.freedesktop.Sdk.Extension.node20",
-        "org.freedesktop.Sdk.Extension.typescript"
-    ],
-    "command" : "ir.urumlug.gnomeTutor",
-    "finish-args" : [
+    "id": "ir.urumlug.gnomeTutor",
+    "runtime": "org.gnome.Platform",
+    "runtime-version": "50",
+    "sdk": "org.gnome.Sdk",
+    "command": "ir.urumlug.gnomeTutor",
+    "finish-args": [
         "--share=network",
         "--share=ipc",
         "--socket=fallback-x11",
         "--device=dri",
-        "--socket=wayland"
+        "--socket=wayland",
+        "--filesystem=home",
+        "--talk-name=org.freedesktop.FileManager1",
+        "--talk-name=systems.misano.LinuxAcademy.Spotlight"
     ],
-    "build-options" : {
-        "append-path" : "/usr/lib/sdk/typescript/bin:/usr/lib/sdk/node20/bin"
-    },
-    "cleanup" : [
+    "cleanup": [
         "/include",
         "/lib/pkgconfig",
         "/man",
@@ -29,15 +25,19 @@
         "*.la",
         "*.a"
     ],
-    "modules" : [
+    "modules": [
         {
-            "name" : "gnome-tutor",
-            "builddir" : true,
-            "buildsystem" : "meson",
-            "sources" : [
+            "name": "gnome-tutor",
+            "builddir": true,
+            "buildsystem": "meson",
+            "config-opts": [
+                "-Dprefix=/app"
+            ],
+            "sources": [
                 {
-                    "type" : "git",
-                    "url" : "file:///home/misano/Projects"
+                    "type": "git",
+                    "url": "https://github.com/mirs0bhan/gnome-tutor.git",
+                    "branch": "main"
                 }
             ]
         }

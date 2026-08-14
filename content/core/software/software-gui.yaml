@@ -1,0 +1,32 @@
+track: software
+track_title: Installing software
+module: software-gui
+title: GNOME Software
+order: 1
+steps:
+  - id: contrast-software
+    kind: contrast
+    title: App stores vs random installers
+    body: |
+      Linux distros ship **repositories** of vetted packages. GNOME **Software**
+      installs from those repos and Flatpak remotes — you rarely need to hunt
+      for `.exe`-style downloads.
+
+  - id: gui-software-browse
+    kind: gui
+    title: Browse Software
+    target_app: org.gnome.Software
+    instruction: Open Software and browse updates or categories (no install required).
+    phases:
+      - instruction: Launch **Software** and open the **Updates** or **Explore** page.
+        label: Open Software
+    hints:
+      - Press Super and type Software.
+      - Flatpak apps appear alongside system packages.
+
+  - id: bridge-software-gui
+    kind: bridge
+    title: When the GUI wins
+    body: |
+      Software is best for discovering apps and managing updates visually. You
+      will mirror the same installs with a terminal package manager next.

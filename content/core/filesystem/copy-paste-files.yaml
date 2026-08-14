@@ -1,0 +1,56 @@
+track: filesystem
+track_title: Files and the filesystem
+module: copy-paste-files
+title: Copying and pasting files
+order: 3
+steps:
+  - id: contrast-copy
+    kind: contrast
+    title: Same shortcuts, different safety rules
+    body: |
+      Copy and paste work like Windows — **Ctrl+C** to copy, **Ctrl+V** to paste.
+      The difference is what happens when things go wrong: deleting files from the
+      terminal with rm has no Recycle Bin. That is why we practice in a sandbox
+      folder first.
+
+  - id: gui-copy
+    kind: gui
+    title: Copy photo.jpg to Documents
+    target_app: org.gnome.Nautilus
+    fixture: fixtures/copy-paste-basic/
+    instruction: |
+      Copy **photo.jpg** from **Downloads** into **Documents** using copy and paste.
+    phases:
+      - instruction: In Downloads, click **photo.jpg** once to select it.
+        label: Select photo.jpg in Downloads
+      - instruction: Press **Ctrl+C** to copy the file (or right-click → Copy).
+        label: Copy the file with Ctrl+C
+      - instruction: Click **Documents** in the sidebar, then press **Ctrl+V** to paste.
+        label: Open Documents and paste with Ctrl+V
+    hints:
+      - Click photo.jpg in Downloads to select it.
+      - Press Ctrl+C to copy, open Documents, then Ctrl+V to paste.
+      - Or right-click the file and use Copy, then Paste in Documents.
+
+  - id: terminal-copy
+    kind: terminal
+    title: cp from the terminal
+    fixture: fixtures/copy-paste-basic/
+    instruction: |
+      Do the same copy with a command: copy photo.jpg into Documents.
+      Try `cp photo.jpg Documents/`.
+    validate:
+      pattern: '^cp\s+.*photo\.jpg.*Documents/?\s*$'
+      expect_exit: 0
+    hints:
+      - The copy command is cp.
+      - cp takes the source file first, then the destination folder.
+      - cp photo.jpg Documents/
+
+  - id: bridge-copy
+    kind: bridge
+    title: cp vs copy and paste
+    body: |
+      You copied one file twice — GUI and terminal. The Files app is perfect for
+      occasional copies. The terminal wins when you need many at once, for example
+      cp *.jpg Documents/ copies every JPEG in the current folder in one step.

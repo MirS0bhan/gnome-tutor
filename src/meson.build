@@ -1,8 +1,35 @@
 pkgdatadir = get_option('datadir') / meson.project_name()
 gnome = import('gnome')
 
+python3 = find_program('python3')
+
+gresource_xml = custom_target(
+  'gnome-tutor-gresource-xml',
+  output: 'ir.urumlug.gnomeTutor.src.gresource.xml',
+  command: [
+    python3,
+    files('../tools/generate-gresource.py'),
+    meson.current_source_dir(),
+    '@OUTPUT@',
+  ],
+  depend_files: files(
+    '../tools/generate-gresource.py',
+  ),
+  build_by_default: true,
+)
+
+test(
+  'gresource-complete',
+  python3,
+  args: [
+    files('../tools/verify-gresource.py'),
+    meson.current_source_dir(),
+    gresource_xml,
+  ],
+)
+
 src_res = gnome.compile_resources('ir.urumlug.gnomeTutor.src',
-  'ir.urumlug.gnomeTutor.src.gresource.xml',
+  gresource_xml,
   gresource_bundle: true,
   install: true,
   install_dir: pkgdatadir,

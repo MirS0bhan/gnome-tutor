@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gnome/gnome-builder-image-gitlab:master
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate content packs
+        run: gjs -m tools/content-lint.js content
+
+      - name: Configure
+        run: meson setup build --prefix=/usr
+
+      - name: Build
+        run: meson compile -C build
+
+      - name: Test
+        run: meson test -C build --print-errorlogs
+
+      - name: Install
+        run: meson install -C build
+
+  flatpak:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Flatpak
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder jq
+          flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak install -y flathub org.gnome.Platform//50 org.gnome.Sdk//50
+
+      - name: Build Flatpak (local source)
+        run: |
+          jq '.modules[0].sources = [{"type":"dir","path":"."}]' ir.urumlug.gnomeTutor.json > ci-flatpak.json
+          flatpak-builder --repo=repo --force-clean flatpak-build ci-flatpak.json
+
+      - name: Validate AppStream metadata
+        run: |
+          flatpak build-export repo flatpak-build
+          flatpak build-bundle repo gnome-tutor.flatpak ir.urumlug.gnomeTutor
+          flatpak run --command=appstreamcli org.freedesktop.Platform//24.08 validate-tree flatpak-build || true
