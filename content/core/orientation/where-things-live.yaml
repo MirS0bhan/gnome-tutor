@@ -26,6 +26,19 @@ steps:
       - Home is your personal space on the system.
       - The sidebar lists common folders like Documents and Downloads.
 
+  - id: terminal-home
+    kind: terminal
+    title: List folders from the terminal
+    fixture: fixtures/open-files/
+    instruction: |
+      In the terminal, list the folders in your practice home with `ls`.
+    validate:
+      pattern: '^ls\s*$'
+      expect_exit: 0
+    hints:
+      - ls lists files and folders in the current directory.
+      - You should see Documents, Downloads, and Pictures in the output.
+
   - id: bridge-home
     kind: bridge
     title: Paths you will see again

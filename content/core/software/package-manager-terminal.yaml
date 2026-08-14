@@ -49,4 +49,4 @@ steps:
     body: |
       Terminal package managers shine when you install the same stack on many
       machines or document setup in a script. Flatpak and distro packages can
-      coexist — check Software for the friendly view.
+      coexist — open **GNOME Software** when you want the friendly browse-and-search view.

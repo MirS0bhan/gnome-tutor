@@ -26,6 +26,37 @@ steps:
       - Press Super and type "Software".
       - Updates appear in Software as well as installed apps.
 
+  - id: terminal-software-search
+    kind: terminal
+    title: Search for an app from the terminal
+    fixture: fixtures/open-files/
+    instruction: |
+      Search for a package from the terminal — the same catalogs Software uses.
+    distro_variants:
+      debian:
+        instruction: Run `apt search firefox` to search packages (read-only).
+        validate:
+          pattern: '^apt\s+search\s+firefox\s*$'
+          expect_exit: 0
+      fedora:
+        instruction: Run `dnf search firefox` to search packages (read-only).
+        validate:
+          pattern: '^dnf\s+search\s+firefox\s*$'
+          expect_exit: 0
+      arch:
+        instruction: Run `pacman -Ss firefox` to search packages (read-only).
+        validate:
+          pattern: '^pacman\s+-Ss\s+firefox\s*$'
+          expect_exit: 0
+      default:
+        instruction: Run `apt search firefox` to search packages (read-only).
+        validate:
+          pattern: '^apt\s+search\s+firefox\s*$'
+          expect_exit: 0
+    hints:
+      - Searching does not install anything.
+      - Once you know the package name, terminal installs are faster.
+
   - id: bridge-software
     kind: bridge
     title: GUI vs terminal installs

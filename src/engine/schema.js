@@ -102,6 +102,13 @@ function validateStep(step, path) {
                     throw new ContentSchemaError('phase needs instruction or label', phasePath);
             }
         }
+        if (step.validate !== undefined) {
+            const validate = step.validate;
+            if (!validate || typeof validate !== 'object')
+                throw new ContentSchemaError('validate must be an object', `${path}/${id}`);
+            if (validate.exists !== undefined && typeof validate.exists !== 'string')
+                throw new ContentSchemaError('validate.exists must be a string', `${path}/${id}`);
+        }
         break;
     case 'terminal':
     case 'challenge':

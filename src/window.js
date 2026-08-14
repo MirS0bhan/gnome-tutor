@@ -29,7 +29,6 @@ export const GnomeTutorWindow = GObject.registerClass({
         });
 
         this._progressStore = new ProgressStore();
-        this._lessonEngine = new LessonEngine({ progressStore: this._progressStore });
         this._curriculum = null;
         this._activeModule = null;
         this._lastModule = null;
@@ -40,6 +39,10 @@ export const GnomeTutorWindow = GObject.registerClass({
 
         this._sidebar = new CurriculumSidebar({ vexpand: true, hexpand: true });
         this._stepView = new StepView({ vexpand: true, hexpand: true });
+        this._lessonEngine = new LessonEngine({
+            progressStore: this._progressStore,
+            onGuiFixtureMatched: state => this._stepView.onGuiFixtureMatched(state),
+        });
         this._stepView.setEngine(this._lessonEngine);
 
         this._instructionCard = new InstructionCardWindow({ application });
