@@ -20,11 +20,16 @@
 
 import GObject from 'gi://GObject';
 import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
 import Gtk from 'gi://Gtk?version=4.0';
 import Adw from 'gi://Adw?version=1';
 
 pkg.initGettext();
 pkg.initFormat();
+
+console.log(`GNOME Linux Academy ${pkg.version} starting`);
+if (GLib.file_test('/.flatpak-info', GLib.FileTest.EXISTS))
+    console.log('Flatpak: host app launch via FileManager1 / portal / flatpak-spawn');
 
 const { GnomeTutorWindow } = await import('./window.js');
 

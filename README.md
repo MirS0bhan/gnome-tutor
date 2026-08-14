@@ -76,6 +76,24 @@ Validate lesson content:
 gjs -m tools/content-lint.js content
 ```
 
+## Flatpak
+
+Build and install locally (required after pulling launcher/sandbox fixes):
+
+```bash
+git pull origin main
+flatpak-builder --force-clean --install --user build-dir ir.urumlug.gnomeTutor.json
+flatpak run ir.urumlug.gnomeTutor
+```
+
+Run from a terminal to see startup logs. A fixed build logs `GNOME Linux Academy 0.1.0 starting` and does **not** mention `Gio.DesktopAppInfo`.
+
+Clear stale lesson sandboxes from older builds (optional):
+
+```bash
+rm -rf ~/.var/app/ir.urumlug.gnomeTutor/cache/gnome-tutor
+```
+
 ## Roadmap status
 
 - [x] **Phase 0** — App skeleton, navigation split view, YAML loader, schema validation, progress store
