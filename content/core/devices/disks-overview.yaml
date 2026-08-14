@@ -1,0 +1,51 @@
+track: devices
+track_title: Devices and storage
+module: disks-overview
+title: Disks and storage
+order: 1
+steps:
+  - id: contrast-disks
+    kind: contrast
+    title: Drive letters vs devices
+    body_left: |
+      **This PC** shows C:, D:, and removable drives as letters.
+    body_right: |
+      **Disks** shows physical devices and partitions. USB drives mount under
+      /media/you/... or /run/media/you/...
+    body: |
+      Linux exposes block devices directly instead of drive letters.
+
+  - id: gui-disks
+    kind: gui
+    title: Inspect your main disk
+    target_app: org.gnome.DiskUtility
+    instruction: |
+      Open **Disks**, select your main drive, and note its size and partition layout
+      (read-only — do not format anything).
+    phases:
+      - instruction: Launch **Disks** from the app grid.
+        label: Open Disks
+      - instruction: Click the main disk and read the size and partition type.
+        label: Inspect disk layout
+    hints:
+      - Press Super and type Disks.
+      - This lesson is inspection only.
+
+  - id: terminal-lsblk
+    kind: terminal
+    title: lsblk and df
+    fixture: fixtures/open-files/
+    instruction: Run `lsblk` to list block devices in text form.
+    validate:
+      pattern: '^lsblk\s*$|^df\s+-h\s*$'
+      expect_exit: 0
+    hints:
+      - lsblk shows the same inventory as Disks, as text.
+      - df -h shows free space on mounted filesystems.
+
+  - id: bridge-disks
+    kind: bridge
+    title: Forum-friendly output
+    body: |
+      When support forums ask for disk info, `lsblk` and `df -h` are the standard
+      answers — the text version of what you saw in Disks.

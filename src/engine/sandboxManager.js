@@ -115,7 +115,23 @@ export class SandboxManager {
             throw new Error(`fixture not found: ${fixturePath}`);
 
         copyRecursive(fixture, sandbox);
+        this._ensureBashrc(sandbox, module);
         return sandbox.get_path();
+    }
+
+    _ensureBashrc(sandboxDir, module) {
+        const bashrc = sandboxDir.get_child('.bashrc');
+        if (bashrc.query_exists(null))
+            return;
+
+        const templatePath = GLib.build_filenamev([
+            module.pack_dir ?? GLib.build_filenamev([SandboxManager.contentRoot(), module.pack_id]),
+            'fixtures',
+            '.bashrc',
+        ]);
+        const template = Gio.File.new_for_path(templatePath);
+        if (template.query_exists(null))
+            template.copy(bashrc, Gio.FileCopyFlags.OVERWRITE, null, null);
     }
 
     reset(module, step) {

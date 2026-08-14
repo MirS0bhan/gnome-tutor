@@ -166,6 +166,37 @@ export const InstructionCardWindow = GObject.registerClass({
         this.present();
     }
 
+    presentTour(module, step, { spotlightAvailable, stepIndex, stepTotal }) {
+        this._phaseIndex = -1;
+        this._phaseTotal = step.phases?.length ?? 1;
+
+        this._headerTitle.title = _('Desktop tour');
+        this._headerTitle.subtitle = _('%1$s · Step %2$d of %3$d').format(
+            module.title,
+            stepIndex + 1,
+            stepTotal,
+        );
+        this._goalLabel.label = step.instruction?.trim() ?? '';
+        this._phaseLabel.label = _('Follow each highlighted area on your desktop.');
+        this._progressLabel.visible = false;
+
+        this._spotlightNote.visible = false;
+        this._spotlightBanner.revealed = !spotlightAvailable;
+        if (!spotlightAvailable) {
+            this._spotlightNote.label = _(
+                'Without Spotlight, follow the text instructions. Enable the extension from the project README, then restart Shell.',
+            );
+            this._spotlightNote.visible = true;
+        }
+
+        this._hintPanel.setHints(step.hints ?? []);
+        this._openButton.visible = false;
+        this._nextButton.visible = false;
+        this._doneButton.visible = false;
+
+        this.present();
+    }
+
     onAppOpened(phaseIndex, phaseTotal, phase) {
         this._phaseIndex = phaseIndex;
         this._phaseTotal = phaseTotal;

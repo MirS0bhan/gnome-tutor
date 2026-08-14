@@ -30,9 +30,9 @@ steps:
     kind: terminal
     title: chmod +x
     fixture: fixtures/permissions-basic/
-    instruction: Add execute permission with `chmod +x script.sh`.
+    instruction: Add execute permission with `chmod +x script.sh` or an octal mode like `chmod 755 script.sh`.
     validate:
-      pattern: '^chmod\s+\+x\s+script\.sh\s*$'
+      pattern: '^chmod\s+(\+x|[0-7]{3,4})\s+script\.sh\s*$'
       expect_exit: 0
     hints:
       - chmod changes permissions.

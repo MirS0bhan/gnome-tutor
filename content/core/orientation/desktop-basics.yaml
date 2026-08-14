@@ -8,47 +8,53 @@ steps:
     kind: contrast
     title: A different shape of desktop
     contrast_diagram: diagrams/activities-vs-start.svg
+    body_left: |
+      A single taskbar and Start menu. Drive letters like C:\ and D:\.
+      Minimize-to-tray habits from Windows.
+    body_right: |
+      **Activities**, **workspaces**, and an **app grid**. One home folder
+      instead of drive letters. No separate "Shell app" — the desktop is the shell.
     body: |
-      Linux desktops use **Activities**, **workspaces**, and an **app grid** instead of a
-      single taskbar and Start menu. Your files live under one home folder — there is
-      no drive-letter maze like C:\ or D:\.
+      Linux desktops use Activities, workspaces, and an app grid instead of a
+      single taskbar and Start menu.
 
   - id: contrast-activities
     kind: contrast
     title: Opening Activities
+    body_left: |
+      Click Start or press the Windows key for the app menu.
+    body_right: |
+      Press **Super** (often the Windows key) or click **Activities** in the
+      top bar. Search while Activities is open. Workspaces are horizontal virtual
+      desktops — not a Windows concept.
     body: |
-      Press the **Super** key (often the Windows key) or click **Activities** in the
-      top bar. The app grid shows installed applications. Type to search while
-      Activities is open.
+      Press Super to open Activities, browse the app grid, and switch workspaces.
 
-      There is no separate Shell app to launch — Activities is part of the desktop.
-
-  - id: gui-files-intro
-    kind: gui
-    title: Open Files from the app grid
-    target_app: org.gnome.Nautilus
-    fixture: fixtures/open-files/
+  - id: tour-activities
+    kind: tour
+    title: Activities spotlight tour
     instruction: |
-      Press Super to open Activities, launch **Files**, and look at the practice folder.
+      Follow the highlighted areas on your desktop. Press Super if Activities
+      does not open on its own.
     phases:
-      - instruction: Open **Files** from the app grid or search, then explore the sidebar shortcuts.
-        label: Launch Files from Activities
+      - instruction: Move the pointer to the top-left corner or press **Super** to open Activities.
+        label: Open Activities
+        spotlight:
+          - anchor: activities-hotcorner
+            label: Activities hot corner
+      - instruction: Click the **app grid** icon to browse installed apps.
+        label: Open the app grid
+        spotlight:
+          - anchor: activities-app-grid
+            label: App grid
+      - instruction: Press **Super+Page Down** to switch to the next workspace.
+        label: Switch workspace
+        spotlight:
+          - anchor: activities-hotcorner
+            label: Workspaces strip (top bar)
     hints:
-      - Press Super and type "Files" to search.
-      - The sidebar shows Documents, Downloads, and Pictures.
-
-  - id: terminal-home-list
-    kind: terminal
-    title: See the same folders in the terminal
-    fixture: fixtures/open-files/
-    instruction: |
-      In the terminal, run `ls` to list the practice home folder.
-    validate:
-      pattern: '^ls\s*$'
-      expect_exit: 0
-    hints:
-      - ls shows the same folders Files displays in the sidebar.
-      - You will practice paths like Documents/ in the Files track.
+      - Spotlight coordinates vary by screen size — text instructions always work.
+      - You will open real apps like Files in the next track.
 
   - id: bridge-desktop
     kind: bridge
@@ -56,3 +62,4 @@ steps:
     body: |
       The GUI is the fastest way to explore a new desktop. The terminal becomes
       more useful once you start automating tasks or working on remote machines.
+      The Files track teaches the same tasks in Files and the terminal.

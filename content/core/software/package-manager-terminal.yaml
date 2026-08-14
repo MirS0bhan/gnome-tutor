@@ -7,17 +7,21 @@ steps:
   - id: contrast-pm
     kind: contrast
     title: One command installs
+    body_left: |
+      Download an `.exe` installer from a website and hope it is safe.
+    body_right: |
+      Package managers fetch vetted software and dependencies. Commands differ by
+      distro — the lesson text matches yours via /etc/os-release.
     body: |
       Package managers resolve dependencies automatically. The command differs by
-      distro — your system was detected and the lesson text matches it.
+      distro.
 
   - id: terminal-install
     kind: terminal
-    title: Search or install (dry run)
+    title: Search packages (dry run)
     fixture: fixtures/open-files/
     instruction: |
-      Run the search command for your distro to look up a package (for example
-      `apt search hello` on Debian/Ubuntu).
+      Run the search command for your distro to look up a package (read-only).
     distro_variants:
       debian:
         instruction: Run `apt search hello` to search packages (read-only).
@@ -42,6 +46,39 @@ steps:
     hints:
       - Searching does not install anything.
       - Replace hello with any package name to explore.
+
+  - id: terminal-real-install
+    kind: terminal
+    sandbox: false
+    title: Real install (optional)
+    instruction: |
+      This step runs on your **real system** — no sandbox reset. Run a search or
+      dry-run install command for a small package if you are comfortable (for example
+      `apt search gnome-calculator`). Skip validation if your distro differs.
+    distro_variants:
+      debian:
+        instruction: Run `apt search gnome-calculator` on your real system (read-only).
+        validate:
+          pattern: '^apt\s+search\s+\S+\s*$'
+          expect_exit: 0
+      fedora:
+        instruction: Run `dnf search gnome-calculator` on your real system (read-only).
+        validate:
+          pattern: '^dnf\s+search\s+\S+\s*$'
+          expect_exit: 0
+      arch:
+        instruction: Run `pacman -Ss gnome-calculator` on your real system (read-only).
+        validate:
+          pattern: '^pacman\s+-Ss\s+\S+\s*$'
+          expect_exit: 0
+      default:
+        instruction: Run `apt search gnome-calculator` on your real system (read-only).
+        validate:
+          pattern: '^apt\s+search\s+\S+\s*$'
+          expect_exit: 0
+    hints:
+      - This is the one curriculum step that does not use the lesson sandbox.
+      - Use Skip validation if your command is correct but the pattern does not match.
 
   - id: bridge-pm
     kind: bridge

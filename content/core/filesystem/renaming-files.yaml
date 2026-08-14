@@ -22,6 +22,8 @@ steps:
         label: Select draft.txt
       - instruction: Press **F2** or right-click → Rename, then type **notes.txt**.
         label: Rename the file to notes.txt
+    validate:
+      exists: Documents/notes.txt
     hints:
       - F2 is the shortcut to rename the selected file.
       - Right-click the file and choose Rename.

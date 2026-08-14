@@ -12,7 +12,7 @@ import { loadVte } from '../engine/vteLoader.js';
 import { applyAdwaitaTheme } from '../engine/vteTheme.js';
 import { HintPanel } from './hintPanel.js';
 
-const EXIT_PROBE = '__GNOME_TUTOR_EXIT:';
+const SENTINEL_RE = /__LA:(-?\d+):(.*)/;
 
 export async function createTerminalBeat(params = {}) {
     const vteModule = await loadVte();
@@ -54,6 +54,7 @@ export const TerminalBeat = GObject.registerClass({
         'validated': {},
         'hint-revealed': {},
         'reset-requested': {},
+        'skip-requested': {},
     },
 }, class TerminalBeat extends Gtk.Box {
     constructor(Vte, params = {}) {
@@ -67,12 +68,16 @@ export const TerminalBeat = GObject.registerClass({
         this._Vte = Vte;
         this._step = null;
         this._sandboxPath = null;
-        this._lineBuffer = '';
         this._spawned = false;
         this._validationPattern = null;
         this._expectExit = null;
-        this._pendingCommand = null;
-        this._exitProbeSource = 0;
+        this._handledSentinel = null;
+
+        this._realSystemBanner = new Adw.Banner({
+            title: _('This step runs on your real system — there is no reset button. Read the instructions carefully.'),
+            revealed: false,
+        });
+        this.append(this._realSystemBanner);
 
         this._instruction = new Gtk.Label({
             wrap: true,
@@ -95,14 +100,17 @@ export const TerminalBeat = GObject.registerClass({
             margin_top: 6,
         });
         this._terminal.set_size_request(-1, 280);
-        this._terminal.connect('commit', (_term, text) => this._onCommit(text));
-        this._terminal.connect('contents-changed', () => this._onContentsChanged());
+        this._terminal.connect('contents-changed', () => this._checkSentinel());
         this.append(this._terminal);
 
         const toolbar = new Gtk.Box({ spacing: 6 });
         this._resetButton = new Gtk.Button({ label: _('Reset step') });
         this._resetButton.connect('clicked', () => this.emit('reset-requested'));
         toolbar.append(this._resetButton);
+
+        this._skipButton = new Gtk.Button({ label: _('Skip validation') });
+        this._skipButton.connect('clicked', () => this.emit('validated'));
+        toolbar.append(this._skipButton);
         this.append(toolbar);
 
         this._hintPanel = new HintPanel();
@@ -113,41 +121,81 @@ export const TerminalBeat = GObject.registerClass({
     }
 
     start(step, sandboxPath) {
-        this._cancelExitProbe();
         this._step = step;
         this._sandboxPath = sandboxPath;
-        this._lineBuffer = '';
-        this._pendingCommand = null;
+        this._handledSentinel = null;
         this._validationPattern = step.validate?.pattern
             ? new RegExp(step.validate.pattern)
             : null;
         this._expectExit = step.validate?.expect_exit ?? null;
 
         this._instruction.label = step.instruction?.trim() ?? '';
-        if (sandboxPath) {
+        const realSystem = step.sandbox === false;
+        this._realSystemBanner.revealed = realSystem;
+        this._resetButton.visible = !realSystem;
+
+        if (realSystem) {
+            this._sandboxLabel.visible = false;
+        } else if (sandboxPath) {
             this._sandboxLabel.label = _('Practice folder (not your real files): %s').format(sandboxPath);
             this._sandboxLabel.visible = true;
         } else {
             this._sandboxLabel.visible = false;
         }
+
         this._hintPanel.setHints(step.hints ?? []);
         this._spawnShell();
     }
 
     reset(step, sandboxPath) {
         this._spawned = false;
+        this._handledSentinel = null;
         this.start(step, sandboxPath);
     }
 
-    _cancelExitProbe() {
-        if (this._exitProbeSource) {
-            GLib.source_remove(this._exitProbeSource);
-            this._exitProbeSource = 0;
+    _shouldUseBwrap() {
+        if (this._step?.sandbox === false)
+            return false;
+        if (GLib.getenv('GNOME_TUTOR_USE_BWRAP') !== '1')
+            return false;
+        if (GLib.file_test('/.flatpak-info', GLib.FileTest.EXISTS))
+            return false;
+        return GLib.find_program_in_path('bwrap') !== null;
+    }
+
+    _shellArgv(cwd) {
+        const bashrc = GLib.build_filenamev([cwd, '.bashrc']);
+        const hasBashrc = GLib.file_test(bashrc, GLib.FileTest.EXISTS);
+
+        if (this._shouldUseBwrap()) {
+            return [
+                'bwrap',
+                '--ro-bind', '/usr', '/usr',
+                '--symlink', 'usr/lib', '/lib',
+                '--symlink', 'usr/lib64', '/lib64',
+                '--symlink', 'usr/bin', '/bin',
+                '--bind', cwd, '/home/learner',
+                '--chdir', '/home/learner',
+                '--unshare-all', '--die-with-parent',
+                '--setenv', 'HOME', '/home/learner',
+                '/bin/bash',
+                ...(hasBashrc ? ['--rcfile', '.bashrc'] : ['--noprofile']),
+            ];
         }
+
+        const shell = GLib.find_program_in_path('bash') ?? '/bin/bash';
+        if (hasBashrc)
+            return [shell, '--rcfile', '.bashrc'];
+        return [shell, '--noprofile', '--norc'];
     }
 
     _spawnShell() {
-        if (!this._sandboxPath) {
+        const realSystem = this._step?.sandbox === false;
+        const cwd = realSystem
+            ? GLib.get_home_dir()
+            : this._sandboxPath;
+
+        if (!cwd) {
             this._terminal.feed('Sandbox folder is not ready.\r\n');
             return;
         }
@@ -160,16 +208,13 @@ export const TerminalBeat = GObject.registerClass({
             }
         }
 
-        const shell = GLib.getenv('SHELL') || '/bin/bash';
-        const envv = [
-            'TERM=xterm-256color',
-            'PS1=\\$ ',
-        ];
+        const argv = this._shellArgv(cwd);
+        const envv = ['TERM=xterm-256color'];
 
         this._terminal.spawn_async(
             this._Vte.PtyFlags.DEFAULT,
-            this._sandboxPath,
-            [shell, '--noprofile', '--norc'],
+            cwd,
+            argv,
             envv,
             GLib.SpawnFlags.SEARCH_PATH,
             null,
@@ -184,62 +229,36 @@ export const TerminalBeat = GObject.registerClass({
                 }
                 this._spawned = true;
                 applyAdwaitaTheme(this._terminal, this);
-                this._terminal.feed(`Lesson sandbox: ${this._sandboxPath}\r\n`);
+                if (!realSystem)
+                    this._terminal.feed(`Lesson sandbox: ${cwd}\r\n`);
             },
         );
     }
 
-    _onCommit(text) {
-        if (text === '\r' || text === '\n') {
-            const command = this._lineBuffer.trim();
-            this._lineBuffer = '';
-            if (command)
-                this._queueValidation(command);
-            return;
-        }
-        if (text !== '\u007f')
-            this._lineBuffer += text;
-        else if (this._lineBuffer.length > 0)
-            this._lineBuffer = this._lineBuffer.slice(0, -1);
-    }
-
-    _queueValidation(command) {
-        if (!this._validationPattern?.test(command))
-            return;
-
-        if (this._expectExit === null || this._expectExit === undefined) {
-            this.emit('validated');
-            return;
-        }
-
-        this._pendingCommand = command;
-        this._cancelExitProbe();
-        this._exitProbeSource = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 350, () => {
-            this._exitProbeSource = 0;
-            this._terminal.feed(`echo "${EXIT_PROBE}$?"\r`);
-            return GLib.SOURCE_REMOVE;
-        });
-    }
-
-    _onContentsChanged() {
-        if (!this._pendingCommand)
+    _checkSentinel() {
+        if (!this._validationPattern)
             return;
 
         const [, text] = this._terminal.get_text(true);
-        const marker = `${EXIT_PROBE}`;
-        const index = text.lastIndexOf(marker);
-        if (index < 0)
+        const lines = text.split('\n').filter(line => line.includes('__LA:'));
+        const last = lines[lines.length - 1];
+        if (!last || last === this._handledSentinel)
             return;
 
-        const tail = text.slice(index + marker.length);
-        const match = tail.match(/^(-?\d+)/);
+        const match = SENTINEL_RE.exec(last);
         if (!match)
             return;
 
         const exitCode = Number.parseInt(match[1], 10);
-        if (exitCode === this._expectExit) {
-            this._pendingCommand = null;
-            this.emit('validated');
-        }
+        const command = match[2]?.trim() ?? '';
+        if (!this._validationPattern.test(command))
+            return;
+
+        if (this._expectExit !== null && this._expectExit !== undefined
+            && exitCode !== this._expectExit)
+            return;
+
+        this._handledSentinel = last;
+        this.emit('validated');
     }
 });

@@ -1,0 +1,49 @@
+track: networking
+track_title: Networking basics
+module: network-basics
+title: IP address and ping
+order: 1
+steps:
+  - id: contrast-network
+    kind: contrast
+    title: Settings vs ip/ping
+    body_left: |
+      **Network settings** in the control panel, or `ipconfig` in cmd.
+    body_right: |
+      **Settings → Network** for Wi-Fi details; `ip a` and `ping` in the terminal —
+      identical over SSH on a machine you are not sitting at.
+    body: |
+      The terminal starts to pull ahead here because it works the same remotely.
+
+  - id: gui-network
+    kind: gui
+    title: Find your connection
+    target_app: org.gnome.Settings
+    instruction: Open Settings → Network (or Wi-Fi) and find details about your current connection.
+    phases:
+      - instruction: Open **Settings** and go to **Network** or **Wi-Fi**.
+        label: Open network settings
+      - instruction: Click your active connection and find the IP or link details.
+        label: View connection details
+    hints:
+      - Press Super and type Settings.
+      - Wording varies slightly by GNOME version.
+
+  - id: terminal-ip
+    kind: terminal
+    title: ip a
+    fixture: fixtures/open-files/
+    instruction: Run `ip a` to list network interfaces and addresses.
+    validate:
+      pattern: '^ip\s+a(ddr)?\s*$'
+      expect_exit: 0
+    hints:
+      - ip a shows interfaces like lo and wlan0 or eth0.
+      - Look for inet addresses on active interfaces.
+
+  - id: bridge-network
+    kind: bridge
+    title: SSH has no GUI
+    body: |
+      Everything until now had a GUI equivalent nearby. Connecting over **SSH** is
+      terminal-only — which is why these commands matter on servers and remote machines.

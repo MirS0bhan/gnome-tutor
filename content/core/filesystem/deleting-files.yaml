@@ -7,10 +7,14 @@ steps:
   - id: contrast-delete
     kind: contrast
     title: Trash vs rm
+    body_left: |
+      Delete in File Explorer often sends files to **Recycle Bin** first.
+    body_right: |
+      Files moves items to **Trash**. Terminal **rm** deletes immediately — there
+      is no undo. This asymmetry matters in real life.
     body: |
-      Files often go to **Trash** first in the GUI. The terminal command **rm**
-      deletes immediately — there is no Recycle Bin. That is why we practice in
-      a sandbox folder.
+      Files often go to Trash first in the GUI. rm in the terminal deletes
+      immediately. That is why we practice in a sandbox folder.
 
   - id: gui-delete
     kind: gui
@@ -44,4 +48,5 @@ steps:
     title: rm has no undo
     body: |
       Use Files when you want Trash as a safety net. Use rm when you are certain —
-      and never run `rm -rf` on paths you have not double-checked.
+      and never run `rm -rf` on paths you have not double-checked. The GUI and
+      terminal are not symmetric here: Trash vs permanent delete.

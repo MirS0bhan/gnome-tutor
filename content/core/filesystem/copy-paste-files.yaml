@@ -7,11 +7,15 @@ steps:
   - id: contrast-copy
     kind: contrast
     title: Same shortcuts, different safety rules
+    body_left: |
+      **Ctrl+C** and **Ctrl+V** in File Explorer. Deleted files often go to
+      Recycle Bin first.
+    body_right: |
+      Same shortcuts in Files. Terminal **rm** deletes immediately — no Recycle Bin.
+      That is why we practice in a sandbox folder first.
     body: |
-      Copy and paste work like Windows — **Ctrl+C** to copy, **Ctrl+V** to paste.
-      The difference is what happens when things go wrong: deleting files from the
-      terminal with rm has no Recycle Bin. That is why we practice in a sandbox
-      folder first.
+      Copy and paste work like Windows. Terminal deletes are permanent — practice
+      in the sandbox first.
 
   - id: gui-copy
     kind: gui
@@ -23,10 +27,17 @@ steps:
     phases:
       - instruction: In Downloads, click **photo.jpg** once to select it.
         label: Select photo.jpg in Downloads
+        spotlight:
+          - mode: window
+            wm_class: nautilus
+            label: Files window
       - instruction: Press **Ctrl+C** to copy the file (or right-click → Copy).
         label: Copy the file with Ctrl+C
       - instruction: Click **Documents** in the sidebar, then press **Ctrl+V** to paste.
         label: Open Documents and paste with Ctrl+V
+        spotlight:
+          - anchor: nautilus-sidebar
+            label: Documents in the sidebar
     hints:
       - Click photo.jpg in Downloads to select it.
       - Press Ctrl+C to copy, open Documents, then Ctrl+V to paste.

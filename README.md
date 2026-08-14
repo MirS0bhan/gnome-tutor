@@ -76,8 +76,10 @@ gjs -m tools/content-lint.js content
 - [x] **Phase 1** — VTE terminal, sandbox fixtures, regex validation, tiered hints, reset button
 - [x] **Phase 2** — GUI beat, Nautilus launcher, floating instruction card, self-reported Done
 - [x] **Phase 3** — Spotlight Shell extension + D-Bus client (optional enhancement)
-- [ ] **Phase 4** — Curriculum breadth (in progress: Track 1 Files complete)
-- [ ] **Phase 5+** — Practice layer, localization
+- [x] **Phase 4** — Curriculum Tracks 0–8 (four-beat pattern); Track 9 practice layer
+- [ ] **Phase 5+** — Localization breadth, SSH practice stretch, SQLite progress
+
+See [docs/CURRICULUM.md](docs/CURRICULUM.md) for track details.
 
 ## License
 

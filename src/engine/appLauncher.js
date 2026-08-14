@@ -15,6 +15,7 @@ const APP_ALIASES = {
     'org.gnome.Software': ['org.gnome.Software'],
     'org.gnome.SystemMonitor': ['org.gnome.SystemMonitor', 'gnome-system-monitor'],
     'org.gnome.TextEditor': ['org.gnome.TextEditor', 'org.gnome.gedit'],
+    'org.gnome.DiskUtility': ['org.gnome.DiskUtility', 'gnome-disks'],
 };
 
 export class AppLauncher {
@@ -48,6 +49,8 @@ export class AppLauncher {
             return _('System Monitor');
         case 'org.gnome.TextEditor':
             return _('Text Editor');
+        case 'org.gnome.DiskUtility':
+            return _('Disks');
         default:
             return appId?.split('.').pop() ?? _('app');
         }

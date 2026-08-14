@@ -1,0 +1,52 @@
+track: settings
+track_title: Settings and configuration
+module: background-settings
+title: Desktop background
+order: 1
+steps:
+  - id: contrast-settings
+    kind: contrast
+    title: Registry vs plain-text config
+    body_left: |
+      Windows **Registry** — a binary database edited with regedit.
+    body_right: |
+      Linux settings are mostly **plain text** under ~/.config and /etc — readable,
+      diffable, backup-able with cp.
+    body: |
+      GNOME stores many preferences in dconf and config files you can read back
+      from the terminal.
+
+  - id: gui-background
+    kind: gui
+    title: Change the background
+    target_app: org.gnome.Settings
+    instruction: Open Settings → Background and pick a different wallpaper (or browse the gallery).
+    phases:
+      - instruction: Open **Settings** and go to **Background**.
+        label: Open Background settings
+      - instruction: Choose a different background image or color.
+        label: Pick a new background
+    hints:
+      - Press Super and type Settings.
+      - Changes apply immediately.
+
+  - id: terminal-gsettings
+    kind: terminal
+    title: Read the setting in text form
+    fixture: fixtures/open-files/
+    instruction: |
+      Read the current background URI with
+      `gsettings get org.gnome.desktop.background picture-uri`.
+    validate:
+      pattern: '^gsettings\s+get\s+org\.gnome\.desktop\.background\s+picture-uri\s*$'
+      expect_exit: 0
+    hints:
+      - gsettings reads GNOME settings from the terminal.
+      - You just changed this value in the GUI.
+
+  - id: bridge-settings
+    kind: bridge
+    title: Backup with cp -r
+    body: |
+      Backing up ~/.config copies much of your desktop setup — something that is
+      impractical with the Windows Registry.

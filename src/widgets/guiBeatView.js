@@ -37,8 +37,16 @@ export const GuiBeatView = GObject.registerClass({
         this.append(this._statusPage);
     }
 
-    reset(_module, _step, { spotlightAvailable }) {
+    reset(_module, _step, { spotlightAvailable, tour = false }) {
         this._phaseLabel.visible = false;
+        if (tour) {
+            this._statusPage.title = _('Follow the desktop tour');
+            this._statusPage.description = spotlightAvailable
+                ? _('Use the instruction card. Spotlight highlights each part of the GNOME desktop.')
+                : _('Follow the floating instruction card — install the Spotlight extension for on-screen highlights.');
+            return;
+        }
+        this._statusPage.title = _('Practice in the real Files app');
         this._statusPage.description = spotlightAvailable
             ? _('Files should open on the practice folder. The instruction card stays beside this window. Spotlight highlights each step when the extension is enabled.')
             : _('Files should open on the practice folder. Follow the floating instruction card — install the Spotlight extension for on-screen highlights.');

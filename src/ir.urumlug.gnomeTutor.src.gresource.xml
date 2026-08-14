@@ -18,6 +18,7 @@
     <file>widgets/stepView.js</file>
     <file>widgets/guiBeatView.js</file>
     <file>widgets/contrastBeatView.js</file>
+    <file>widgets/bridgeBeatView.js</file>
     <file>widgets/practiceBeatView.js</file>
     <file>widgets/hintPanel.js</file>
     <file>engine/vteLoader.js</file>

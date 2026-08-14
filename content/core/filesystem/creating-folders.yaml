@@ -22,6 +22,9 @@ steps:
     phases:
       - instruction: Click **Documents** in the sidebar to open that folder.
         label: Open Documents in the sidebar
+        spotlight:
+          - anchor: nautilus-sidebar
+            label: Documents in the sidebar
       - instruction: Right-click empty space, choose **New Folder**, and name it **Projects**.
         label: Create a folder named Projects
     validate:

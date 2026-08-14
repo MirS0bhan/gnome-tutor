@@ -7,12 +7,15 @@ steps:
   - id: contrast-nautilus
     kind: contrast
     title: Files app vs. File Explorer
+    body_left: |
+      **File Explorer** with drive letters (C:\, D:\) and backslashes.
+    body_right: |
+      **Files** (Nautilus) under one **Home** folder. Forward slashes.
+      Filenames are case-sensitive: Photo.jpg ≠ photo.jpg.
     body: |
-      On Windows you open File Explorer. On GNOME, the same job is done by **Files**
-      (the app called Nautilus). It shows your home folder, sidebar shortcuts like
-      Documents and Downloads, and the files inside each folder.
-
-      There are no drive letters — everything lives under one home directory.
+      On Windows you open File Explorer. On GNOME, **Files** (Nautilus) shows
+      your home folder, sidebar shortcuts, and files inside each folder. There are
+      no drive letters.
 
   - id: gui-open-nautilus
     kind: gui
@@ -25,8 +28,14 @@ steps:
     phases:
       - instruction: Click **Documents** in the left sidebar to open that folder.
         label: Click Documents in the sidebar
+        spotlight:
+          - anchor: nautilus-sidebar
+            label: Documents in the sidebar
       - instruction: Click **Downloads** in the sidebar and look at the files there.
         label: Open Downloads from the sidebar
+        spotlight:
+          - anchor: nautilus-sidebar
+            label: Downloads in the sidebar
     hints:
       - Press Super and type "Files" if the app did not open automatically.
       - Use the left sidebar to jump between Documents and Downloads.

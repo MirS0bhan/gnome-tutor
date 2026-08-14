@@ -9,8 +9,8 @@ import Adw from 'gi://Adw';
 
 import { GuiBeatView } from './guiBeatView.js';
 import { ContrastBeatView } from './contrastBeatView.js';
+import { BridgeBeatView } from './bridgeBeatView.js';
 import { PracticeBeatView } from './practiceBeatView.js';
-import { HintPanel } from './hintPanel.js';
 
 function kindLabel(kind) {
     switch (kind) {
@@ -22,6 +22,12 @@ function kindLabel(kind) {
         return _('Terminal practice');
     case 'bridge':
         return _('Bridge');
+    case 'tour':
+        return _('Desktop tour');
+    case 'practice':
+        return _('Practice');
+    case 'challenge':
+        return _('Challenge');
     default:
         return kind;
     }
@@ -195,7 +201,7 @@ export const StepView = GObject.registerClass({
     }
 
     onGuiFixtureMatched(state) {
-        if (!state || !this._step || this._step.kind !== 'gui')
+        if (!state || !this._step || (this._step.kind !== 'gui' && this._step.kind !== 'tour'))
             return;
 
         const isLast = state.phaseIndex + 1 >= state.phaseTotal;
@@ -264,7 +270,9 @@ export const StepView = GObject.registerClass({
 
         if (step.kind === 'terminal' || step.kind === 'challenge') {
             this._stack.visible_child_name = 'terminal';
-            const sandboxPath = this._engine?.sandboxPath(module, step);
+            const sandboxPath = step.sandbox === false
+                ? null
+                : this._engine?.sandboxPath(module, step);
             void this._ensureTerminalBeat().then(beat => {
                 if (this._step !== step)
                     return;
@@ -288,7 +296,7 @@ export const StepView = GObject.registerClass({
             return;
         }
 
-        this._footer.visible = step.kind !== 'gui';
+        this._footer.visible = step.kind !== 'gui' && step.kind !== 'tour';
         this._continueButton.label = stepIndex + 1 >= stepTotal ? _('Finish module') : _('Continue');
 
         if (step.kind === 'contrast') {
@@ -307,6 +315,24 @@ export const StepView = GObject.registerClass({
             return;
         }
 
+        if (step.kind === 'tour') {
+            this._stack.visible_child_name = 'gui';
+            const spotlightAvailable = this._engine?.spotlight.available ?? false;
+            this._guiBeat.reset(module, step, { spotlightAvailable, tour: true });
+            this._instructionCard?.presentTour(module, step, {
+                spotlightAvailable,
+                stepIndex,
+                stepTotal,
+            });
+            const state = this._engine.beginTour(module, step);
+            if (state) {
+                this._instructionCard?.onAppOpened(state.phaseIndex, state.phaseTotal, state.phase);
+                const label = state.phase?.instruction ?? state.phase?.label ?? '';
+                this._guiBeat.setPhaseProgress(state.phaseIndex, state.phaseTotal, label);
+            }
+            return;
+        }
+
         if (step.kind === 'gui') {
             this._stack.visible_child_name = 'gui';
             const spotlightAvailable = this._engine?.spotlight.available ?? false;
@@ -320,59 +346,24 @@ export const StepView = GObject.registerClass({
             return;
         }
 
+        if (step.kind === 'bridge') {
+            this._instructionCard?.dismiss();
+            this._stack.visible_child_name = 'content';
+            this._clearContentBox();
+            this._contentBox.append(new Gtk.Label({
+                label: _('%1$s · Step %2$d of %3$d').format(kindLabel(step.kind), stepIndex + 1, stepTotal),
+                css_classes: ['dim-label'],
+                halign: Gtk.Align.START,
+            }));
+            const bridge = new BridgeBeatView({ vexpand: true });
+            bridge.setStep(module, step);
+            bridge.connect('hint-revealed', () => this.emit('hint-revealed'));
+            this._contentBox.append(bridge);
+            return;
+        }
+
         this._instructionCard?.dismiss();
         this._stack.visible_child_name = 'content';
         this._clearContentBox();
-
-        this._contentBox.append(new Gtk.Label({
-            label: module.title,
-            css_classes: ['title-4'],
-            halign: Gtk.Align.START,
-        }));
-
-        this._contentBox.append(new Gtk.Label({
-            label: _('%1$s · Step %2$d of %3$d').format(kindLabel(step.kind), stepIndex + 1, stepTotal),
-            css_classes: ['dim-label'],
-            halign: Gtk.Align.START,
-        }));
-
-        const card = new Gtk.Box({
-            orientation: Gtk.Orientation.VERTICAL,
-            spacing: 12,
-            css_classes: ['card'],
-            margin_top: 12,
-        });
-        const cardInner = new Gtk.Box({
-            orientation: Gtk.Orientation.VERTICAL,
-            spacing: 12,
-            margin_top: 18,
-            margin_bottom: 18,
-            margin_start: 18,
-            margin_end: 18,
-        });
-
-        switch (step.kind) {
-        case 'bridge':
-            cardInner.append(new Gtk.Label({
-                label: step.body,
-                wrap: true,
-                halign: Gtk.Align.START,
-                justify: Gtk.Justification.FILL,
-            }));
-            break;
-        }
-
-        card.append(cardInner);
-        this._contentBox.append(card);
-
-        if (step.kind === 'bridge') {
-            const hints = step.hints ?? [];
-            if (hints.length > 0) {
-                const hintPanel = new HintPanel();
-                hintPanel.setHints(hints);
-                hintPanel.connect('hint-revealed', () => this.emit('hint-revealed'));
-                this._contentBox.append(hintPanel);
-            }
-        }
     }
 });

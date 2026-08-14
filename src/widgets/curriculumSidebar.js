@@ -17,6 +17,8 @@ function stepKindLabel(kind) {
         return _('Terminal');
     case 'bridge':
         return _('Bridge');
+    case 'tour':
+        return _('Tour');
     case 'practice':
         return _('Practice');
     case 'challenge':

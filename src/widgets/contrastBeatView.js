@@ -66,18 +66,20 @@ export const ContrastBeatView = GObject.registerClass({
             margin_top: 12,
         });
 
-        columns.append(this._column(_('Windows / macOS'), 'computer-symbolic',
-            _('Drive letters (C:\\, D:\\)\nStart menu & taskbar\nRegistry for settings')));
-        columns.append(this._column(_('Linux / GNOME'), 'folder-symbolic',
-            _('One home folder\nActivities & app grid\nPlain-text config files')));
+        columns.append(this._column(_('What you\'re used to'), 'computer-symbolic',
+            step.body_left ?? _('Drive letters (C:\\, D:\\)\nStart menu & taskbar\nRegistry for settings')));
+        columns.append(this._column(_('On Linux / GNOME'), 'folder-symbolic',
+            step.body_right ?? _('One home folder\nActivities & app grid\nPlain-text config files')));
         this.append(columns);
 
-        this.append(new Gtk.Label({
-            label: step.body,
-            wrap: true,
-            halign: Gtk.Align.START,
-            justify: Gtk.Justification.FILL,
-        }));
+        if (step.body) {
+            this.append(new Gtk.Label({
+                label: step.body,
+                wrap: true,
+                halign: Gtk.Align.START,
+                justify: Gtk.Justification.FILL,
+            }));
+        }
 
         const hints = step.hints ?? [];
         if (hints.length > 0) {

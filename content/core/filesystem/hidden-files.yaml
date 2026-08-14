@@ -6,25 +6,28 @@ order: 5
 steps:
   - id: contrast-hidden
     kind: contrast
-    title: Dotfiles
+    title: Dotfiles are hidden by default
+    body_left: |
+      Windows hides some system files; you toggle "Show hidden items" in View.
+    body_right: |
+      Linux config often lives in **dotfiles** (names starting with `.`). Press
+      **Ctrl+H** in Files or use `ls -a` in the terminal.
     body: |
-      Files and folders whose names start with a dot (`.`) are **hidden** by default.
-      They often hold app settings — for example `.config` in your home folder.
+      Hidden files on Linux often start with a dot. Both Files and the terminal
+      can reveal them.
 
   - id: gui-hidden
     kind: gui
-    title: Show hidden files
+    title: Show hidden files in Files
     target_app: org.gnome.Nautilus
     fixture: fixtures/hidden-files/
-    instruction: Show hidden files and find **.secrets** in the practice folder.
+    instruction: Press **Ctrl+H** in Files to reveal hidden files in the practice folder.
     phases:
-      - instruction: Press **Ctrl+H** (or the menu ☰ → Show Hidden Files).
+      - instruction: Open the practice folder and press **Ctrl+H** to toggle hidden files.
         label: Toggle hidden files with Ctrl+H
-      - instruction: Look for the hidden file **.secrets** in the list.
-        label: Find .secrets in the folder
     hints:
-      - Hidden files start with a dot.
-      - Ctrl+H toggles hidden files in Nautilus.
+      - Hidden files start with a dot, like .secrets
+      - Ctrl+H toggles visibility in Files.
 
   - id: terminal-hidden
     kind: terminal
@@ -35,12 +38,12 @@ steps:
       pattern: '^ls\s+-a\s*$'
       expect_exit: 0
     hints:
-      - ls lists files; -a means "all", including dotfiles.
-      - ls -a
+      - ls lists directory contents.
+      - The -a flag shows hidden dotfiles.
 
   - id: bridge-hidden
     kind: bridge
-    title: Seeing hidden files
+    title: Ctrl+H vs ls -a
     body: |
-      The GUI toggle is perfect when exploring. `ls -a` is faster when you already
-      know you need dotfiles in a script or remote session.
+      Ctrl+H in Files and ls -a in the terminal show the same dotfiles. Config
+      folders like .config are why backing up ~/.config copies much of your setup.

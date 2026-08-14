@@ -1,0 +1,54 @@
+track: editing
+track_title: Editing text
+module: text-editor-basics
+title: Text Editor and nano
+order: 1
+steps:
+  - id: contrast-editors
+    kind: contrast
+    title: Notepad vs terminal editors
+    body_left: |
+      **Notepad** or similar for quick edits on the desktop.
+    body_right: |
+      **Text Editor** for GUI edits; **nano** for SSH sessions with no display.
+      vim/emacs exist but are optional advanced tools.
+    body: |
+      Graphical editors work like Notepad. Terminal editors matter when you only
+      have SSH access.
+
+  - id: gui-edit
+    kind: gui
+    title: Edit notes.txt
+    target_app: org.gnome.TextEditor
+    fixture: fixtures/edit-notes/
+    instruction: Open **notes.txt**, add a line of text, and save.
+    phases:
+      - instruction: Open **notes.txt** in Text Editor.
+        label: Open the file
+      - instruction: Add a new line at the bottom and save with **Ctrl+S**.
+        label: Save your changes
+    validate:
+      exists: notes.txt
+    hints:
+      - Press Super and type Text Editor.
+      - Ctrl+S saves the file.
+
+  - id: terminal-nano
+    kind: terminal
+    title: Read the file with cat
+    fixture: fixtures/edit-notes/
+    instruction: |
+      After editing in the GUI, run `cat notes.txt` in the terminal to see the same file.
+    validate:
+      pattern: '^cat\s+notes\.txt\s*$'
+      expect_exit: 0
+    hints:
+      - cat prints file contents to the terminal.
+      - nano notes.txt opens the file in a terminal editor when you are ready.
+
+  - id: bridge-editors
+    kind: bridge
+    title: nano is enough
+    body: |
+      nano covers most terminal editing. vim and emacs are there when you want them
+      — nobody needs them to be a capable Linux user.

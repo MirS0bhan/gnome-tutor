@@ -1,1 +1,2 @@
-Welcome to the practice sandbox.
+Welcome to the practice dungeon.
+Explore with cd and ls.

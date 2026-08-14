@@ -7,18 +7,37 @@ steps:
   - id: practice-intro
     kind: contrast
     title: Your sandbox
+    body_left: |
+      Tutorial steps with a reset button after each task.
+    body_right: |
+      One **persistent** practice folder. Experiment freely — reset when you want
+      a clean slate. Optional one-line challenges reuse the same validation engine.
     body: |
-      This track keeps one **persistent** practice folder. Experiment with commands,
-      make mistakes, and reset when you want a clean slate — nothing here touches
-      your real files.
+      This track keeps one persistent practice folder. Nothing here touches your
+      real files.
 
   - id: practice-shell
     kind: practice
     title: Free practice shell
     fixture: fixtures/practice-home/
     instruction: |
-      Use the terminal below freely. Try cd, ls, mkdir, cp, and rm. Press
-      **Reset step** in the menu or terminal toolbar to restore the starter files.
+      Use the terminal below freely. Try cd, ls, mkdir, cp, and rm. Pick an optional
+      challenge from the dropdown, or explore on your own.
+    challenges:
+      - title: List all files
+        instruction: Run `ls -a` to list every file including hidden ones.
+        validate:
+          pattern: '^ls\s+-a\s*$'
+          expect_exit: 0
+        hints:
+          - ls -a shows dotfiles.
+      - title: Make a folder
+        instruction: Create a folder named `experiments` with mkdir.
+        validate:
+          pattern: '^mkdir\s+experiments/?\s*$'
+          expect_exit: 0
+        hints:
+          - mkdir creates a directory.
 
   - id: challenge-ls
     kind: challenge

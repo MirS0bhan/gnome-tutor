@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-const STEP_KINDS = new Set(['contrast', 'gui', 'terminal', 'bridge', 'practice', 'challenge']);
+const STEP_KINDS = new Set(['contrast', 'gui', 'terminal', 'bridge', 'practice', 'challenge', 'tour']);
 
 export class ContentSchemaError extends Error {
     constructor(message, path = '') {
@@ -42,6 +42,9 @@ function validateSpotlight(spotlight, path) {
         if (entry.anchor !== undefined) {
             if (typeof entry.anchor !== 'string' || !entry.anchor.trim())
                 throw new ContentSchemaError('spotlight.anchor must be a non-empty string', entryPath);
+        } else if (entry.wm_class !== undefined || entry.mode === 'window') {
+            if (typeof entry.wm_class !== 'string' || !entry.wm_class.trim())
+                throw new ContentSchemaError('spotlight.wm_class must be a non-empty string', entryPath);
         } else {
             for (const key of ['x', 'y', 'w', 'h']) {
                 if (typeof entry[key] !== 'number')
@@ -72,7 +75,12 @@ function validateStep(step, path) {
     switch (kind) {
     case 'contrast':
         requireString(step, 'title', `${path}/${id}`);
-        requireString(step, 'body', `${path}/${id}`);
+        if (!step.body && !(step.body_left && step.body_right))
+            throw new ContentSchemaError('contrast needs body or body_left and body_right', `${path}/${id}`);
+        if (step.body_left !== undefined && typeof step.body_left !== 'string')
+            throw new ContentSchemaError('body_left must be a string', `${path}/${id}`);
+        if (step.body_right !== undefined && typeof step.body_right !== 'string')
+            throw new ContentSchemaError('body_right must be a string', `${path}/${id}`);
         if (step.contrast_diagram !== undefined && typeof step.contrast_diagram !== 'string')
             throw new ContentSchemaError('contrast_diagram must be a string', `${path}/${id}`);
         if (step.hints !== undefined)
@@ -100,6 +108,8 @@ function validateStep(step, path) {
                 const label = typeof phase.label === 'string' ? phase.label.trim() : '';
                 if (!instruction && !label)
                     throw new ContentSchemaError('phase needs instruction or label', phasePath);
+                if (phase.spotlight !== undefined)
+                    validateSpotlight(phase.spotlight, `${phasePath}/spotlight`);
             }
         }
         if (step.validate !== undefined) {
@@ -109,12 +119,20 @@ function validateStep(step, path) {
             if (validate.exists !== undefined && typeof validate.exists !== 'string')
                 throw new ContentSchemaError('validate.exists must be a string', `${path}/${id}`);
         }
+        if (step.spawn_process !== undefined && typeof step.spawn_process !== 'boolean')
+            throw new ContentSchemaError('spawn_process must be a boolean', `${path}/${id}`);
         break;
     case 'terminal':
     case 'challenge':
         requireString(step, 'instruction', `${path}/${id}`);
+        if (step.sandbox === false && !step.fixture)
+            break;
         if (step.fixture !== undefined && typeof step.fixture !== 'string')
             throw new ContentSchemaError('fixture must be a string', `${path}/${id}`);
+        if (step.spawn_process !== undefined && typeof step.spawn_process !== 'boolean')
+            throw new ContentSchemaError('spawn_process must be a boolean', `${path}/${id}`);
+        if (step.sandbox !== undefined && typeof step.sandbox !== 'boolean')
+            throw new ContentSchemaError('sandbox must be a boolean', `${path}/${id}`);
         if (step.hints !== undefined)
             requireStringArray(step, 'hints', `${path}/${id}`);
         if (step.distro_variants !== undefined)
@@ -142,6 +160,43 @@ function validateStep(step, path) {
         requireString(step, 'instruction', `${path}/${id}`);
         if (step.fixture !== undefined && typeof step.fixture !== 'string')
             throw new ContentSchemaError('fixture must be a string', `${path}/${id}`);
+        if (step.challenges !== undefined) {
+            if (!Array.isArray(step.challenges))
+                throw new ContentSchemaError('challenges must be an array', `${path}/${id}`);
+            for (const [index, challenge] of step.challenges.entries()) {
+                if (!challenge || typeof challenge !== 'object')
+                    throw new ContentSchemaError('challenge must be an object', `${path}/${id}/challenges[${index}]`);
+                requireString(challenge, 'title', `${path}/${id}/challenges[${index}]`);
+                requireString(challenge, 'instruction', `${path}/${id}/challenges[${index}]`);
+                if (challenge.validate?.pattern !== undefined) {
+                    try {
+                        new RegExp(challenge.validate.pattern);
+                    } catch {
+                        throw new ContentSchemaError('challenge validate.pattern is invalid', `${path}/${id}/challenges[${index}]`);
+                    }
+                }
+            }
+        }
+        break;
+    case 'tour':
+        requireString(step, 'instruction', `${path}/${id}`);
+        if (step.spawn_process !== undefined && typeof step.spawn_process !== 'boolean')
+            throw new ContentSchemaError('spawn_process must be a boolean', `${path}/${id}`);
+        if (!Array.isArray(step.phases) || step.phases.length === 0)
+            throw new ContentSchemaError('tour needs non-empty phases', `${path}/${id}`);
+        for (const [index, phase] of step.phases.entries()) {
+            const phasePath = `${path}/${id}/phases[${index}]`;
+            if (!phase || typeof phase !== 'object')
+                throw new ContentSchemaError('phase must be an object', phasePath);
+            const instruction = typeof phase.instruction === 'string' ? phase.instruction.trim() : '';
+            const label = typeof phase.label === 'string' ? phase.label.trim() : '';
+            if (!instruction && !label)
+                throw new ContentSchemaError('phase needs instruction or label', phasePath);
+            if (phase.spotlight !== undefined)
+                validateSpotlight(phase.spotlight, `${phasePath}/spotlight`);
+        }
+        if (step.hints !== undefined)
+            requireStringArray(step, 'hints', `${path}/${id}`);
         break;
     }
 

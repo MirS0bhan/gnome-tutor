@@ -21,21 +21,32 @@ try {
     let warnings = 0;
 
     for (const module of curriculum.modules) {
-        if (module.track !== 'filesystem')
-            continue;
+        if (module.track === 'filesystem') {
+            const kinds = new Set(module.steps.map(step => step.kind));
+            for (const kind of FOUR_BEAT_KINDS) {
+                if (kinds.has(kind))
+                    continue;
+                printerr(`Warning: ${module.source_path ?? module.module}: filesystem module missing "${kind}" step\n`);
+                warnings++;
+            }
+        }
 
-        const kinds = new Set(module.steps.map(step => step.kind));
-        for (const kind of FOUR_BEAT_KINDS) {
-            if (kinds.has(kind))
-                continue;
-            printerr(`Warning: ${module.source_path ?? module.module}: filesystem module missing "${kind}" step\n`);
-            warnings++;
+        for (const step of module.steps) {
+            if (step.kind === 'gui' && step.fixture && !step.phases?.length) {
+                printerr(`Warning: ${module.source_path ?? module.module}/${step.id}: GUI step with fixture should define phases\n`);
+                warnings++;
+            }
+            if ((step.kind === 'terminal' || step.kind === 'challenge')
+                && step.fixture && step.sandbox !== false && !step.validate?.pattern) {
+                printerr(`Warning: ${module.source_path ?? module.module}/${step.id}: terminal step with fixture should define validate.pattern\n`);
+                warnings++;
+            }
         }
     }
 
     print(`Validated ${curriculum.packs.length} pack(s), ${curriculum.modules.length} module(s), ${curriculum.tracks.length} track(s).`);
     if (warnings > 0) {
-        printerr(`${warnings} filesystem four-beat warning(s).\n`);
+        printerr(`${warnings} content warning(s).\n`);
         exit(1);
     }
 } catch (error) {

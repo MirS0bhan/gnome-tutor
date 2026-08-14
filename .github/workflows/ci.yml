@@ -17,6 +17,9 @@ jobs:
       - name: Validate content packs
         run: gjs -m tools/content-lint.js content
 
+      - name: Check gresource manifest
+        run: gjs -m tools/check-gresource.js
+
       - name: Configure
         run: meson setup build --prefix=/usr
 
