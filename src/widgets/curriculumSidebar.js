@@ -146,9 +146,16 @@ export const CurriculumSidebar = GObject.registerClass({
                 margin_end: 12,
             });
 
-            rowBox.append(new Adw.CircularProgressIndicator({
-                percentage: progress.done ? 100 : Math.round(progress.fraction * 100),
-            }));
+            const indicatorLabel = progress.done
+                ? '✓'
+                : `${Math.round(progress.fraction * 100)}%`;
+            const indicator = new Gtk.Label({
+                label: indicatorLabel,
+                width_chars: 3,
+                xalign: 0.5,
+                css_classes: progress.done ? ['success'] : ['dim-label', 'caption'],
+            });
+            rowBox.append(indicator);
 
             const textBox = new Gtk.Box({
                 orientation: Gtk.Orientation.VERTICAL,

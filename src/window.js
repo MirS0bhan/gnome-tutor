@@ -70,7 +70,6 @@ export const GnomeTutorWindow = GObject.registerClass({
         this._stepView.setInstructionCard(this._instructionCard);
 
         this._sidebar_scrolled.set_child(this._sidebar);
-        this._contentHost.append(this._journeyStack);
 
         this._wireSignals();
         this._loadCurriculum();
@@ -221,18 +220,23 @@ export const GnomeTutorWindow = GObject.registerClass({
             this._welcomeHost.remove(child);
             child = next;
         }
+        if (this._journeyStack.get_parent())
+            this._journeyStack.unparent();
         this._journeyStack.showWelcome();
         this._welcomeHost.append(this._journeyStack);
     }
 
     _showMainShell(page = 'home') {
         this._rootStack.visible_child_name = 'main';
+        if (this._journeyStack.get_parent())
+            this._journeyStack.unparent();
         let child = this._contentHost.get_first_child();
-        if (child !== this._journeyStack) {
-            if (child)
-                this._contentHost.remove(child);
-            this._contentHost.append(this._journeyStack);
+        while (child) {
+            const next = child.get_next_sibling();
+            this._contentHost.remove(child);
+            child = next;
         }
+        this._contentHost.append(this._journeyStack);
         if (page === 'home')
             this._journeyStack.showHome();
     }
