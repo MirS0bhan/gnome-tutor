@@ -463,7 +463,35 @@ export const GnomeTutorWindow = GObject.registerClass({
             this._stepView.setCurriculum(this._curriculum);
         } catch (error) {
             console.error(`Failed to load curriculum: ${error.message}`);
+            this._showCurriculumError(error);
         }
+    }
+
+    _showCurriculumError(error) {
+        this._showMainShell('home');
+        let child = this._contentHost.get_first_child();
+        while (child) {
+            const next = child.get_next_sibling();
+            this._contentHost.remove(child);
+            child = next;
+        }
+
+        const status = new Adw.StatusPage({
+            icon_name: 'dialog-error-symbolic',
+            title: _('Could not load lessons'),
+            description: error.message,
+            vexpand: true,
+        });
+        this._contentHost.append(status);
+        this._header_title.subtitle = _('Curriculum unavailable');
+
+        const dialog = Adw.AlertDialog.new(
+            _('Could not load lessons'),
+            error.message,
+        );
+        dialog.add_response('ok', _('OK'));
+        dialog.connect('response', () => {});
+        dialog.present(this);
     }
 
     _recordHint() {

@@ -7,6 +7,8 @@ import Adw from 'gi://Adw';
 import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk';
 
+import { ExtensionInstaller } from '../engine/extensionInstaller.js';
+
 let _window = null;
 
 export function showPreferencesWindow(parent) {
