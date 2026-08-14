@@ -6,14 +6,19 @@
     <file>engine/schema.js</file>
     <file>engine/yaml.js</file>
     <file>engine/contentLoader.js</file>
+    <file>engine/distroInfo.js</file>
     <file>engine/progressStore.js</file>
     <file>engine/sandboxManager.js</file>
     <file>engine/appLauncher.js</file>
     <file>engine/spotlightClient.js</file>
     <file>engine/lessonEngine.js</file>
+    <file>engine/spotlightAnchors.js</file>
+    <file>engine/fixtureWatcher.js</file>
     <file>widgets/curriculumSidebar.js</file>
     <file>widgets/stepView.js</file>
     <file>widgets/guiBeatView.js</file>
+    <file>widgets/contrastBeatView.js</file>
+    <file>widgets/practiceBeatView.js</file>
     <file>widgets/hintPanel.js</file>
     <file>engine/vteLoader.js</file>
     <file>engine/vteTheme.js</file>
