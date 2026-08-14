@@ -5,4 +5,3 @@ data/ir.urumlug.gnomeTutor.metainfo.xml.in
 data/ir.urumlug.gnomeTutor.gschema.xml
 src/main.js
 src/window.js
-src/window.ui

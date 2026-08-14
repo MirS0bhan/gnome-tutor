@@ -1,0 +1,34 @@
+track: orientation
+track_title: Orientation
+module: where-things-live
+title: Where things live
+order: 2
+steps:
+  - id: contrast-home
+    kind: contrast
+    title: One home folder, not drive letters
+    contrast_diagram: diagrams/home-not-c-drive.svg
+    body: |
+      On Windows, paths look like `C:\Users\You\Documents`. On Linux, your personal
+      files live under **/home/yourname** (shown as **Home** in Files). There is no
+      registry — many settings are plain files in hidden `.config` folders.
+
+  - id: gui-home
+    kind: gui
+    title: Open Home in Files
+    target_app: org.gnome.Nautilus
+    fixture: fixtures/open-files/
+    instruction: Open Files and explore the practice **Home** folder layout.
+    phases:
+      - instruction: Open Files on the practice folder and look at **Documents**, **Downloads**, and **Pictures** in the sidebar.
+        label: Explore the sidebar shortcuts in Files
+    hints:
+      - Home is your personal space on the system.
+      - The sidebar lists common folders like Documents and Downloads.
+
+  - id: bridge-home
+    kind: bridge
+    title: Paths you will see again
+    body: |
+      The Files app shows friendly names; the terminal uses the same folders as paths
+      like `Documents/` and `Downloads/`. You will practice those paths in the Files track.

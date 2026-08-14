@@ -23,6 +23,7 @@ bin_conf.set('prefix', get_option('prefix'))
 bin_conf.set('libdir', get_option('prefix') / get_option('libdir'))
 bin_conf.set('datadir', get_option('prefix') / get_option('datadir'))
 bin_conf.set('resource_path', '/ir/urumlug/gnomeTutor')
+bin_conf.set('build_root', meson.project_build_root())
 
 configure_file(
   input: 'ir.urumlug.gnomeTutor.in',

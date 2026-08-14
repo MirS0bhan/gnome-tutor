@@ -1,0 +1,46 @@
+track: filesystem
+track_title: فایل‌ها و سیستم فایل
+module: opening-files
+title: باز کردن فایل‌ها (Nautilus)
+order: 1
+steps:
+  - id: contrast-nautilus
+    kind: contrast
+    title: برنامه فایل‌ها در مقابل File Explorer
+    body: |
+      در ویندوز File Explorer دارید. در GNOME همان کار با **فایل‌ها** (Nautilus)
+      انجام می‌شود — پوشهٔ شخصی، نوار کناری، و فایل‌های هر پوشه.
+
+  - id: gui-open-nautilus
+    kind: gui
+    title: مرور پوشه‌ها
+    target_app: org.gnome.Nautilus
+    fixture: fixtures/open-files/
+    instruction: |
+      فایل‌ها را روی پوشهٔ تمرین باز کنید و از نوار کناری Documents و Downloads
+      را ببینید.
+    phases:
+      - instruction: روی **Documents** در نوار کناری کلیک کنید.
+        label: Documents را در نوار کناری باز کنید
+      - instruction: **Downloads** را باز کنید و فایل‌ها را ببینید.
+        label: Downloads را از نوار کناری باز کنید
+    hints:
+      - Super را بزنید و «Files» یا «فایل‌ها» را تایپ کنید.
+
+  - id: terminal-navigate
+    kind: terminal
+    title: cd به Documents
+    fixture: fixtures/open-files/
+    instruction: با `cd Documents` وارد پوشه Documents شوید.
+    validate:
+      pattern: '^cd\s+Documents/?\s*$'
+      expect_exit: 0
+    hints:
+      - cd یعنی change directory.
+
+  - id: bridge-navigation
+    kind: bridge
+    title: GUI و ترمinal
+    body: |
+      برنامه فایل‌ها برای مرور بصری عالی است. ترمinal وقتی مسیر را می‌دانید
+      یا باید سریع جابه‌جا شوید بهتر است.
