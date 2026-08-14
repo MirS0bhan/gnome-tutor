@@ -175,7 +175,7 @@ export const GnomeTutorWindow = GObject.registerClass({
         this.set_content(this._toast_overlay);
 
         const breakpoint = new Adw.Breakpoint({
-            condition: 'max-width: 700sp',
+            condition: Adw.BreakpointCondition.parse('max-width: 700sp'),
         });
         breakpoint.add_setter(this._splitView, 'collapsed', true);
         breakpoint.add_setter(this._sidebarToggle, 'visible', true);
