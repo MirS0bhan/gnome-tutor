@@ -1,0 +1,160 @@
+# Windows to GNOME Coach
+# Copyright (C) 2026 UrumLUG
+# This file is distributed under the same license as the gnome-tutor package.
+msgid ""
+msgstr ""
+"Project-Id-Version: windows-onboarding 1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-14 17:30+0000\n"
+"PO-Revision-Date: 2026-08-14 17:30+0000\n"
+"Last-Translator: UrumLUG\n"
+"Language-Team: Persian\n"
+"Language: fa\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n==0 || n==1);\n"
+
+msgid "Start menu"
+msgstr "منوی استارت"
+
+msgid "Activities / Super"
+msgstr "Activities / Super"
+
+msgid "Looking for the Start menu? It moved to the top-left corner — or press Super (the Windows key)."
+msgstr "دنبال منوی استارت می‌گردید؟ به گوشهٔ بالا-چپ منتقل شده — یا Super (همان کلید ویندوز) را بزنید."
+
+msgid "Start menu and taskbar"
+msgstr "منوی استارت و نوار وظیفه"
+
+msgid "Activities Overview and Dash"
+msgstr "نمای کلی Activities و داش"
+
+msgid "This is your old Start menu and taskbar in one place. Type to launch apps; the icon row is your taskbar (only while Activities is open)."
+msgstr "این همان منوی استارت و نوار وظیفه است، یک‌جا. برای اجرای برنامه‌ها تایپ کنید؛ ردیف آیکن‌ها نوار وظیفه شماست (فقط وقتی Activities باز است)."
+
+msgid "Taskbar"
+msgstr "نوار وظیفه"
+
+msgid "Dash"
+msgstr "داش"
+
+msgid "Your taskbar is this row of icons. It only appears in Activities — pin apps by right-clicking them here."
+msgstr "نوار وظیفه این ردیف آیکن‌هاست. فقط در Activities دیده می‌شود — برنامه‌ها را با راست‌کلیک اینجا سنجاق کنید."
+
+msgid "System tray"
+msgstr "سینی سیستم"
+
+msgid "Quick Settings"
+msgstr "تنظیمات سریع"
+
+msgid "Wi-Fi, volume, and the clock moved to the top-right. Click there for what Windows called the system tray."
+msgstr "وای‌فای، صدا و ساعت به گوشهٔ بالا-راست رفته‌اند. همان سینی سیستم ویندوز را آنجا کلیک کنید."
+
+msgid "System tray and Control Panel"
+msgstr "سینی سیستم و کنترل پنل"
+
+msgid "Quick Settings and Settings"
+msgstr "تنظیمات سریع و تنظیمات"
+
+msgid "This menu replaces the system tray. The gear opens Settings (Windows Settings / Control Panel)."
+msgstr "این منو جای سینی سیستم را گرفته است. چرخ‌دنده تنظیمات را باز می‌کند (تنظیمات ویندوز / کنترل پنل)."
+
+msgid "Alt+Tab"
+msgstr "Alt+Tab"
+
+msgid "Application switcher"
+msgstr "تعویض‌کننده برنامه"
+
+msgid "Same shortcut as Windows. Apps are grouped here; Super+Tab shows every window."
+msgstr "همان میانبر ویندوز. برنامه‌ها اینجا گروه‌بندی می‌شوند؛ Super+Tab همهٔ پنجره‌ها را نشان می‌دهد."
+
+msgid "Minimize, Maximize, Close"
+msgstr "کوچک‌کردن، بزرگ‌کردن، بستن"
+
+msgid "Close (Minimize hidden)"
+msgstr "بستن (کوچک‌کردن پنهان است)"
+
+msgid "Close is here. Minimize is hidden by default — use Activities to get a window out of the way, or turn Minimize on in Settings → Windows."
+msgstr "بستن اینجاست. کوچک‌کردن پیش‌فرض پنهان است — از Activities برای کنار زدن پنجره استفاده کنید، یا کوچک‌کردن را در تنظیمات ← پنجره‌ها روشن کنید."
+
+msgid "Virtual desktops"
+msgstr "دسکتاپ‌های مجازی"
+
+msgid "Workspaces"
+msgstr "فضاهای کاری"
+
+msgid "Your windows aren’t gone — you switched workspaces (virtual desktops). Super+Page Up goes back."
+msgstr "پنجره‌ها حذف نشده‌اند — فضای کاری (دسکتاپ مجازی) عوض شده. Super+Page Up برمی‌گردد."
+
+msgid "File Explorer"
+msgstr "File Explorer"
+
+msgid "Files"
+msgstr "Files"
+
+msgid "That’s the Windows File Explorer shortcut. Here the app is Files — opening it for you. Next time: Super, then type Files."
+msgstr "این میانبر File Explorer ویندوز است. اینجا برنامه Files است — الان بازش می‌کنیم. دفعه بعد: Super، بعد Files را تایپ کنید."
+
+msgid "Desktop icons / Personalize"
+msgstr "آیکن‌های دسکتاپ / شخصی‌سازی"
+
+msgid "Empty desktop and Files"
+msgstr "دسکتاپ خالی و Files"
+
+msgid "The desktop isn’t a folder of icons here. Your files live in Files (Super, then type Files)."
+msgstr "دسکتاپ اینجا پوشه‌ای از آیکن‌ها نیست. پرونده‌ها در Files هستند (Super، بعد Files را تایپ کنید)."
+
+msgid "Windows Settings"
+msgstr "تنظیمات ویندوز"
+
+msgid "Settings"
+msgstr "تنظیمات"
+
+msgid "That’s the Windows Settings shortcut. GNOME Settings is opening — you can also click the gear in the top-right menu."
+msgstr "این میانبر تنظیمات ویندوز است. تنظیمات گنوم در حال باز شدن است — چرخ‌دنده در منوی بالا-راست هم همان را باز می‌کند."
+
+msgid "Dismiss"
+msgstr "بستن"
+
+msgid "Windows to GNOME Coach"
+msgstr "راهنمای ویندوز به گنوم"
+
+msgid "Coach-marks"
+msgstr "راهنماهای زمینه‌ای"
+
+msgid "Hints appear only when you hit a real Windows habit that does not work in GNOME. They never start a tour on login."
+msgstr "راهنما فقط وقتی ظاهر می‌شود که عادت ویندوزی در گنوم کار نکند. هنگام ورود تور شروع نمی‌شود."
+
+msgid "Enable coach-marks"
+msgstr "فعال‌کردن راهنماها"
+
+msgid "Master on/off. Off means no hints at all."
+msgstr "کلید اصلی. خاموش یعنی هیچ راهنمایی نشان داده نمی‌شود."
+
+msgid "Replay all hints"
+msgstr "بازپخش همهٔ راهنماها"
+
+msgid "Clear seen state so each hint can appear once more."
+msgstr "وضعیت دیده‌شده را پاک می‌کند تا هر راهنما یک‌بار دیگر ظاهر شود."
+
+msgid "Replay"
+msgstr "بازپخش"
+
+msgid "Optional hints"
+msgstr "راهنماهای اختیاری"
+
+msgid "These nags for many switchers. Leave them off unless you want every contrast-map row."
+msgstr "برای بسیاری از کاربران آزارنده‌اند. خاموش بگذارید مگر اینکه همهٔ ردیف‌های جدول تقابل را بخواهید."
+
+msgid "Alt+Tab grouping"
+msgstr "گروه‌بندی Alt+Tab"
+
+msgid "After the window switcher closes. GNOME already uses Alt+Tab."
+msgstr "بعد از بسته شدن تعویض‌کننده پنجره. گنوم از قبل Alt+Tab دارد."
+
+msgid "Minimize / maximize"
+msgstr "کوچک‌کردن / بزرگ‌کردن"
+
+msgid "When you drag a titlebar. Minimize is hidden in GNOME by default."
+msgstr "وقتی نوار عنوان را می‌کشید. کوچک‌کردن در گنوم پیش‌فرض پنهان است."

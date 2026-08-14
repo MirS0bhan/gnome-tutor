@@ -13,6 +13,7 @@ gnome = import('gnome')
 subdir('data')
 subdir('content')
 subdir('extension')
+subdir('extension-windows-onboarding')
 subdir('src')
 subdir('po')
 

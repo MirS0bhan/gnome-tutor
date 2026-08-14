@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="windows-onboarding">
+  <schema id="org.urumlug.WindowsOnboarding" path="/org/urumlug/WindowsOnboarding/">
+    <key name="enabled" type="b">
+      <default>true</default>
+      <summary>Enable Windows to GNOME coach-marks</summary>
+      <description>Master toggle. When false, no hints are shown.</description>
+    </key>
+    <key name="seen-hints" type="as">
+      <default>[]</default>
+      <summary>Hint IDs already shown</summary>
+      <description>Each id is recorded when the coach-mark is first shown and never repeats until Replay.</description>
+    </key>
+    <key name="hint-alttab" type="b">
+      <default>false</default>
+      <summary>Show Alt+Tab grouping hint</summary>
+      <description>Off by default: GNOME already handles Alt+Tab, and a bubble after the switcher can nag.</description>
+    </key>
+    <key name="hint-window-controls" type="b">
+      <default>false</default>
+      <summary>Show minimize/maximize hint</summary>
+      <description>Off by default: firing on the first window feels like a tour.</description>
+    </key>
+    <key name="win-explorer" type="as">
+      <default><![CDATA[['<Super>e']]]></default>
+      <summary>Windows File Explorer shortcut</summary>
+    </key>
+    <key name="win-settings" type="as">
+      <default><![CDATA[['<Super>i']]]></default>
+      <summary>Windows Settings shortcut</summary>
+    </key>
+  </schema>
+</schemalist>
