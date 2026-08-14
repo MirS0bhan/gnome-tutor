@@ -26,6 +26,10 @@ const SpotlightIface = `
     <method name="HighlightWindow">
       <arg type="s" name="wm_class" direction="in"/>
       <arg type="s" name="label" direction="in"/>
+      <arg type="b" name="found" direction="out"/>
+    </method>
+    <method name="UpdateLabel">
+      <arg type="s" name="label" direction="in"/>
     </method>
     <method name="Clear">
     </method>
@@ -36,11 +40,13 @@ export default class Extension {
     enable() {
         this._actors = [];
         this._label = null;
+        this._labelAnchor = null;
         this._ownerId = 0;
 
         this._impl = {
             Highlight: (x, y, w, h, label) => this._highlightRect(x, y, w, h, label),
             HighlightWindow: (wmClass, label) => this._highlightWindow(wmClass, label),
+            UpdateLabel: label => this._updateLabel(label),
             Clear: () => this._clear(),
         };
 
@@ -80,6 +86,7 @@ export default class Extension {
             this._label.destroy();
             this._label = null;
         }
+        this._labelAnchor = null;
     }
 
     _addShield(x, y, width, height) {
@@ -94,6 +101,33 @@ export default class Extension {
         });
         Main.uiGroup.add_child(actor);
         this._actors.push(actor);
+    }
+
+    _showLabel(label, rx, ry) {
+        if (this._label) {
+            this._label.destroy();
+            this._label = null;
+        }
+
+        if (!label)
+            return;
+
+        const monitor = this._monitorGeometry();
+        this._labelAnchor = { rx, ry };
+        this._label = new St.Label({
+            text: label,
+            style: 'background-color: rgba(0, 0, 0, 0.85); color: white; padding: 10px 14px; border-radius: 10px; font-size: 15px; max-width: 480px;',
+            x: rx,
+            y: Math.max(monitor.y + 8, ry - 48),
+        });
+        Main.uiGroup.add_child(this._label);
+    }
+
+    _updateLabel(label) {
+        if (!this._label || !this._labelAnchor)
+            return false;
+        this._label.text = label ?? '';
+        return true;
     }
 
     _highlightRect(x, y, w, h, label) {
@@ -118,29 +152,45 @@ export default class Extension {
         Main.uiGroup.add_child(frame);
         this._actors.push(frame);
 
-        if (label) {
-            this._label = new St.Label({
-                text: label,
-                style: 'background-color: rgba(0, 0, 0, 0.8); color: white; padding: 8px 12px; border-radius: 8px; font-size: 14px;',
-                x: rx,
-                y: Math.max(monitor.y, ry - 40),
+        this._showLabel(label, rx, ry);
+    }
+
+    _findWindow(wmClass) {
+        const windows = global.display.get_tab_list(Meta.TabList.NORMAL, null);
+        const needle = (wmClass ?? '').toLowerCase().trim();
+
+        if (!needle || needle === 'nautilus') {
+            return windows.find(meta => {
+                const wm = meta.get_wm_class()?.toLowerCase() ?? '';
+                const instance = meta.get_wm_class_instance()?.toLowerCase() ?? '';
+                return wm.includes('nautilus') || instance.includes('nautilus');
             });
-            Main.uiGroup.add_child(this._label);
         }
+
+        return windows.find(meta => {
+            const wm = meta.get_wm_class()?.toLowerCase() ?? '';
+            const instance = meta.get_wm_class_instance()?.toLowerCase() ?? '';
+            return wm.includes(needle) || instance.includes(needle);
+        });
     }
 
     _highlightWindow(wmClass, label) {
-        const windows = global.display.get_tab_list(Meta.TabList.NORMAL, null);
-        const needle = wmClass.toLowerCase();
-        const window = windows.find(meta =>
-            meta.get_wm_class()?.toLowerCase().includes(needle));
+        const window = this._findWindow(wmClass);
 
         if (!window) {
             this._clear();
-            return;
+            return false;
         }
 
+        const monitor = this._monitorGeometry();
         const rect = window.get_frame_rect();
-        this._highlightRect(rect.x, rect.y, rect.width, rect.height, label);
+        this._highlightRect(
+            rect.x - monitor.x,
+            rect.y - monitor.y,
+            rect.width,
+            rect.height,
+            label,
+        );
+        return true;
     }
 }

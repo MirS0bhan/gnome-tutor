@@ -7,7 +7,9 @@ import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
 import Adw from 'gi://Adw';
 
-import { TerminalBeat } from './terminalBeat.js';
+import { GuiBeatView } from './guiBeatView.js';
+import { ContrastBeatView } from './contrastBeatView.js';
+import { PracticeBeatView } from './practiceBeatView.js';
 import { HintPanel } from './hintPanel.js';
 
 function kindLabel(kind) {
@@ -42,8 +44,10 @@ export const StepView = GObject.registerClass({
         });
 
         this._engine = null;
+        this._instructionCard = null;
         this._module = null;
         this._step = null;
+        this._terminalUnavailable = false;
 
         this._stack = new Gtk.Stack({ vexpand: true, hexpand: true });
         this._emptyPage = this._buildEmptyPage();
@@ -61,14 +65,25 @@ export const StepView = GObject.registerClass({
         });
         this._contentPage.set_child(this._contentBox);
 
-        this._terminalBeat = new TerminalBeat({ visible: false });
-        this._terminalBeat.connect('validated', () => this.emit('validated'));
-        this._terminalBeat.connect('hint-revealed', () => this.emit('hint-revealed'));
-        this._terminalBeat.connect('reset-requested', () => this.emit('reset-step'));
+        this._guiPage = new Gtk.Box({ vexpand: true });
+        this._guiBeat = new GuiBeatView();
+        this._guiPage.append(this._guiBeat);
+
+        this._practicePage = new Gtk.Box({ vexpand: true });
+        this._practiceBeat = new PracticeBeatView({ vexpand: true });
+        this._practiceBeat.connect('hint-revealed', () => this.emit('hint-revealed'));
+        this._practiceBeat.connect('reset-requested', () => this.emit('reset-step'));
+        this._practicePage.append(this._practiceBeat);
+
+        this._terminalPage = new Gtk.Box({ vexpand: true });
+        this._terminalBeat = null;
+        this._terminalBeatPromise = null;
 
         this._stack.add_named(this._emptyPage, 'empty');
         this._stack.add_named(this._contentPage, 'content');
-        this._stack.add_named(this._terminalBeat, 'terminal');
+        this._stack.add_named(this._guiPage, 'gui');
+        this._stack.add_named(this._practicePage, 'practice');
+        this._stack.add_named(this._terminalPage, 'terminal');
         this._stack.visible_child_name = 'empty';
         this.append(this._stack);
 
@@ -89,15 +104,58 @@ export const StepView = GObject.registerClass({
         this.append(this._footer);
     }
 
+    _connectTerminalBeat(beat) {
+        beat.connect('validated', () => this.emit('validated'));
+        beat.connect('hint-revealed', () => this.emit('hint-revealed'));
+        beat.connect('reset-requested', () => this.emit('reset-step'));
+        beat.connect('skip-requested', () => this.emit('continue'));
+    }
+
+    async _ensureTerminalBeat() {
+        if (this._terminalBeat)
+            return this._terminalBeat;
+
+        if (!this._terminalBeatPromise) {
+            this._terminalBeatPromise = (async () => {
+                const { createTerminalBeat } = await import('./terminalBeat.js');
+                const beat = await createTerminalBeat({ vexpand: true, hexpand: true });
+                let child = this._terminalPage.get_first_child();
+                while (child) {
+                    const next = child.get_next_sibling();
+                    this._terminalPage.remove(child);
+                    child = next;
+                }
+                this._terminalPage.append(beat);
+                this._terminalBeat = beat;
+                this._connectTerminalBeat(beat);
+                return beat;
+            })();
+        }
+
+        return this._terminalBeatPromise;
+    }
+
     setEngine(engine) {
         this._engine = engine;
     }
 
+    setInstructionCard(card) {
+        this._instructionCard = card;
+        if (!card)
+            return;
+
+        card.connect('open-app', () => this._onGuiOpenApp());
+        card.connect('next-phase', () => this._onGuiNextPhase());
+        card.connect('done', () => this.emit('continue'));
+        card.connect('hint-revealed', () => this.emit('hint-revealed'));
+    }
+
     _buildEmptyPage() {
         return new Adw.StatusPage({
-            icon_name: 'system-run-symbolic',
-            title: _('Choose a lesson'),
-            description: _('Select a module from the curriculum sidebar to begin. Each module follows the four-beat pattern: contrast, GUI, terminal, and bridge.'),
+            icon_name: 'folder-symbolic',
+            title: _('Start with Files'),
+            description: _('New to Linux? Open the Files and the filesystem track and begin with Opening Files (Nautilus). Each module teaches the same task in the GUI and the terminal.'),
+            vexpand: true,
         });
     }
 
@@ -110,30 +168,141 @@ export const StepView = GObject.registerClass({
         }
     }
 
+    _syncGuiPhase(state) {
+        if (!state)
+            return;
+        this._instructionCard?.onPhaseAdvanced(state.phaseIndex, state.phaseTotal, state.phase);
+    }
+
+    _onGuiOpenApp() {
+        if (!this._engine || !this._module || !this._step)
+            return;
+        const state = this._engine.launchGuiApp(this._module, this._step);
+        if (state)
+            this._instructionCard?.onAppOpened(state.phaseIndex, state.phaseTotal, state.phase);
+    }
+
+    _onGuiNextPhase() {
+        if (!this._engine)
+            return;
+        const state = this._engine.advanceGuiPhase();
+        this._syncGuiPhase(state);
+    }
+
     clear() {
+        this._instructionCard?.dismiss();
         this._stack.visible_child_name = 'empty';
         this._footer.visible = false;
+        this._terminalUnavailable = false;
         this._module = null;
         this._step = null;
         this._clearContentBox();
     }
 
+    showModuleComplete(module, progressStore, onPracticeAgain) {
+        this._instructionCard?.dismiss();
+        this._footer.visible = false;
+        this._stack.visible_child_name = 'content';
+        this._clearContentBox();
+
+        let hintTotal = 0;
+        for (const step of module.steps)
+            hintTotal += progressStore?.hintCount(`${module.track}/${module.module}/${step.id}`) ?? 0;
+
+        const hintLine = hintTotal === 0
+            ? _('You did not need any hints — nice work.')
+            : ngettext(
+                'You revealed %d hint during this module.',
+                'You revealed %d hints during this module.',
+                hintTotal,
+            ).format(hintTotal);
+
+        this._contentBox.append(new Adw.StatusPage({
+            icon_name: 'object-select-symbolic',
+            title: _('Module complete'),
+            description: _('%1$s is done. %2$s Pick another module in the sidebar, or practice this one again.').format(
+                module.title,
+                hintLine,
+            ),
+            vexpand: true,
+        }));
+
+        const againButton = new Gtk.Button({
+            label: _('Practice again'),
+            css_classes: ['suggested-action'],
+            halign: Gtk.Align.CENTER,
+            margin_top: 12,
+        });
+        againButton.connect('clicked', () => onPracticeAgain());
+        this._contentBox.append(againButton);
+    }
+
     showStep(module, step, { stepIndex, stepTotal }) {
         this._module = module;
         this._step = step;
-        this._footer.visible = step.kind !== 'gui';
-        this._continueButton.label = stepIndex + 1 >= stepTotal ? _('Finish module') : _('Continue');
+        this._terminalUnavailable = false;
 
         if (this._engine)
             this._engine.beginStep(module, step);
 
-        if (step.kind === 'terminal') {
+        if (step.kind === 'terminal' || step.kind === 'challenge') {
             this._stack.visible_child_name = 'terminal';
             const sandboxPath = this._engine?.sandboxPath(module, step);
-            this._terminalBeat.reset(step, sandboxPath);
+            void this._ensureTerminalBeat().then(beat => {
+                if (this._step !== step)
+                    return;
+                beat.reset(step, sandboxPath);
+                this._terminalUnavailable = beat.constructor.$gtype.name === 'TerminalBeatUnavailable';
+                this._footer.visible = true;
+                if (this._terminalUnavailable)
+                    this._continueButton.label = _('Continue without terminal');
+                else
+                    this._continueButton.label = stepIndex + 1 >= stepTotal ? _('Finish module') : _('Continue');
+            });
             return;
         }
 
+        if (step.kind === 'practice') {
+            this._stack.visible_child_name = 'practice';
+            this._footer.visible = true;
+            this._continueButton.label = stepIndex + 1 >= stepTotal ? _('Finish module') : _('Continue');
+            const sandboxPath = this._engine?.practicePath(module, step);
+            void this._practiceBeat.showPractice(step, sandboxPath);
+            return;
+        }
+
+        this._footer.visible = step.kind !== 'gui';
+        this._continueButton.label = stepIndex + 1 >= stepTotal ? _('Finish module') : _('Continue');
+
+        if (step.kind === 'contrast') {
+            this._instructionCard?.dismiss();
+            this._stack.visible_child_name = 'content';
+            this._clearContentBox();
+            const contrast = new ContrastBeatView({ vexpand: true });
+            contrast.setStep(module, step);
+            contrast.connect('hint-revealed', () => this.emit('hint-revealed'));
+            this._contentBox.append(new Gtk.Label({
+                label: _('%1$s · Step %2$d of %3$d').format(kindLabel(step.kind), stepIndex + 1, stepTotal),
+                css_classes: ['dim-label'],
+                halign: Gtk.Align.START,
+            }));
+            this._contentBox.append(contrast);
+            return;
+        }
+
+        if (step.kind === 'gui') {
+            this._stack.visible_child_name = 'gui';
+            const spotlightAvailable = this._engine?.spotlight.available ?? false;
+            this._guiBeat.reset(module, step, { spotlightAvailable });
+            this._instructionCard?.presentStep(module, step, {
+                spotlightAvailable,
+                stepIndex,
+                stepTotal,
+            });
+            return;
+        }
+
+        this._instructionCard?.dismiss();
         this._stack.visible_child_name = 'content';
         this._clearContentBox();
 
@@ -165,35 +334,6 @@ export const StepView = GObject.registerClass({
         });
 
         switch (step.kind) {
-        case 'contrast':
-            cardInner.append(new Gtk.Label({
-                label: step.title,
-                css_classes: ['title-2'],
-                halign: Gtk.Align.START,
-                wrap: true,
-            }));
-            cardInner.append(new Gtk.Label({
-                label: step.body,
-                wrap: true,
-                halign: Gtk.Align.START,
-                justify: Gtk.Justification.FILL,
-            }));
-            break;
-        case 'gui':
-            cardInner.append(new Gtk.Label({
-                label: step.instruction,
-                wrap: true,
-                halign: Gtk.Align.START,
-            }));
-            cardInner.append(new Gtk.Label({
-                label: this._engine?.spotlight.available
-                    ? _('The target app is open and the spotlight extension is highlighting it. Use the floating instruction card, then press Done when finished.')
-                    : _('The target app should now be open. Follow the floating instruction card, then press Done when finished.'),
-                css_classes: ['dim-label', 'body'],
-                wrap: true,
-                halign: Gtk.Align.START,
-            }));
-            break;
         case 'bridge':
             cardInner.append(new Gtk.Label({
                 label: step.body,

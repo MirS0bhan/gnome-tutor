@@ -1,0 +1,46 @@
+track: filesystem
+track_title: Files and the filesystem
+module: renaming-files
+title: Renaming files
+order: 4
+steps:
+  - id: contrast-rename
+    kind: contrast
+    title: Rename vs move
+    body: |
+      Renaming a file changes its name in the same folder. **Moving** it to another
+      folder with a new name is one operation in the terminal (`mv`).
+
+  - id: gui-rename
+    kind: gui
+    title: Rename in Files
+    target_app: org.gnome.Nautilus
+    fixture: fixtures/rename-basic/
+    instruction: Rename **draft.txt** to **notes.txt** in Documents.
+    phases:
+      - instruction: Open **Documents** and click **draft.txt** once.
+        label: Select draft.txt
+      - instruction: Press **F2** or right-click → Rename, then type **notes.txt**.
+        label: Rename the file to notes.txt
+    hints:
+      - F2 is the shortcut to rename the selected file.
+      - Right-click the file and choose Rename.
+
+  - id: terminal-rename
+    kind: terminal
+    title: mv to rename
+    fixture: fixtures/rename-basic/
+    instruction: Rename the same file with `mv Documents/draft.txt Documents/notes.txt`.
+    validate:
+      pattern: '^mv\s+Documents/draft\.txt\s+Documents/notes\.txt\s*$'
+      expect_exit: 0
+    hints:
+      - mv takes the old path first, then the new path.
+      - mv Documents/draft.txt Documents/notes.txt
+
+  - id: bridge-rename
+    kind: bridge
+    title: When to use mv
+    body: |
+      Renaming one file is easy in Files. Renaming many at once — for example
+      adding a prefix to every `.jpg` — is much faster with a shell loop or `mv` with patterns.

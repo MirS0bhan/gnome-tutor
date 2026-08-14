@@ -68,6 +68,28 @@ export class SandboxManager {
         return GLib.build_filenamev([this._baseDir, this.stepKey(module, step)]);
     }
 
+    practicePath(module) {
+        return GLib.build_filenamev([this._baseDir, 'practice', module.track, module.module]);
+    }
+
+    provisionPractice(module, fixtureRelative) {
+        const dest = Gio.File.new_for_path(this.practicePath(module));
+        if (dest.query_exists(null))
+            return dest.get_path();
+
+        if (fixtureRelative) {
+            const fixturePath = this.resolveFixturePath(module, fixtureRelative);
+            const fixture = Gio.File.new_for_path(fixturePath);
+            if (fixture.query_exists(null))
+                copyRecursive(fixture, dest);
+            else
+                dest.make_directory_with_parents(null);
+        } else {
+            dest.make_directory_with_parents(null);
+        }
+        return dest.get_path();
+    }
+
     resolveFixturePath(module, fixtureRelative) {
         const packRoot = module.pack_dir ?? GLib.build_filenamev([
             SandboxManager.contentRoot(),

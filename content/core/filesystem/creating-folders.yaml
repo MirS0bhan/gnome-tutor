@@ -1,0 +1,54 @@
+track: filesystem
+track_title: Files and the filesystem
+module: creating-folders
+title: Creating folders
+order: 2
+steps:
+  - id: contrast-folders
+    kind: contrast
+    title: Folders are directories
+    body: |
+      A "folder" in the Files app is called a **directory** on Linux. Whether you
+      create one with the mouse or with a command, it is the same thing on disk —
+      a container that holds files and other folders.
+
+  - id: gui-new-folder
+    kind: gui
+    title: New Folder in Documents
+    target_app: org.gnome.Nautilus
+    fixture: fixtures/create-folders/
+    instruction: |
+      Open Files and create a new folder named **Projects** inside Documents.
+    phases:
+      - instruction: Click **Documents** in the sidebar to open that folder.
+        label: Open Documents in the sidebar
+      - instruction: Right-click empty space, choose **New Folder**, and name it **Projects**.
+        label: Create a folder named Projects
+    hints:
+      - Make sure you are inside Documents before creating the folder.
+      - Right-click in empty space and choose New Folder.
+      - Type Projects as the name and confirm.
+
+  - id: terminal-mkdir
+    kind: terminal
+    title: mkdir from the terminal
+    fixture: fixtures/create-folders/
+    instruction: |
+      Create the same kind of folder from the terminal: make a directory called
+      Projects inside Documents. Try `mkdir Documents/Projects`.
+    validate:
+      pattern: '^mkdir\s+(Documents/)?Projects/?\s*$'
+      expect_exit: 0
+    hints:
+      - The command to make a directory is mkdir.
+      - mkdir Documents/Projects creates Projects inside Documents.
+      - You can run ls Documents to check that Projects appeared.
+
+  - id: bridge-folders
+    kind: bridge
+    title: mkdir vs New Folder
+    body: |
+      mkdir is the terminal equivalent of New Folder. For nested paths like
+      Documents/Projects/2026/notes, one command — mkdir -p — creates every
+      missing folder in the path. That is much faster than clicking through
+      deep trees in the GUI.

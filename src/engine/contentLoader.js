@@ -7,6 +7,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 
 import { ContentSchemaError, validateModule, validatePackManifest } from './schema.js';
+import { applyDistroVariants } from './distroInfo.js';
 import { parseYaml } from './yaml.js';
 
 export { ContentSchemaError };
@@ -44,6 +45,12 @@ function listDirectory(path) {
     return entries.sort();
 }
 
+function moduleSort(a, b) {
+    if (a.order !== b.order)
+        return a.order - b.order;
+    return a.title.localeCompare(b.title);
+}
+
 export class ContentLoader {
     constructor(contentRoot) {
         this._contentRoot = contentRoot;
@@ -52,7 +59,7 @@ export class ContentLoader {
         this.modules = [];
     }
 
-    load() {
+    load({ packId = null } = {}) {
         this.packs = [];
         this.tracks = new Map();
         this.modules = [];
@@ -64,18 +71,20 @@ export class ContentLoader {
             const packFile = Gio.File.new_for_path(packDir);
             if (packFile.query_file_type(Gio.FileQueryInfoFlags.NONE, null) !== Gio.FileType.DIRECTORY)
                 continue;
+            if (packId && packName !== packId && packId !== 'all')
+                continue;
             this._loadPack(packDir, packName);
         }
 
         this.modules.sort((a, b) => {
             if (a.track !== b.track)
                 return a.track.localeCompare(b.track);
-            return a.title.localeCompare(b.title);
+            return moduleSort(a, b);
         });
 
         const tracks = [...this.tracks.values()].sort((a, b) => a.id.localeCompare(b.id));
         for (const track of tracks)
-            track.modules.sort((a, b) => a.title.localeCompare(b.title));
+            track.modules.sort(moduleSort);
 
         return {
             packs: this.packs,
@@ -125,11 +134,14 @@ export class ContentLoader {
     _loadModuleFile(pack, path) {
         const raw = parseModuleText(readTextFile(Gio.File.new_for_path(path)), path);
         const module = validateModule(raw, path);
+        const steps = module.steps.map(step => applyDistroVariants(step));
         const enriched = {
             ...module,
+            steps,
             pack_id: pack.id,
             pack_dir: pack.pack_dir,
-            step_ids: module.steps.map(step => `${module.track}/${module.module}/${step.id}`),
+            pack_language: pack.language,
+            step_ids: steps.map(step => `${module.track}/${module.module}/${step.id}`),
         };
         pack.modules.push(enriched);
         this.modules.push(enriched);
@@ -149,22 +161,26 @@ export class ContentLoader {
         if (fromEnv)
             return fromEnv;
 
-        if (pkg.datadir) {
-            const installed = GLib.build_filenamev([pkg.datadir, 'gnome-tutor', 'content']);
-            if (Gio.File.new_for_path(installed).query_exists(null))
-                return installed;
+        const candidates = [];
+
+        if (GLib.getenv('FLATPAK_ID'))
+            candidates.push('/app/share/gnome-tutor/content');
+
+        if (pkg?.datadir) {
+            candidates.push(GLib.build_filenamev([pkg.datadir, 'gnome-tutor', 'content']));
         }
 
-        const candidates = [
+        candidates.push(
             GLib.build_filenamev([GLib.get_current_dir(), 'content']),
             GLib.build_filenamev([GLib.get_current_dir(), '..', 'content']),
             GLib.build_filenamev([GLib.get_current_dir(), '..', '..', 'content']),
-        ];
+        );
+
         for (const path of candidates) {
             if (Gio.File.new_for_path(path).query_exists(null))
                 return path;
         }
 
-        return GLib.build_filenamev([pkg.datadir ?? GLib.get_current_dir(), 'gnome-tutor', 'content']);
+        return candidates[0] ?? '/app/share/gnome-tutor/content';
     }
 }

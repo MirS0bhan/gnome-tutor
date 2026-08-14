@@ -55,10 +55,21 @@ export class SpotlightClient {
         if (!this._available)
             return false;
         try {
-            this._proxy.HighlightWindow_sync(wmClass ?? '', label ?? '');
-            return true;
+            return this._proxy.HighlightWindow_sync(wmClass ?? '', label ?? '') === true;
         } catch (error) {
             console.debug(`Spotlight HighlightWindow failed: ${error.message}`);
+            return false;
+        }
+    }
+
+    updateLabel(label) {
+        if (!this._available)
+            return false;
+        try {
+            this._proxy.UpdateLabel_sync(label ?? '');
+            return true;
+        } catch (error) {
+            console.debug(`Spotlight UpdateLabel failed: ${error.message}`);
             return false;
         }
     }

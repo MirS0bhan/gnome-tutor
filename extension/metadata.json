@@ -4,6 +4,5 @@
   "uuid": "linux-academy-spotlight@urumlug.ir",
   "shell-version": ["48", "49", "50"],
   "url": "https://github.com/urumlug/gnome-tutor",
-  "version": 1,
-  "settings-schema": "ir.urumlug.gnomeTutor"
+  "version": 1
 }

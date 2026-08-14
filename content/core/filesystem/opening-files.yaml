@@ -1,0 +1,55 @@
+track: filesystem
+track_title: Files and the filesystem
+module: opening-files
+title: Opening Files (Nautilus)
+order: 1
+steps:
+  - id: contrast-nautilus
+    kind: contrast
+    title: Files app vs. File Explorer
+    body: |
+      On Windows you open File Explorer. On GNOME, the same job is done by **Files**
+      (the app called Nautilus). It shows your home folder, sidebar shortcuts like
+      Documents and Downloads, and the files inside each folder.
+
+      There are no drive letters — everything lives under one home directory.
+
+  - id: gui-open-nautilus
+    kind: gui
+    title: Browse folders in Files
+    target_app: org.gnome.Nautilus
+    fixture: fixtures/open-files/
+    instruction: |
+      Open Files (Nautilus) on the practice folder. Use the sidebar to visit
+      Documents and Downloads.
+    phases:
+      - instruction: Click **Documents** in the left sidebar to open that folder.
+        label: Click Documents in the sidebar
+      - instruction: Click **Downloads** in the sidebar and look at the files there.
+        label: Open Downloads from the sidebar
+    hints:
+      - Press Super and type "Files" if the app did not open automatically.
+      - Use the left sidebar to jump between Documents and Downloads.
+      - Double-click a folder to open it, or use the sidebar shortcuts.
+
+  - id: terminal-navigate
+    kind: terminal
+    title: cd into Documents
+    fixture: fixtures/open-files/
+    instruction: |
+      In the terminal, move into the Documents folder with `cd Documents`.
+    validate:
+      pattern: '^cd\s+Documents/?\s*$'
+      expect_exit: 0
+    hints:
+      - cd means "change directory".
+      - Start with cd Documents — the sandbox folder is your starting location.
+      - After cd Documents, run ls to list files.
+
+  - id: bridge-navigation
+    kind: bridge
+    title: GUI and terminal together
+    body: |
+      You just browsed the same folders twice. The Files app is ideal when you are
+      exploring visually. The terminal shines when you already know the path or need
+      to move through many folders quickly with commands like cd and ls.

@@ -106,6 +106,29 @@ export class ProgressStore {
         this._setCompletedModules([...completed]);
     }
 
+    clearModuleProgress(module) {
+        const prefix = `${module.track}/${module.module}/`;
+        const moduleKey = `${module.track}/${module.module}`;
+        const steps = this._getCompletedSteps().filter(id => !id.startsWith(prefix));
+        this._setCompletedSteps(steps);
+
+        const modules = this._getCompletedModules().filter(id => id !== moduleKey);
+        this._setCompletedModules(modules);
+
+        for (const step of module.steps) {
+            const stepId = `${module.track}/${module.module}/${step.id}`;
+            delete this._hintCounts[stepId];
+        }
+        this._saveHintCounts();
+    }
+
+    clearAllProgress() {
+        this._setCompletedSteps([]);
+        this._setCompletedModules([]);
+        this._hintCounts = {};
+        this._saveHintCounts();
+    }
+
     moduleProgress(module) {
         const completedSteps = module.steps.filter(step =>
             this.isStepCompleted(`${module.track}/${module.module}/${step.id}`));

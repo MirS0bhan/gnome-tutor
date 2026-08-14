@@ -26,6 +26,28 @@ extension/     Shell spotlight extension (Phase 3)
 tools/         content-lint and other dev scripts
 ```
 
+## Curriculum (Track 1 — Files)
+
+Recommended order for new users:
+
+1. **Opening Files (Nautilus)** — launch Files, use the sidebar, then `cd`
+2. **Creating folders** — New Folder in the GUI, then `mkdir`
+3. **Copying and pasting files** — Ctrl+C/V in Files, then `cp`
+
+Each module uses the four-beat pattern: contrast → GUI → terminal → bridge.
+
+## Spotlight extension
+
+Yes — a GNOME Shell extension lives in `extension/`. It is **optional**; lessons work without it via the floating instruction card.
+
+```bash
+mkdir -p ~/.local/share/gnome-shell/extensions/linux-academy-spotlight@urumlug.ir
+cp extension/metadata.json extension/extension.js ~/.local/share/gnome-shell/extensions/linux-academy-spotlight@urumlug.ir/
+gnome-extensions enable linux-academy-spotlight@urumlug.ir
+```
+
+Restart Shell or log out/in after enabling.
+
 ## Development
 
 ```bash
@@ -54,7 +76,8 @@ gjs -m tools/content-lint.js content
 - [x] **Phase 1** — VTE terminal, sandbox fixtures, regex validation, tiered hints, reset button
 - [x] **Phase 2** — GUI beat, Nautilus launcher, floating instruction card, self-reported Done
 - [x] **Phase 3** — Spotlight Shell extension + D-Bus client (optional enhancement)
-- [ ] **Phase 4+** — Curriculum breadth, practice layer, localization
+- [ ] **Phase 4** — Curriculum breadth (in progress: Track 1 Files complete)
+- [ ] **Phase 5+** — Practice layer, localization
 
 ## License
 

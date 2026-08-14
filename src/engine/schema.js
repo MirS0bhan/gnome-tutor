@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-const STEP_KINDS = new Set(['contrast', 'gui', 'terminal', 'bridge']);
+const STEP_KINDS = new Set(['contrast', 'gui', 'terminal', 'bridge', 'practice', 'challenge']);
 
 export class ContentSchemaError extends Error {
     constructor(message, path = '') {
@@ -32,6 +32,34 @@ function requireStringArray(obj, key, path, { min = 0 } = {}) {
     return value;
 }
 
+function validateSpotlight(spotlight, path) {
+    if (!Array.isArray(spotlight))
+        throw new ContentSchemaError('spotlight must be an array', path);
+    for (const [index, entry] of spotlight.entries()) {
+        const entryPath = `${path}[${index}]`;
+        if (!entry || typeof entry !== 'object')
+            throw new ContentSchemaError('spotlight entry must be an object', entryPath);
+        if (entry.anchor !== undefined) {
+            if (typeof entry.anchor !== 'string' || !entry.anchor.trim())
+                throw new ContentSchemaError('spotlight.anchor must be a non-empty string', entryPath);
+        } else {
+            for (const key of ['x', 'y', 'w', 'h']) {
+                if (typeof entry[key] !== 'number')
+                    throw new ContentSchemaError(`spotlight.${key} must be a number`, entryPath);
+            }
+        }
+    }
+}
+
+function validateDistroVariants(variants, path) {
+    if (!variants || typeof variants !== 'object')
+        throw new ContentSchemaError('distro_variants must be an object', path);
+    for (const [key, variant] of Object.entries(variants)) {
+        if (!variant || typeof variant !== 'object')
+            throw new ContentSchemaError(`distro_variants.${key} must be an object`, path);
+    }
+}
+
 function validateStep(step, path) {
     if (!step || typeof step !== 'object')
         throw new ContentSchemaError('step must be an object', path);
@@ -45,6 +73,10 @@ function validateStep(step, path) {
     case 'contrast':
         requireString(step, 'title', `${path}/${id}`);
         requireString(step, 'body', `${path}/${id}`);
+        if (step.contrast_diagram !== undefined && typeof step.contrast_diagram !== 'string')
+            throw new ContentSchemaError('contrast_diagram must be a string', `${path}/${id}`);
+        if (step.hints !== undefined)
+            requireStringArray(step, 'hints', `${path}/${id}`);
         break;
     case 'gui':
         requireString(step, 'instruction', `${path}/${id}`);
@@ -53,13 +85,33 @@ function validateStep(step, path) {
             throw new ContentSchemaError('fixture must be a string', `${path}/${id}`);
         if (step.hints !== undefined)
             requireStringArray(step, 'hints', `${path}/${id}`);
+        if (step.spotlight !== undefined)
+            validateSpotlight(step.spotlight, `${path}/${id}/spotlight`);
+        if (step.distro_variants !== undefined)
+            validateDistroVariants(step.distro_variants, `${path}/${id}`);
+        if (step.phases !== undefined) {
+            if (!Array.isArray(step.phases) || step.phases.length === 0)
+                throw new ContentSchemaError('phases must be a non-empty array', `${path}/${id}`);
+            for (const [index, phase] of step.phases.entries()) {
+                const phasePath = `${path}/${id}/phases[${index}]`;
+                if (!phase || typeof phase !== 'object')
+                    throw new ContentSchemaError('phase must be an object', phasePath);
+                const instruction = typeof phase.instruction === 'string' ? phase.instruction.trim() : '';
+                const label = typeof phase.label === 'string' ? phase.label.trim() : '';
+                if (!instruction && !label)
+                    throw new ContentSchemaError('phase needs instruction or label', phasePath);
+            }
+        }
         break;
     case 'terminal':
+    case 'challenge':
         requireString(step, 'instruction', `${path}/${id}`);
         if (step.fixture !== undefined && typeof step.fixture !== 'string')
             throw new ContentSchemaError('fixture must be a string', `${path}/${id}`);
         if (step.hints !== undefined)
             requireStringArray(step, 'hints', `${path}/${id}`);
+        if (step.distro_variants !== undefined)
+            validateDistroVariants(step.distro_variants, `${path}/${id}`);
         if (step.validate !== undefined) {
             const validate = step.validate;
             if (!validate || typeof validate !== 'object')
@@ -76,6 +128,13 @@ function validateStep(step, path) {
         break;
     case 'bridge':
         requireString(step, 'body', `${path}/${id}`);
+        if (step.hints !== undefined)
+            requireStringArray(step, 'hints', `${path}/${id}`);
+        break;
+    case 'practice':
+        requireString(step, 'instruction', `${path}/${id}`);
+        if (step.fixture !== undefined && typeof step.fixture !== 'string')
+            throw new ContentSchemaError('fixture must be a string', `${path}/${id}`);
         break;
     }
 
@@ -90,6 +149,7 @@ export function validateModule(module, sourcePath = '') {
     const trackTitle = requireString(module, 'track_title', sourcePath);
     const moduleId = requireString(module, 'module', sourcePath);
     const title = requireString(module, 'title', sourcePath);
+    const order = typeof module.order === 'number' ? module.order : 100;
 
     if (!Array.isArray(module.steps) || module.steps.length === 0)
         throw new ContentSchemaError('steps must be a non-empty array', sourcePath);
@@ -102,6 +162,7 @@ export function validateModule(module, sourcePath = '') {
         track_title: trackTitle,
         module: moduleId,
         title,
+        order,
         steps,
         source_path: sourcePath,
     };

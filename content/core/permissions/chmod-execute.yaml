@@ -1,0 +1,47 @@
+track: permissions
+track_title: Permissions and ownership
+module: chmod-execute
+title: Making a file executable
+order: 2
+steps:
+  - id: contrast-execute
+    kind: contrast
+    title: Why +x matters
+    body: |
+      A shell script needs **execute** permission before you can run it as
+      `./script.sh`. Without +x, you must call the interpreter explicitly.
+
+  - id: gui-chmod
+    kind: gui
+    title: Allow executing
+    target_app: org.gnome.Nautilus
+    fixture: fixtures/permissions-basic/
+    instruction: In Properties → Permissions, allow **Execute** for the owner on **script.sh**.
+    phases:
+      - instruction: Open Properties → Permissions for **script.sh**.
+        label: Open Permissions for script.sh
+      - instruction: Enable **Allow executing file as program** (or Owner Execute).
+        label: Turn on execute permission
+    hints:
+      - The exact wording varies slightly by GNOME version.
+      - Owner execute is enough for a script you own.
+
+  - id: terminal-chmod
+    kind: terminal
+    title: chmod +x
+    fixture: fixtures/permissions-basic/
+    instruction: Add execute permission with `chmod +x script.sh`.
+    validate:
+      pattern: '^chmod\s+\+x\s+script\.sh\s*$'
+      expect_exit: 0
+    hints:
+      - chmod changes permissions.
+      - +x adds execute for all categories unless you specify u/g/o.
+
+  - id: bridge-chmod
+    kind: bridge
+    title: sudo stays dangerous
+    body: |
+      chmod fixes permission bits on files you own. **sudo** runs commands as
+      admin — GUIs hide it behind "Authenticate" dialogs because mistakes affect
+      the whole system.

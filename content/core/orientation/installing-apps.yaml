@@ -1,0 +1,35 @@
+track: orientation
+track_title: Orientation
+module: installing-apps
+title: Installing apps
+order: 3
+steps:
+  - id: contrast-installers
+    kind: contrast
+    title: Repositories, not random .exe files
+    body: |
+      On Windows you often download installers from websites. On GNOME, **Software**
+      installs vetted apps from your distro and Flatpak remotes — similar to an app
+      store, with updates in one place.
+
+  - id: gui-software
+    kind: gui
+    title: Browse GNOME Software
+    target_app: org.gnome.Software
+    instruction: Open **Software** and browse or search for an app (you do not need to install anything).
+    phases:
+      - instruction: Open Software from the app grid or search.
+        label: Launch GNOME Software
+      - instruction: Use the search box or categories to browse available apps.
+        label: Browse or search for an app
+    hints:
+      - Press Super and type "Software".
+      - Updates appear in Software as well as installed apps.
+
+  - id: bridge-software
+    kind: bridge
+    title: GUI vs terminal installs
+    body: |
+      Software is ideal when you are exploring. Terminal package managers (`apt`,
+      `dnf`, `pacman`) are faster once you know the package name — you will practice
+      those in the Software track later.

@@ -7,6 +7,21 @@ import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
 import Adw from 'gi://Adw';
 
+function stepKindLabel(kind) {
+    switch (kind) {
+    case 'contrast':
+        return _('Contrast');
+    case 'gui':
+        return _('Files');
+    case 'terminal':
+        return _('Terminal');
+    case 'bridge':
+        return _('Bridge');
+    default:
+        return kind;
+    }
+}
+
 export const CurriculumSidebar = GObject.registerClass({
     GTypeName: 'CurriculumSidebar',
     Signals: {
@@ -17,28 +32,31 @@ export const CurriculumSidebar = GObject.registerClass({
     constructor(params = {}) {
         super({
             orientation: Gtk.Orientation.VERTICAL,
+            spacing: 12,
+            vexpand: true,
+            hexpand: true,
+            margin_top: 12,
+            margin_bottom: 12,
+            margin_start: 12,
+            margin_end: 12,
             ...params,
         });
 
         this._progressStore = null;
         this._curriculum = null;
         this._selectedModule = null;
+        this._selectedStep = null;
 
         this.append(new Adw.WindowTitle({
             title: _('Curriculum'),
             subtitle: _('Tracks, modules, and steps'),
         }));
 
-        this._scrolled = new Gtk.ScrolledWindow({
-            vexpand: true,
-            hscrollbar_policy: Gtk.PolicyType.NEVER,
+        this._groupsBox = new Gtk.Box({
+            orientation: Gtk.Orientation.VERTICAL,
+            spacing: 18,
         });
-        this._list = new Gtk.ListBox({
-            selection_mode: Gtk.SelectionMode.NONE,
-            css_classes: ['navigation-sidebar'],
-        });
-        this._scrolled.set_child(this._list);
-        this.append(this._scrolled);
+        this.append(this._groupsBox);
     }
 
     setProgressStore(store) {
@@ -53,11 +71,16 @@ export const CurriculumSidebar = GObject.registerClass({
 
     selectModule(module) {
         this._selectedModule = module;
+        this._selectedStep = null;
         this._rebuild();
     }
 
-    _moduleKey(module) {
-        return `${module.track}/${module.module}`;
+    get selectedModule() {
+        return this._selectedModule;
+    }
+
+    get selectedStep() {
+        return this._selectedStep;
     }
 
     _stepKey(module, step) {
@@ -65,10 +88,10 @@ export const CurriculumSidebar = GObject.registerClass({
     }
 
     _rebuild() {
-        let child = this._list.get_first_child();
+        let child = this._groupsBox.get_first_child();
         while (child) {
             const next = child.get_next_sibling();
-            this._list.remove(child);
+            this._groupsBox.remove(child);
             child = next;
         }
 
@@ -76,65 +99,62 @@ export const CurriculumSidebar = GObject.registerClass({
             return;
 
         for (const track of this._curriculum.tracks) {
-            const trackRow = new Adw.ExpanderRow({
+            const group = new Adw.PreferencesGroup({
                 title: track.title,
-                subtitle: _('%d modules').format(track.modules.length),
+                description: _('%d modules').format(track.modules.length),
             });
-            trackRow.set_selectable(false);
 
             for (const module of track.modules) {
-                const progress = this._progressStore?.moduleProgress(module) ?? { completed: 0, total: module.steps.length, done: false };
+                const progress = this._progressStore?.moduleProgress(module)
+                    ?? { completed: 0, total: module.steps.length, done: false };
                 const subtitle = progress.done
                     ? _('Complete')
                     : _('%d of %d steps').format(progress.completed, progress.total);
 
-                const moduleRow = new Adw.ActionRow({
+                const moduleRow = new Adw.ExpanderRow({
                     title: module.title,
                     subtitle,
                 });
-                moduleRow.set_activatable(true);
+                moduleRow.expanded = this._selectedModule === module;
 
                 if (progress.done) {
                     moduleRow.add_suffix(new Gtk.Image({
                         icon_name: 'object-select-symbolic',
                         css_classes: ['success'],
                     }));
-                } else if (this._selectedModule === module) {
-                    moduleRow.add_suffix(new Gtk.Image({
-                        icon_name: 'view-reveal-symbolic',
-                    }));
                 }
 
-                moduleRow.connect('activated', () => {
+                moduleRow.connect('notify::expanded', () => {
+                    if (!moduleRow.expanded || this._selectedModule === module)
+                        return;
                     this._selectedModule = module;
-                    this.emit('module-selected', module);
-                    this._rebuild();
+                    this._selectedStep = null;
+                    this.emit('module-selected');
                 });
 
-                trackRow.add_row(moduleRow);
-
-                if (this._selectedModule === module) {
-                    trackRow.expanded = true;
-                    for (const step of module.steps) {
-                        const completed = this._progressStore?.isStepCompleted(this._stepKey(module, step)) ?? false;
-                        const stepRow = new Adw.ActionRow({
-                            title: step.id,
-                            subtitle: step.kind,
-                        });
-                        stepRow.add_prefix(new Gtk.Image({
-                            icon_name: completed ? 'object-select-symbolic' : 'radio-missing-symbolic',
-                            css_classes: completed ? ['success'] : [],
-                        }));
-                        stepRow.set_activatable(true);
-                        stepRow.connect('activated', () => {
-                            this.emit('step-selected', module, step);
-                        });
-                        trackRow.add_row(stepRow);
-                    }
+                for (const step of module.steps) {
+                    const completed = this._progressStore?.isStepCompleted(this._stepKey(module, step)) ?? false;
+                    const stepRow = new Adw.ActionRow({
+                        title: step.title ?? step.id.replace(/-/g, ' '),
+                        subtitle: stepKindLabel(step.kind),
+                    });
+                    stepRow.add_prefix(new Gtk.Image({
+                        icon_name: completed ? 'object-select-symbolic' : 'radio-missing-symbolic',
+                        css_classes: completed ? ['success'] : ['dim-label'],
+                    }));
+                    stepRow.set_activatable(true);
+                    stepRow.connect('activated', () => {
+                        this._selectedModule = module;
+                        this._selectedStep = step;
+                        this.emit('step-selected');
+                    });
+                    moduleRow.add_row(stepRow);
                 }
+
+                group.add(moduleRow);
             }
 
-            this._list.append(trackRow);
+            this._groupsBox.append(group);
         }
     }
 });

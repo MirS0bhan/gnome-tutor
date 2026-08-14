@@ -13,7 +13,10 @@
     <file>engine/lessonEngine.js</file>
     <file>widgets/curriculumSidebar.js</file>
     <file>widgets/stepView.js</file>
+    <file>widgets/guiBeatView.js</file>
     <file>widgets/hintPanel.js</file>
+    <file>engine/vteLoader.js</file>
+    <file>engine/vteTheme.js</file>
     <file>widgets/terminalBeat.js</file>
     <file>widgets/instructionCardWindow.js</file>
   </gresource>
