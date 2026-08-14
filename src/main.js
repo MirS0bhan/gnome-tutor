@@ -22,7 +22,7 @@ import GObject from 'gi://GObject';
 import Gio from 'gi://Gio';
 import Gtk from 'gi://Gtk?version=4.0';
 import Adw from 'gi://Adw?version=1';
-import { print, printerr } from 'system';
+import { print } from 'system';
 
 pkg.initGettext();
 pkg.initFormat();
@@ -89,7 +89,7 @@ export async function main(argv) {
                 print(`Run: gnome-extensions enable ${ExtensionInstaller.uuid}`);
             return 0;
         } catch (error) {
-            printerr(`Failed to install Spotlight extension: ${error.message}\n`);
+            console.error(`Failed to install Spotlight extension: ${error.message}`);
             return 1;
         }
     }
