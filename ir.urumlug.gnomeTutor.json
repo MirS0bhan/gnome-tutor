@@ -13,7 +13,10 @@
         "--share=ipc",
         "--socket=fallback-x11",
         "--device=dri",
-        "--socket=wayland"
+        "--socket=wayland",
+        "--filesystem=home",
+        "--talk-name=org.freedesktop.FileManager1",
+        "--talk-name=systems.misano.LinuxAcademy.Spotlight"
     ],
     "build-options" : {
         "append-path" : "/usr/lib/sdk/typescript/bin:/usr/lib/sdk/node20/bin"

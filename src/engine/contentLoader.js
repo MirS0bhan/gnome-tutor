@@ -98,7 +98,7 @@ export class ContentLoader {
             manifestFile.get_path(),
         );
 
-        const pack = { ...manifest, modules: [] };
+        const pack = { ...manifest, modules: [], pack_dir: packDir };
         this.packs.push(pack);
 
         for (const entry of listDirectory(packDir)) {
@@ -128,6 +128,7 @@ export class ContentLoader {
         const enriched = {
             ...module,
             pack_id: pack.id,
+            pack_dir: pack.pack_dir,
             step_ids: module.steps.map(step => `${module.track}/${module.module}/${step.id}`),
         };
         pack.modules.push(enriched);

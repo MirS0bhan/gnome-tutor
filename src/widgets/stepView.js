@@ -1,4 +1,4 @@
-/* stepView.js — placeholder beat renderers for Phase 0.
+/* stepView.js
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -6,6 +6,9 @@
 import GObject from 'gi://GObject';
 import Gtk from 'gi://Gtk';
 import Adw from 'gi://Adw';
+
+import { TerminalBeat } from './terminalBeat.js';
+import { HintPanel } from './hintPanel.js';
 
 function kindLabel(kind) {
     switch (kind) {
@@ -26,7 +29,9 @@ export const StepView = GObject.registerClass({
     GTypeName: 'StepView',
     Signals: {
         'continue': {},
-        'mark-done': {},
+        'validated': {},
+        'hint-revealed': {},
+        'reset-step': {},
     },
 }, class StepView extends Gtk.Box {
     constructor(params = {}) {
@@ -35,6 +40,10 @@ export const StepView = GObject.registerClass({
             vexpand: true,
             ...params,
         });
+
+        this._engine = null;
+        this._module = null;
+        this._step = null;
 
         this._stack = new Gtk.Stack({ vexpand: true, hexpand: true });
         this._emptyPage = this._buildEmptyPage();
@@ -52,8 +61,14 @@ export const StepView = GObject.registerClass({
         });
         this._contentPage.set_child(this._contentBox);
 
+        this._terminalBeat = new TerminalBeat({ visible: false });
+        this._terminalBeat.connect('validated', () => this.emit('validated'));
+        this._terminalBeat.connect('hint-revealed', () => this.emit('hint-revealed'));
+        this._terminalBeat.connect('reset-requested', () => this.emit('reset-step'));
+
         this._stack.add_named(this._emptyPage, 'empty');
         this._stack.add_named(this._contentPage, 'content');
+        this._stack.add_named(this._terminalBeat, 'terminal');
         this._stack.visible_child_name = 'empty';
         this.append(this._stack);
 
@@ -74,6 +89,10 @@ export const StepView = GObject.registerClass({
         this.append(this._footer);
     }
 
+    setEngine(engine) {
+        this._engine = engine;
+    }
+
     _buildEmptyPage() {
         return new Adw.StatusPage({
             icon_name: 'system-run-symbolic',
@@ -82,9 +101,7 @@ export const StepView = GObject.registerClass({
         });
     }
 
-    clear() {
-        this._stack.visible_child_name = 'empty';
-        this._footer.visible = false;
+    _clearContentBox() {
         let child = this._contentBox.get_first_child();
         while (child) {
             const next = child.get_next_sibling();
@@ -93,17 +110,32 @@ export const StepView = GObject.registerClass({
         }
     }
 
+    clear() {
+        this._stack.visible_child_name = 'empty';
+        this._footer.visible = false;
+        this._module = null;
+        this._step = null;
+        this._clearContentBox();
+    }
+
     showStep(module, step, { stepIndex, stepTotal }) {
-        let child = this._contentBox.get_first_child();
-        while (child) {
-            const next = child.get_next_sibling();
-            this._contentBox.remove(child);
-            child = next;
+        this._module = module;
+        this._step = step;
+        this._footer.visible = step.kind !== 'gui';
+        this._continueButton.label = stepIndex + 1 >= stepTotal ? _('Finish module') : _('Continue');
+
+        if (this._engine)
+            this._engine.beginStep(module, step);
+
+        if (step.kind === 'terminal') {
+            this._stack.visible_child_name = 'terminal';
+            const sandboxPath = this._engine?.sandboxPath(module, step);
+            this._terminalBeat.reset(step, sandboxPath);
+            return;
         }
 
         this._stack.visible_child_name = 'content';
-        this._footer.visible = true;
-        this._continueButton.label = stepIndex + 1 >= stepTotal ? _('Finish module') : _('Continue');
+        this._clearContentBox();
 
         this._contentBox.append(new Gtk.Label({
             label: module.title,
@@ -154,20 +186,9 @@ export const StepView = GObject.registerClass({
                 halign: Gtk.Align.START,
             }));
             cardInner.append(new Gtk.Label({
-                label: _('Phase 2 will launch %s and show a floating instruction card.').format(step.target_app),
-                css_classes: ['dim-label', 'body'],
-                wrap: true,
-                halign: Gtk.Align.START,
-            }));
-            break;
-        case 'terminal':
-            cardInner.append(new Gtk.Label({
-                label: step.instruction,
-                wrap: true,
-                halign: Gtk.Align.START,
-            }));
-            cardInner.append(new Gtk.Label({
-                label: _('Phase 1 will embed a real sandboxed terminal here.'),
+                label: this._engine?.spotlight.available
+                    ? _('The target app is open and the spotlight extension is highlighting it. Use the floating instruction card, then press Done when finished.')
+                    : _('The target app should now be open. Follow the floating instruction card, then press Done when finished.'),
                 css_classes: ['dim-label', 'body'],
                 wrap: true,
                 halign: Gtk.Align.START,
@@ -185,5 +206,15 @@ export const StepView = GObject.registerClass({
 
         card.append(cardInner);
         this._contentBox.append(card);
+
+        if (step.kind === 'contrast' || step.kind === 'bridge') {
+            const hints = step.hints ?? [];
+            if (hints.length > 0) {
+                const hintPanel = new HintPanel();
+                hintPanel.setHints(hints);
+                hintPanel.connect('hint-revealed', () => this.emit('hint-revealed'));
+                this._contentBox.append(hintPanel);
+            }
+        }
     }
 });

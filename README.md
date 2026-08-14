@@ -51,9 +51,9 @@ gjs -m tools/content-lint.js content
 ## Roadmap status
 
 - [x] **Phase 0** — App skeleton, navigation split view, YAML loader, schema validation, progress store
-- [ ] **Phase 1** — VTE terminal, sandbox fixtures, terminal validation
-- [ ] **Phase 2** — GUI beat, app launcher, floating instruction card
-- [ ] **Phase 3** — Spotlight Shell extension
+- [x] **Phase 1** — VTE terminal, sandbox fixtures, regex validation, tiered hints, reset button
+- [x] **Phase 2** — GUI beat, Nautilus launcher, floating instruction card, self-reported Done
+- [x] **Phase 3** — Spotlight Shell extension + D-Bus client (optional enhancement)
 - [ ] **Phase 4+** — Curriculum breadth, practice layer, localization
 
 ## License

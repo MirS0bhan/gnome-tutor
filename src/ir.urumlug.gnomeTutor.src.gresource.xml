@@ -7,7 +7,14 @@
     <file>engine/yaml.js</file>
     <file>engine/contentLoader.js</file>
     <file>engine/progressStore.js</file>
+    <file>engine/sandboxManager.js</file>
+    <file>engine/appLauncher.js</file>
+    <file>engine/spotlightClient.js</file>
+    <file>engine/lessonEngine.js</file>
     <file>widgets/curriculumSidebar.js</file>
     <file>widgets/stepView.js</file>
+    <file>widgets/hintPanel.js</file>
+    <file>widgets/terminalBeat.js</file>
+    <file>widgets/instructionCardWindow.js</file>
   </gresource>
 </gresources>

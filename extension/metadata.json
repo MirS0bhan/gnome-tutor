@@ -1,0 +1,9 @@
+{
+  "name": "Linux Academy Spotlight",
+  "description": "Optional spotlight overlay for GNOME Linux Academy GUI lessons.",
+  "uuid": "linux-academy-spotlight@urumlug.ir",
+  "shell-version": ["48", "49", "50"],
+  "url": "https://github.com/urumlug/gnome-tutor",
+  "version": 1,
+  "settings-schema": "ir.urumlug.gnomeTutor"
+}
