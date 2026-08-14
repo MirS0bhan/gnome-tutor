@@ -1,5 +1,7 @@
 #!@GJS@ -m
 
+import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
 import { exit, programArgs, programInvocationName } from "system";
 
 imports.package.init({
@@ -9,6 +11,19 @@ imports.package.init({
   libdir: "@libdir@",
   datadir: "@datadir@",
 });
+
+function registerInstalledResource(name) {
+    const path = GLib.build_filenamev([imports.package.get_datadir(), name]);
+    const file = Gio.File.new_for_path(path);
+    if (!file.query_exists(null)) {
+        printerr(`Missing gresource bundle: ${path}\n`);
+        exit(1);
+    }
+    Gio.Resource.load(path)._register();
+}
+
+registerInstalledResource('ir.urumlug.gnomeTutor.src.gresource');
+registerInstalledResource('ir.urumlug.gnomeTutor.data.gresource');
 
 const { main } = await import("resource://@resource_path@/js/main.js");
 const exit_code = await main([programInvocationName, ...programArgs]);
